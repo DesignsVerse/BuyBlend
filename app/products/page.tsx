@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState, useTransition } from "react"
+import { Suspense, useEffect, useMemo, useState, useTransition } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { client, queries } from "@/lib/sanity/client"
 import type { Product, Category } from "@/lib/sanity/types"
@@ -273,7 +273,7 @@ function useAllCategories() {
   return categories
 }
 
-export default function ProductsPage() {
+function ProductsPageInner() {
   const [filters, setFilters] = useURLFilters()
   const { data, isPending } = useProductsData(filters)
   const categories = useAllCategories()
@@ -531,5 +531,13 @@ export default function ProductsPage() {
         </section>
       </div>
     </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading…</div>}>
+      <ProductsPageInner />
+    </Suspense>
   )
 }

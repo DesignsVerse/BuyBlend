@@ -12,7 +12,7 @@ export function HeroSection() {
       id: 1,
       title: "Elegant Diamond Collection",
       description: "Discover our exquisite diamond jewelry crafted to perfection",
-      image: "/api/placeholder/1200/600",
+      image: "/images/1.jpg",
       ctaText: "Shop Now",
       ctaLink: "/collections/diamonds"
     },
@@ -20,34 +20,34 @@ export function HeroSection() {
       id: 2,
       title: "New Gold Arrivals",
       description: "Explore our latest 24K gold jewelry collection",
-      image: "/api/placeholder/1200/600",
+      image: "/images/2.webp",
       ctaText: "View Collection",
       ctaLink: "/collections/gold"
     },
-    {
-      id: 3,
-      title: "Pearl Elegance",
-      description: "Timeless pearl jewelry for the modern woman",
-      image: "/api/placeholder/1200/600",
-      ctaText: "Discover Pearls",
-      ctaLink: "/collections/pearls"
-    },
-    {
-      id: 4,
-      title: "Wedding Collection",
-      description: "Perfect jewelry for your special day",
-      image: "/api/placeholder/1200/600",
-      ctaText: "Explore Wedding",
-      ctaLink: "/collections/wedding"
-    },
-    {
-      id: 5,
-      title: "Limited Edition",
-      description: "Exclusive designs available for a limited time",
-      image: "/api/placeholder/1200/600",
-      ctaText: "Shop Exclusive",
-      ctaLink: "/collections/limited"
-    }
+    // {
+    //   id: 3,
+    //   title: "Pearl Elegance",
+    //   description: "Timeless pearl jewelry for the modern woman",
+    //   image: "/api/placeholder/1200/600",
+    //   ctaText: "Discover Pearls",
+    //   ctaLink: "/collections/pearls"
+    // },
+    // {
+    //   id: 4,
+    //   title: "Wedding Collection",
+    //   description: "Perfect jewelry for your special day",
+    //   image: "/api/placeholder/1200/600",
+    //   ctaText: "Explore Wedding",
+    //   ctaLink: "/collections/wedding"
+    // },
+    // {
+    //   id: 5,
+    //   title: "Limited Edition",
+    //   description: "Exclusive designs available for a limited time",
+    //   image: "/api/placeholder/1200/600",
+    //   ctaText: "Shop Exclusive",
+    //   ctaLink: "/collections/limited"
+    // }
   ];
 
   // Auto-scroll functionality
@@ -88,25 +88,11 @@ export function HeroSection() {
                 className="object-cover"
                 priority={banner.id === 1}
               />
-              <div className="absolute inset-0 bg-black/30"></div>
             </div>
             
             {/* Content */}
             <div className="relative flex h-screen max-h-[550px] items-center justify-center">
-              <div className="container mx-auto px-4 text-center text-white">
-                <h1 className="mb-4 text-4xl font-light md:text-5xl lg:text-6xl font-serif">
-                  {banner.title}
-                </h1>
-                <p className="mb-8 max-w-2xl mx-auto text-lg md:text-xl">
-                  {banner.description}
-                </p>
-                <a
-                  href={banner.ctaLink}
-                  className="inline-block bg-white text-black px-8 py-3 rounded-sm font-medium hover:bg-gray-100 transition-colors duration-300"
-                >
-                  {banner.ctaText}
-                </a>
-              </div>
+              
             </div>
           </div>
         ))}

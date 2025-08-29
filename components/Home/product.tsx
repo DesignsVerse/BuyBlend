@@ -83,36 +83,6 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
             <ArrowRight className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
           </button>
         </motion.div>
-
-        {/* Trust Badges */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 1 }}
-          className="flex flex-wrap justify-center gap-6 mt-10 pt-8 border-t border-gray-100"
-        >
-          {[
-            { icon: Gem, text: "Premium Quality" },
-            { icon: Sparkles, text: "Certified Authenticity" },
-            { icon: "🚚", text: "Free Shipping" },
-            { icon: "🔄", text: "Easy Returns" }
-          ].map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 1.2 + index * 0.1 }}
-              className="flex items-center text-xs text-gray-600"
-            >
-              {typeof item.icon === 'string' ? (
-                <span className="text-lg mr-2">{item.icon}</span>
-              ) : (
-                <item.icon className="h-4 w-4 mr-2 text-amber-500" />
-              )}
-              {item.text}
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
     </section>
   )

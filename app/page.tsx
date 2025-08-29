@@ -1,15 +1,13 @@
 import { client, queries } from "@/lib/sanity/client"
 import type { Product } from "@/lib/sanity/types"
 import { ProductCard } from "@/components/Home/product-card"
-import { SiteHeader } from "@/components/Home/header"
 import { mockProducts } from "@/lib/sanity/mock-data"
 import { HeroSection } from "@/components/Home/hero"
 import { FeaturedProductsSection } from "@/components/Home/product"
-import { SiteFooter } from "@/components/Home/footer"
 import { TrustBadgesSection } from "@/components/Home/trustbadges"
-import ProductShowcase from "@/components/Home/feature"
 import CustomProductCard from "@/components/Home/feature"
 import Testimonials from "@/components/Home/testimonial"
+import CategoriesSection from "@/components/Home/category"
 
 async function getProducts(): Promise<Product[]> {
   try {
@@ -36,24 +34,11 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <HeroSection/>
-      <TrustBadgesSection/>
-      {/* Hero Section */}
-      {/* <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to Our Store</h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
-            Discover amazing products with seamless shopping experience
-          </p>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-            Shop Now
-          </button>
-        </div>
-      </section> */}
-      <CustomProductCard/>
+      <HeroSection />
+      <TrustBadgesSection />
+      <CategoriesSection />
       <FeaturedProductsSection featuredProducts={featuredProducts} />
-      {/* All Products */}
-
+      <CustomProductCard />
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">All Products</h2>
@@ -70,7 +55,7 @@ export default async function HomePage() {
           )}
         </div>
       </section>
-      <Testimonials/>
+      <Testimonials />
     </div>
   )
 }

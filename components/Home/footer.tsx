@@ -20,41 +20,7 @@ export function SiteFooter() {
 
   return (
     <footer className="bg-black text-white">
-      {/* Premium Features Banner */}
-      <div className="border-b border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent">
-        <div className="container mx-auto px-4 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="flex flex-col items-center text-center">
-              <div className="bg-white/10 p-3 rounded-full mb-3">
-                <Truck className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-medium mb-1">Free Shipping</h3>
-              <p className="text-sm text-gray-400">On orders over $500</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="bg-white/10 p-3 rounded-full mb-3">
-                <Shield className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-medium mb-1">Secure Payment</h3>
-              <p className="text-sm text-gray-400">256-bit encryption</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="bg-white/10 p-3 rounded-full mb-3">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-medium mb-1">Authenticity</h3>
-              <p className="text-sm text-gray-400">Certified luxury pieces</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="bg-white/10 p-3 rounded-full mb-3">
-                <CreditCard className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="font-medium mb-1">Easy Returns</h3>
-              <p className="text-sm text-gray-400">30-day guarantee</p>
-            </div>
-          </div>
-        </div>
-      </div>
+     
 
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 py-14">

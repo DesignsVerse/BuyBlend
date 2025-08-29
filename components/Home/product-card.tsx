@@ -16,7 +16,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [isHovered, setIsHovered] = useState(false)
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const { toggleItem, isInWishlist } = useWishlist()
   const activeWishlist = isInWishlist(product._id)
@@ -73,8 +72,6 @@ export function ProductCard({ product }: ProductCardProps) {
         
         <div 
           className="relative aspect-square overflow-hidden rounded-t-lg"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
         >
           {/* Product Image */}
           <Image
@@ -94,68 +91,47 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-          {/* Quick Actions */}
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/10 flex items-center justify-center space-x-2 backdrop-blur-sm z-10"
-              >
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <Button 
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full bg-white/90 hover:bg-white text-gray-800 h-8 w-8 shadow-md"
-                    asChild
-                  >
-                    <Link href={`/products/${product.slug.current}`}>
-                      <Eye className="h-3 w-3" />
-                    </Link>
-                  </Button>
-                </motion.div>
-                
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.15 }}
-                >
-                  <Button 
-                    variant="ghost"
-                    size="icon"
-                    className={`rounded-full h-8 w-8 shadow-md ${
-                      activeWishlist 
-                        ? 'bg-red-500/90 hover:bg-red-500 text-white' 
-                        : 'bg-white/90 hover:bg-white text-gray-800'
-                    }`}
-                    onClick={() => {
-                      toggleItem({
-                        id: product._id,
-                        name: product.name,
-                        price: product.price,
-                        slug: product.slug.current,
-                        image: (() => {
-                          if (product.images?.[0]) {
-                            const image = product.images[0] as any
-                            if (typeof image === "string") return image
-                            try { return urlFor(image)?.width(200)?.height(200)?.url() ?? "/diverse-products-still-life.png" } catch { return "/diverse-products-still-life.png" }
-                          }
-                          return "/diverse-products-still-life.png"
-                        })(),
-                      })
-                    }}
-                  >
-                    <Heart className={`h-3 w-3 ${activeWishlist ? 'fill-current' : ''}`} />
-                  </Button>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Quick Actions - Always Visible */}
+          <div className="absolute top-2 right-2 flex space-x-1 z-10">
+            <Button 
+              variant="ghost"
+              size="icon"
+              className="rounded-full bg-white/90 hover:bg-white text-gray-800 h-7 w-7 shadow-md"
+              asChild
+            >
+              <Link href={`/products/${product.slug.current}`}>
+                <Eye className="h-3 w-3" />
+              </Link>
+            </Button>
+            
+            <Button 
+              variant="ghost"
+              size="icon"
+              className={`rounded-full h-7 w-7 shadow-md ${
+                activeWishlist 
+                  ? 'bg-red-500/90 hover:bg-red-500 text-white' 
+                  : 'bg-white/90 hover:bg-white text-gray-800'
+              }`}
+              onClick={() => {
+                toggleItem({
+                  id: product._id,
+                  name: product.name,
+                  price: product.price,
+                  slug: product.slug.current,
+                  image: (() => {
+                    if (product.images?.[0]) {
+                      const image = product.images[0] as any
+                      if (typeof image === "string") return image
+                      try { return urlFor(image)?.width(200)?.height(200)?.url() ?? "/diverse-products-still-life.png" } catch { return "/diverse-products-still-life.png" }
+                    }
+                    return "/diverse-products-still-life.png"
+                  })(),
+                })
+              }}
+            >
+              <Heart className={`h-3 w-3 ${activeWishlist ? 'fill-current' : ''}`} />
+            </Button>
+          </div>
 
           {/* Top Badges */}
           <div className="absolute top-2 left-2 flex flex-col space-y-1">

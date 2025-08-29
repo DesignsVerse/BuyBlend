@@ -13,7 +13,7 @@ import { SiteHeader } from "@/components/Home/header"
 import { WishlistProvider } from "@/lib/wishlist/wishlist-context"
 
 export const metadata: Metadata = {
-  title: "v0 App",
+  title: "BuyBlend.in",
   description: "Created with v0",
   generator: "v0.app",
 }

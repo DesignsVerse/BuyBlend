@@ -77,6 +77,9 @@ export function SiteHeader() {
               <Link href="/about" className="text-sm font-medium hover:text-gray-600 transition-colors">
                 About
               </Link>
+              <Link href="/contact" className="text-sm font-medium hover:text-gray-600 transition-colors">
+                Contact Us
+              </Link>
             </nav>
 
             {/* Right side icons */}

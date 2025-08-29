@@ -6,6 +6,7 @@ import { mockProducts } from "@/lib/sanity/mock-data"
 import { HeroSection } from "@/components/Home/hero"
 import { FeaturedProductsSection } from "@/components/Home/product"
 import { SiteFooter } from "@/components/Home/footer"
+import { TrustBadgesSection } from "@/components/Home/trustbadges"
 
 async function getProducts(): Promise<Product[]> {
   try {
@@ -34,6 +35,7 @@ export default async function HomePage() {
     <div className="min-h-screen">
       <SiteHeader />
       <HeroSection/>
+      <TrustBadgesSection/>
       {/* Hero Section */}
       {/* <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="container mx-auto px-4 text-center">

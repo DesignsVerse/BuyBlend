@@ -19,38 +19,35 @@ export function SiteFooter() {
   }
 
   return (
-    <footer className="bg-gray-950 text-white">
+    <footer className="bg-black text-white">
       {/* Premium Features Banner */}
-      <div className="border-b border-gray-800">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="border-b border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent">
+        <div className="container mx-auto px-4 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="flex flex-col items-center text-center">
-              <div className="bg-amber-500/10 p-3 rounded-full mb-3">
-                <Truck className="h-6 w-6 text-amber-400" />
+              <div className="bg-white/10 p-3 rounded-full mb-3">
+                <Truck className="h-6 w-6 text-white" />
               </div>
               <h3 className="font-medium mb-1">Free Shipping</h3>
               <p className="text-sm text-gray-400">On orders over $500</p>
             </div>
-            
             <div className="flex flex-col items-center text-center">
-              <div className="bg-amber-500/10 p-3 rounded-full mb-3">
-                <Shield className="h-6 w-6 text-amber-400" />
+              <div className="bg-white/10 p-3 rounded-full mb-3">
+                <Shield className="h-6 w-6 text-white" />
               </div>
               <h3 className="font-medium mb-1">Secure Payment</h3>
               <p className="text-sm text-gray-400">256-bit encryption</p>
             </div>
-            
             <div className="flex flex-col items-center text-center">
-              <div className="bg-amber-500/10 p-3 rounded-full mb-3">
-                <Sparkles className="h-6 w-6 text-amber-400" />
+              <div className="bg-white/10 p-3 rounded-full mb-3">
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
               <h3 className="font-medium mb-1">Authenticity</h3>
               <p className="text-sm text-gray-400">Certified luxury pieces</p>
             </div>
-            
             <div className="flex flex-col items-center text-center">
-              <div className="bg-amber-500/10 p-3 rounded-full mb-3">
-                <CreditCard className="h-6 w-6 text-amber-400" />
+              <div className="bg-white/10 p-3 rounded-full mb-3">
+                <CreditCard className="h-6 w-6 text-white" />
               </div>
               <h3 className="font-medium mb-1">Easy Returns</h3>
               <p className="text-sm text-gray-400">30-day guarantee</p>
@@ -60,28 +57,28 @@ export function SiteFooter() {
       </div>
 
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand Column */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-2 mb-6">
-              <span className="text-2xl font-serif font-bold tracking-wider">LUXE JEWELS</span>
+              <span className="text-2xl font-serif font-bold tracking-wider">BuyBlend.in</span>
             </Link>
             <p className="text-gray-400 mb-6 max-w-xs">
               Discover exquisite jewelry crafted to perfection. Each piece tells a story of elegance and timeless beauty.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="bg-gray-800 hover:bg-amber-500 p-2 rounded-full transition-colors">
-                <Facebook className="h-5 w-5" />
+            <div className="flex space-x-3">
+              <a href="#" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">
+                <Facebook className="h-5 w-5 text-white group-hover:text-black" />
               </a>
-              <a href="#" className="bg-gray-800 hover:bg-amber-500 p-2 rounded-full transition-colors">
-                <Instagram className="h-5 w-5" />
+              <a href="#" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">
+                <Instagram className="h-5 w-5 text-white group-hover:text-black" />
               </a>
-              <a href="#" className="bg-gray-800 hover:bg-amber-500 p-2 rounded-full transition-colors">
-                <Twitter className="h-5 w-5" />
+              <a href="#" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">
+                <Twitter className="h-5 w-5 text-white group-hover:text-black" />
               </a>
-              <a href="#" className="bg-gray-800 hover:bg-amber-500 p-2 rounded-full transition-colors">
-                <Youtube className="h-5 w-5" />
+              <a href="#" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">
+                <Youtube className="h-5 w-5 text-white group-hover:text-black" />
               </a>
             </div>
           </div>
@@ -90,11 +87,11 @@ export function SiteFooter() {
           <div>
             <h3 className="font-serif text-lg font-medium mb-6">Collections</h3>
             <ul className="space-y-3">
-              <li><Link href="/collections/rings" className="text-gray-400 hover:text-amber-400 transition-colors">Rings</Link></li>
-              <li><Link href="/collections/necklaces" className="text-gray-400 hover:text-amber-400 transition-colors">Necklaces</Link></li>
-              <li><Link href="/collections/earrings" className="text-gray-400 hover:text-amber-400 transition-colors">Earrings</Link></li>
-              <li><Link href="/collections/bracelets" className="text-gray-400 hover:text-amber-400 transition-colors">Bracelets</Link></li>
-              <li><Link href="/collections/new-arrivals" className="text-gray-400 hover:text-amber-400 transition-colors">New Arrivals</Link></li>
+              <li><Link href="/collections/rings" className="text-gray-400 hover:text-white transition-colors">Rings</Link></li>
+              <li><Link href="/collections/necklaces" className="text-gray-400 hover:text-white transition-colors">Necklaces</Link></li>
+              <li><Link href="/collections/earrings" className="text-gray-400 hover:text-white transition-colors">Earrings</Link></li>
+              <li><Link href="/collections/bracelets" className="text-gray-400 hover:text-white transition-colors">Bracelets</Link></li>
+              <li><Link href="/collections/new-arrivals" className="text-gray-400 hover:text-white transition-colors">New Arrivals</Link></li>
             </ul>
           </div>
 
@@ -102,11 +99,11 @@ export function SiteFooter() {
           <div>
             <h3 className="font-serif text-lg font-medium mb-6">Company</h3>
             <ul className="space-y-3">
-              <li><Link href="/about" className="text-gray-400 hover:text-amber-400 transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="text-gray-400 hover:text-amber-400 transition-colors">Contact Us</Link></li>
-              <li><Link href="/blog" className="text-gray-400 hover:text-amber-400 transition-colors">Blog</Link></li>
-              <li><Link href="/careers" className="text-gray-400 hover:text-amber-400 transition-colors">Careers</Link></li>
-              <li><Link href="/press" className="text-gray-400 hover:text-amber-400 transition-colors">Press</Link></li>
+              <li><Link href="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link href="/blog" className="text-gray-400 hover:text-white transition-colors">Blog</Link></li>
+              <li><Link href="/careers" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
+              <li><Link href="/press" className="text-gray-400 hover:text-white transition-colors">Press</Link></li>
             </ul>
           </div>
 
@@ -122,12 +119,12 @@ export function SiteFooter() {
                   placeholder="Your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   required
                 />
                 <Button 
                   type="submit" 
-                  className="bg-amber-500 hover:bg-amber-600 text-white"
+                  className="bg-white text-black hover:bg-white/90"
                   disabled={subscribed}
                 >
                   {subscribed ? "✓" : "Join"}
@@ -154,20 +151,20 @@ export function SiteFooter() {
       </div>
 
       {/* Bottom Footer */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 text-sm">
               © {new Date().getFullYear()} Luxe Jewels. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="/privacy" className="text-gray-500 hover:text-amber-400 text-sm transition-colors">
+              <Link href="/privacy" className="text-gray-500 hover:text-white text-sm transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-gray-500 hover:text-amber-400 text-sm transition-colors">
+              <Link href="/terms" className="text-gray-500 hover:text-white text-sm transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/refunds" className="text-gray-500 hover:text-amber-400 text-sm transition-colors">
+              <Link href="/refunds" className="text-gray-500 hover:text-white text-sm transition-colors">
                 Return Policy
               </Link>
             </div>

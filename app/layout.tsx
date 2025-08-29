@@ -6,6 +6,11 @@ import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { CartProvider } from "@/lib/cart/cart-context"
 import { Toaster } from "@/components/ui/toaster"
+import { Footer } from "react-day-picker"
+import Head from "next/head"
+import { SiteFooter } from "@/components/Home/footer"
+import { SiteHeader } from "@/components/Home/header"
+import { WishlistProvider } from "@/lib/wishlist/wishlist-context"
 
 export const metadata: Metadata = {
   title: "v0 App",
@@ -31,8 +36,12 @@ html {
       </head>
       <body className="antialiased">
         <CartProvider>
-          {children}
-          <Toaster />
+          <WishlistProvider>
+            <SiteHeader/>
+            {children}
+            <Toaster />
+            <SiteFooter/>
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

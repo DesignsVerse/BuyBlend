@@ -2,6 +2,7 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { Search, User, Heart, Menu, X, ArrowRight } from "lucide-react"
+import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { CartButton } from "@/components/cart/cart-button"
 
 export function SiteHeader() {
@@ -10,6 +11,7 @@ export function SiteHeader() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const { state: wishlistState } = useWishlist()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,7 +49,7 @@ export function SiteHeader() {
           <div className="flex h-20 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 z-50">
-              <span className="text-2xl font-serif font-bold tracking-wider">LUXE JEWELS</span>
+              <span className="text-2xl font-serif font-bold tracking-wider">BuyBlend.in</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -57,7 +59,7 @@ export function SiteHeader() {
               </Link>
               <div className="relative group">
                 <Link href="/products" className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center">
-                  Collections
+                  Products
                   <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -86,10 +88,14 @@ export function SiteHeader() {
                 >
                   <Search className="h-5 w-5" />
                 </button>
-                <button className="relative p-1 transition-transform hover:scale-110">
+                <Link href="/wishlist" className="relative p-1 transition-transform hover:scale-110">
                   <Heart className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-xs text-white">0</span>
-                </button>
+                  {wishlistState.itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-black text-xs text-white">
+                      {wishlistState.itemCount}
+                    </span>
+                  )}
+                </Link>
                 <button className="relative p-1 transition-transform hover:scale-110">
                   <User className="h-5 w-5" />
                 </button>
@@ -136,10 +142,10 @@ export function SiteHeader() {
                     <Search className="h-5 w-5" />
                     <span>Search</span>
                   </button>
-                  <button className="flex items-center space-x-2 text-lg">
+                  <Link href="/wishlist" className="flex items-center space-x-2 text-lg" onClick={() => setIsMobileMenuOpen(false)}>
                     <Heart className="h-5 w-5" />
                     <span>Wishlist</span>
-                  </button>
+                  </Link>
                   <button className="flex items-center space-x-2 text-lg">
                     <User className="h-5 w-5" />
                     <span>Account</span>

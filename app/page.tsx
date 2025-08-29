@@ -7,6 +7,9 @@ import { HeroSection } from "@/components/Home/hero"
 import { FeaturedProductsSection } from "@/components/Home/product"
 import { SiteFooter } from "@/components/Home/footer"
 import { TrustBadgesSection } from "@/components/Home/trustbadges"
+import ProductShowcase from "@/components/Home/feature"
+import CustomProductCard from "@/components/Home/feature"
+import Testimonials from "@/components/Home/testimonial"
 
 async function getProducts(): Promise<Product[]> {
   try {
@@ -33,7 +36,6 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <SiteHeader />
       <HeroSection/>
       <TrustBadgesSection/>
       {/* Hero Section */}
@@ -48,10 +50,10 @@ export default async function HomePage() {
           </button>
         </div>
       </section> */}
-
+      <CustomProductCard/>
       <FeaturedProductsSection featuredProducts={featuredProducts} />
-
       {/* All Products */}
+
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">All Products</h2>
@@ -68,7 +70,7 @@ export default async function HomePage() {
           )}
         </div>
       </section>
-      <SiteFooter/>
+      <Testimonials/>
     </div>
   )
 }

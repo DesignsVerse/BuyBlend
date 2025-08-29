@@ -9,6 +9,7 @@ import { Eye, Heart, Sparkles, Gem, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useWishlist } from "@/lib/wishlist/wishlist-context"
 
 interface ProductCardProps {
   product: Product
@@ -17,7 +18,8 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const [activeWishlist, setActiveWishlist] = useState(false)
+  const { toggleItem, isInWishlist } = useWishlist()
+  const activeWishlist = isInWishlist(product._id)
 
   const getImageUrl = () => {
     if (!product.images?.[0]) return "/diverse-products-still-life.png"
@@ -27,7 +29,7 @@ export function ProductCard({ product }: ProductCardProps) {
     if (!image) return "/diverse-products-still-life.png"
 
     try {
-      return urlFor(image).width(400).height(400).url()
+      return urlFor(image)?.width(400)?.height(400)?.url() ?? "/diverse-products-still-life.png"
     } catch (error) {
       console.log("Error processing image:", error)
       return "/diverse-products-still-life.png"
@@ -131,7 +133,22 @@ export function ProductCard({ product }: ProductCardProps) {
                         ? 'bg-red-500/90 hover:bg-red-500 text-white' 
                         : 'bg-white/90 hover:bg-white text-gray-800'
                     }`}
-                    onClick={() => setActiveWishlist(!activeWishlist)}
+                    onClick={() => {
+                      toggleItem({
+                        id: product._id,
+                        name: product.name,
+                        price: product.price,
+                        slug: product.slug.current,
+                        image: (() => {
+                          if (product.images?.[0]) {
+                            const image = product.images[0] as any
+                            if (typeof image === "string") return image
+                            try { return urlFor(image)?.width(200)?.height(200)?.url() ?? "/diverse-products-still-life.png" } catch { return "/diverse-products-still-life.png" }
+                          }
+                          return "/diverse-products-still-life.png"
+                        })(),
+                      })
+                    }}
                   >
                     <Heart className={`h-3 w-3 ${activeWishlist ? 'fill-current' : ''}`} />
                   </Button>

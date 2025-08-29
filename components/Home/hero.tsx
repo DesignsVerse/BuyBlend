@@ -72,7 +72,7 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative h-screen max-h-[550px] w-full overflow-hidden">
+    <section className="relative h-screen max-h-[500px] w-full overflow-hidden">
       <div 
         className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -91,7 +91,7 @@ export function HeroSection() {
             </div>
             
             {/* Content */}
-            <div className="relative flex h-screen max-h-[550px] items-center justify-center">
+            <div className="relative flex h-screen max-h-[500px] items-center justify-center">
               
             </div>
           </div>

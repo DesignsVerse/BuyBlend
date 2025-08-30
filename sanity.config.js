@@ -56,6 +56,30 @@ const config = defineConfig({
             type: "number",
           },
           {
+            name: "originalPrice",
+            title: "Original Price",
+            type: "number",
+            description: "Original price before discount",
+          },
+          {
+            name: "category",
+            title: "Category",
+            type: "reference",
+            to: [{ type: "category" }],
+          },
+          {
+            name: "inventoryCount",
+            title: "Inventory Count",
+            type: "number",
+            initialValue: 0,
+          },
+          {
+            name: "inStock",
+            title: "In Stock",
+            type: "boolean",
+            initialValue: true,
+          },
+          {
             name: "featured",
             title: "Featured",
             type: "boolean",

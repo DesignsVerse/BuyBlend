@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/lib/cart/cart-context"
 import { useToast } from "@/hooks/use-toast"
@@ -16,68 +16,57 @@ interface AddToCartButtonProps {
 }
 
 export function AddToCartButton({ product, disabled, className }: AddToCartButtonProps) {
-  const [isAdding, setIsAdding] = useState(false)
-  const [isAdded, setIsAdded] = useState(false)
+  const [status, setStatus] = useState<"idle" | "adding" | "added">("idle")
   const { addItem, trackActivity, state } = useCart()
   const { toast } = useToast()
 
-  const handleAddToCart = async () => {
-    if (disabled || isAdding || isAdded) return
+  const getImageUrl = useCallback(() => {
+    if (!product.images?.[0]) return "/fallback-product.png"
     
-    setIsAdding(true)
+    const image = product.images[0]
+    if (typeof image === "string") return image
+    
+    try {
+      return urlFor(image).width(200).height(200).url() ?? "/fallback-product.png"
+    } catch {
+      return "/fallback-product.png"
+    }
+  }, [product.images])
+
+  const handleAddToCart = useCallback(async () => {
+    if (disabled || status !== "idle") return
+
+    setStatus("adding")
 
     try {
-      let imageUrl: string | undefined
-
-      // Handle image processing
-      if (product.images?.[0]) {
-        const image = product.images[0]
-
-        if (typeof image === "string") {
-          // Regular file path from mock data
-          imageUrl = image
-        } else if (image && typeof image === "object") {
-          // Sanity asset reference
-          try {
-            imageUrl = urlFor(image).width(200).height(200).url()
-          } catch (error) {
-            console.warn("Failed to process Sanity image, using fallback:", error)
-            imageUrl = "/diverse-products-still-life.png"
-          }
-        }
-      } else {
-        // Fallback if no image
-        imageUrl = "/diverse-products-still-life.png"
-      }
+      const imageUrl = getImageUrl()
 
       // Add item to cart
       addItem({
         id: product._id,
         name: product.name,
         price: product.price,
-        slug: product.slug.current,
+        slug: product.slug?.current || product.name.toLowerCase().replace(/\s+/g, '-'),
         image: imageUrl,
       })
 
-      // Track activity
+      // Track cart activity
       trackActivity()
 
-      // Show success feedback
-      setIsAdded(true)
-      
+      // Show success toast
+      setStatus("added")
       toast({
         title: "Added to Cart",
-        description: `${product.name} has been added to your shopping cart.`,
-        className: "bg-green-50 border-green-200 text-green-900"
+        description: `${product.name} has been added to your cart.`,
+        className: "bg-green-50 border-green-200 text-green-900",
+        duration: 3000,
       })
 
-      // Send analytics (if applicable)
+      // Send analytics
       try {
         await fetch("/api/analytics/add-to-cart", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             sessionId: state.sessionId,
             userId: state.userId,
@@ -89,11 +78,10 @@ export function AddToCartButton({ product, disabled, className }: AddToCartButto
         })
       } catch (error) {
         console.error("Analytics error:", error)
-        // Don't show error to user for analytics failures
       }
 
-      // Reset added state after 2 seconds
-      setTimeout(() => setIsAdded(false), 2000)
+      // Reset status after 2 seconds
+      setTimeout(() => setStatus("idle"), 2000)
 
     } catch (error) {
       console.error("Error adding to cart:", error)
@@ -101,65 +89,45 @@ export function AddToCartButton({ product, disabled, className }: AddToCartButto
         title: "Error",
         description: "Failed to add item to cart. Please try again.",
         variant: "destructive",
+        duration: 3000,
       })
-    } finally {
-      setIsAdding(false)
+      setStatus("idle")
     }
-  }
+  }, [disabled, status, addItem, trackActivity, state, product, toast, getImageUrl])
 
-  const getButtonContent = () => {
-    if (isAdded) {
-      return (
-        <>
-          <Check className="h-4 w-4 mr-2" />
-          Added
-        </>
-      )
-    }
-    
-    if (isAdding) {
-      return (
-        <>
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          Adding...
-        </>
-      )
-    }
-    
-    if (disabled) {
-      return (
-        <>
-          <ShoppingBag className="h-4 w-4 mr-2" />
-          Out of Stock
-        </>
-      )
-    }
-    
-    return (
-      <>
-        <ShoppingBag className="h-4 w-4 mr-2" />
-        Add to Cart
-      </>
-    )
+  const buttonContent = {
+    idle: {
+      icon: <ShoppingBag className="h-4 w-4 mr-2" />,
+      text: disabled ? "Out of Stock" : "Add to Cart",
+    },
+    adding: {
+      icon: <Loader2 className="h-4 w-4 mr-2 animate-spin" />,
+      text: "Adding...",
+    },
+    added: {
+      icon: <Check className="h-4 w-4 mr-2" />,
+      text: "Added",
+    },
   }
 
   return (
     <Button
       onClick={handleAddToCart}
-      disabled={disabled || isAdding || isAdded}
+      disabled={disabled || status !== "idle"}
       className={cn(
-        "w-full rounded-lg py-3.5 transition-all duration-300 font-medium",
-        "bg-gradient-to-r from-gray-900 to-black text-white",
-        "hover:from-gray-800 hover:to-gray-900",
-        "disabled:from-gray-300 disabled:to-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed",
-        "shadow-md hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0",
-        "border border-gray-800/30",
-        isAdded && "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800",
+        "w-full py-3 rounded-lg font-medium transition-all duration-200",
+        "bg-gradient-to-r from-gray-900 to-gray-800 text-white",
+        "hover:from-gray-800 hover:to-gray-700",
+        "disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
+        status === "added" && "bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600",
+        "shadow-sm hover:shadow-md active:shadow-sm",
         className
       )}
       size="lg"
+      aria-label={buttonContent[status].text}
     >
-      {getButtonContent()}
+      {buttonContent[status].icon}
+      {buttonContent[status].text}
     </Button>
   )
 }

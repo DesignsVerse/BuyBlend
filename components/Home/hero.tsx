@@ -12,16 +12,18 @@ export function HeroSection() {
       id: 1,
       title: "Elegant Diamond Collection",
       description: "Discover our exquisite diamond jewelry crafted to perfection",
-      image: "/images/1.jpg",
-      ctaText: "Shop Now",
+      imageMobile: "/images/mobile.webp",
+      imageDesktop: "/images/1.jpg",
+            ctaText: "Shop Now",
       ctaLink: "/collections/diamonds"
     },
     {
       id: 2,
       title: "New Gold Arrivals",
       description: "Explore our latest 24K gold jewelry collection",
-      image: "/images/2.webp",
-      ctaText: "View Collection",
+      imageMobile: "/images/mobile.webp",
+      imageDesktop: "/images/2.webp",
+            ctaText: "View Collection",
       ctaLink: "/collections/gold"
     },
     // {
@@ -73,21 +75,36 @@ export function HeroSection() {
 
   return (
     <section className="relative h-screen max-h-[500px] w-full overflow-hidden">
-      <div 
+      <div
         className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
         {banners.map((banner) => (
-          <div key={banner.id} className="relative w-full flex-shrink-0">
-            {/* Background Image */}
+          <div key={banner.id} className="relative w-full flex-shrink-0" aria-hidden={currentSlide !== banner.id - 1}>
+            {/* Background Images: mobile vs desktop */}
             <div className="absolute inset-0">
-              <Image
-                src={banner.image}
-                alt={banner.title}
-                fill
-                className="object-cover"
-                priority={banner.id === 1}
-              />
+              {/* Mobile image */}
+              <div className="block md:hidden">
+                <Image
+                  src={banner.imageMobile}
+                  alt={banner.title}
+                  fill
+                  className="object-cover"
+                  priority={banner.id === 1}
+                  sizes="100vw"
+                />
+              </div>
+              {/* Desktop image */}
+              <div className="hidden md:block">
+                <Image
+                  src={banner.imageDesktop}
+                  alt={banner.title}
+                  fill
+                  className="object-cover"
+                  priority={banner.id === 1}
+                  sizes="100vw"
+                />
+              </div>
             </div>
             
             {/* Content */}

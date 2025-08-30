@@ -16,7 +16,18 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
     setIsVisible(true)
   }, [])
 
-  if (!featuredProducts || featuredProducts.length === 0) {
+  // Filter only Ring category products
+  const ringProducts = featuredProducts.filter(product => {
+    const categoryName = product.category?.name?.toLowerCase()
+    console.log('Product:', product.name, 'Category:', categoryName) // Debug log
+    return categoryName === 'ring' || categoryName === 'rings'
+  })
+
+  console.log('Total featured products:', featuredProducts.length) // Debug log
+  console.log('Ring products found:', ringProducts.length) // Debug log
+
+  if (!ringProducts || ringProducts.length === 0) {
+    console.log('No ring products found, hiding section') // Debug log
     return null
   }
 
@@ -58,7 +69,7 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
           transition={{ duration: 0.7, delay: 0.3 }}
           className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
         >
-          {featuredProducts.map((product, index) => (
+          {ringProducts.map((product, index) => (
             <motion.div
               key={product._id}
               initial={{ opacity: 0, y: 20 }}

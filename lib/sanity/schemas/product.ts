@@ -52,6 +52,12 @@ export const product = {
       validation: (Rule: any) => Rule.required().min(0),
     },
     {
+      name: "originalPrice",
+      title: "Original Price",
+      type: "number",
+      validation: (Rule: any) => Rule.min(0),
+    },
+    {
       name: "compareAtPrice",
       title: "Compare at Price",
       type: "number",
@@ -68,6 +74,18 @@ export const product = {
       title: "Inventory Count",
       type: "number",
       validation: (Rule: any) => Rule.required().min(0),
+    },
+    {
+      name: "inventoryCount",
+      title: "Inventory Count (Alternative)",
+      type: "number",
+      validation: (Rule: any) => Rule.min(0),
+    },
+    {
+      name: "inStock",
+      title: "In Stock",
+      type: "boolean",
+      initialValue: true,
     },
     {
       name: "featured",

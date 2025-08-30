@@ -3,12 +3,11 @@ import Image from "next/image"
 import Link from "next/link"
 import type { Product } from "@/lib/sanity/types"
 import { urlFor } from "@/lib/sanity/client"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { AddToCartButton } from "@/components/cart/add-to-cart-button"
 import { Eye, Heart, Sparkles, Gem, Crown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useMemo } from "react"
+import { motion } from "framer-motion"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 
 interface ProductCardProps {
@@ -18,185 +17,205 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const { toggleItem, isInWishlist } = useWishlist()
-  const activeWishlist = isInWishlist(product._id)
+  const isWishlisted = isInWishlist(product._id)
 
-  const getImageUrl = () => {
-    if (!product.images?.[0]) return "/diverse-products-still-life.png"
+  // Memoized values
+  const productSlug = useMemo(() => 
+    product.slug?.current || 
+    product.name?.toLowerCase().replace(/\s+/g, '-') || 
+    'product',
+    [product.slug, product.name]
+  )
+
+  const imageUrl = useMemo(() => {
+    if (!product.images?.[0]) return "/fallback-product.png"
     
     const image = product.images[0]
     if (typeof image === "string") return image
-    if (!image) return "/diverse-products-still-life.png"
-
+    
     try {
-      return urlFor(image)?.width(400)?.height(400)?.url() ?? "/diverse-products-still-life.png"
-    } catch (error) {
-      console.log("Error processing image:", error)
-      return "/diverse-products-still-life.png"
+      return urlFor(image)?.width(400)?.height(400)?.url() ?? "/fallback-product.png"
+    } catch {
+      return "/fallback-product.png"
     }
-  }
+  }, [product.images])
 
-  const imageUrl = getImageUrl()
-  const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price
-  const discountPercent = hasDiscount && product.compareAtPrice
-    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
-    : 0
+  const hasDiscount = useMemo(() => 
+    product.originalPrice && product.originalPrice !== product.price,
+    [product.originalPrice, product.price]
+  )
 
-  const productTier = product.price > 1000 ? "luxury" : product.price > 500 ? "premium" : "standard"
+  const discountPercent = useMemo(() => 
+    hasDiscount && product.originalPrice
+      ? Math.round(((Math.abs(product.originalPrice - product.price)) / 
+         Math.max(product.originalPrice, product.price)) * 100)
+      : 0,
+    [hasDiscount, product.originalPrice, product.price]
+  )
+
+  const isPriceIncreased = useMemo(() => 
+    product.originalPrice && product.originalPrice < product.price,
+    [product.originalPrice, product.price]
+  )
+
+  const productTier = useMemo(() => 
+    product.price > 1000 ? "luxury" : 
+    product.price > 500 ? "premium" : "standard",
+    [product.price]
+  )
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4 }}
-      whileHover={{ y: -5 }}
+    <motion.div 
       className="group relative"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -8, transition: { duration: 0.2 } }}
     >
-      {/* Premium Tier Badge - Smaller */}
+      {/* Tier Badges */}
       {productTier === "luxury" && (
-        <div className="absolute -top-2 -right-2 z-30 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center">
-          <Crown className="h-3 w-3 mr-1" />
-          Luxury
-        </div>
+        <span className="absolute -top-2 -right-2 z-10 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center">
+          <Crown className="w-3 h-3 mr-1" /> Luxury
+        </span>
       )}
-      
       {productTier === "premium" && (
-        <div className="absolute -top-2 -right-2 z-30 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center">
-          <Gem className="h-3 w-3 mr-1" />
-          Premium
-        </div>
+        <span className="absolute -top-2 -right-2 z-10 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center">
+          <Gem className="w-3 h-3 mr-1" /> Premium
+        </span>
       )}
 
-      <Card className="overflow-hidden border-0 bg-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg relative h-full flex flex-col">
-        {/* Metallic Accent Border */}
-        <div className="absolute inset-0 rounded-lg border border-gray-100/60 pointer-events-none" />
-        
-        <div 
-          className="relative aspect-square overflow-hidden rounded-t-lg"
-        >
-          {/* Product Image */}
+      <div className="relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+        {/* Image Section */}
+        <div className="relative aspect-square overflow-hidden">
           <Image
             src={imageUrl}
-            alt={product.images?.[0]?.alt || product.name}
+            alt={product.name}
             fill
-            className={`object-cover transition-all duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'} group-hover:scale-105`}
+            className={`object-cover transition-transform duration-500 ${
+              isImageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+            } group-hover:scale-110`}
             onLoad={() => setIsImageLoaded(true)}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            priority={product.featured}
           />
-          
-          {/* Loading State */}
+
+          {/* Loading Skeleton */}
           {!isImageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 animate-pulse" />
           )}
 
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-          {/* Quick Actions - Always Visible */}
-          <div className="absolute top-2 right-2 flex space-x-1 z-10">
-            <Button 
+          {/* Quick Actions */}
+          <div className="absolute top-2 right-2 flex gap-1">
+            <Button
               variant="ghost"
               size="icon"
-              className="rounded-full bg-white/90 hover:bg-white text-gray-800 h-7 w-7 shadow-md"
+              className="h-8 w-8 rounded-full bg-white/80 hover:bg-white shadow-md"
               asChild
             >
-              <Link href={`/products/${product.slug.current}`}>
-                <Eye className="h-3 w-3" />
+              <Link href={`/products/${productSlug}`}>
+                <Eye className="w-4 h-4 text-gray-700" />
               </Link>
             </Button>
-            
-            <Button 
+            <Button
               variant="ghost"
               size="icon"
-              className={`rounded-full h-7 w-7 shadow-md ${
-                activeWishlist 
-                  ? 'bg-red-500/90 hover:bg-red-500 text-white' 
-                  : 'bg-white/90 hover:bg-white text-gray-800'
+              className={`h-8 w-8 rounded-full shadow-md ${
+                isWishlisted 
+                  ? 'bg-red-500 text-white hover:bg-red-600' 
+                  : 'bg-white/80 hover:bg-white text-gray-700'
               }`}
-              onClick={() => {
-                toggleItem({
-                  id: product._id,
-                  name: product.name,
-                  price: product.price,
-                  slug: product.slug.current,
-                  image: (() => {
-                    if (product.images?.[0]) {
-                      const image = product.images[0] as any
-                      if (typeof image === "string") return image
-                      try { return urlFor(image)?.width(200)?.height(200)?.url() ?? "/diverse-products-still-life.png" } catch { return "/diverse-products-still-life.png" }
-                    }
-                    return "/diverse-products-still-life.png"
-                  })(),
-                })
-              }}
+              onClick={() => toggleItem({
+                id: product._id,
+                name: product.name,
+                price: product.price,
+                slug: productSlug,
+                image: imageUrl,
+              })}
             >
-              <Heart className={`h-3 w-3 ${activeWishlist ? 'fill-current' : ''}`} />
+              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
             </Button>
           </div>
 
-          {/* Top Badges */}
-          <div className="absolute top-2 left-2 flex flex-col space-y-1">
+          {/* Status Badges */}
+          <div className="absolute top-2 left-2 space-y-1">
             {hasDiscount && (
-              <div className="bg-red-500 text-white px-2 py-1 text-[10px] font-bold rounded-full">
-                -{discountPercent}%
-              </div>
+              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                isPriceIncreased ? 'bg-red-500' : 'bg-green-500'
+              } text-white`}>
+                {isPriceIncreased ? `+${discountPercent}%` : `-${discountPercent}%`}
+              </span>
             )}
-            
-            {product.inventory === 0 && (
-              <div className="bg-gray-600 text-white px-2 py-1 text-[10px] font-medium rounded-full">
+            {product.inventoryCount === 0 && (
+              <span className="bg-gray-600 text-white px-2 py-1 text-xs font-semibold rounded-full">
                 Sold Out
-              </div>
+              </span>
             )}
-
             {product.featured && (
-              <div className="bg-blue-500 text-white px-2 py-1 text-[10px] font-bold rounded-full flex items-center">
-                <Sparkles className="h-2 w-2 mr-1" />
-                Featured
-              </div>
+              <span className="bg-blue-500 text-white px-2 py-1 text-xs font-semibold rounded-full flex items-center">
+                <Sparkles className="w-3 h-3 mr-1" /> Featured
+              </span>
             )}
           </div>
         </div>
 
-        {/* Card Content - Compact */}
-        <CardContent className="p-3 flex-1 flex flex-col">
+        {/* Content Section */}
+        <div className="p-4 flex flex-col gap-2">
           {/* Category */}
-          {product.category && (
-            <p className="text-[10px] text-gray-500 uppercase tracking-wide mb-1">
+          {product.category?.name && (
+            <span className="text-xs text-gray-500 uppercase tracking-wide">
               {product.category.name}
-            </p>
+            </span>
           )}
-          
+
           {/* Product Name */}
-          <Link href={`/products/${product.slug.current}`}>
-            <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2 hover:text-blue-600 transition-colors leading-tight">
+          <Link href={`/products/${productSlug}`}>
+            <h3 className="text-base font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2">
               {product.name}
             </h3>
           </Link>
 
           {/* Description */}
-          <p className="text-xs text-gray-600 line-clamp-2 mb-2 flex-1">
-            {product.description}
-          </p>
+          {product.description && (
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {product.description}
+            </p>
+          )}
 
           {/* Price Section */}
-          <div className="flex items-center justify-between mt-auto pt-2">
-            <div className="flex items-baseline gap-1">
-              <span className="text-sm font-bold text-gray-900">${product.price}</span>
-              {hasDiscount && (
-                <span className="text-xs text-gray-500 line-through">${product.compareAtPrice}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-1">
+              {hasDiscount ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-bold text-gray-900">
+                      ₹{isPriceIncreased ? product.originalPrice : product.price}
+                    </span>
+                    <span className="text-sm text-gray-500 line-through">
+                      ₹{isPriceIncreased ? product.price : product.originalPrice}
+                    </span>
+                  </div>
+                  {!isPriceIncreased && (
+                    <span className="text-xs text-green-600">
+                      Save ₹{product.originalPrice! - product.price}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-lg font-bold text-gray-900">₹{product.price}</span>
               )}
             </div>
           </div>
-        </CardContent>
+        </div>
 
-        {/* Add to Cart */}
-        <CardFooter className="p-3 pt-0">
-          <AddToCartButton 
-            product={product} 
-            disabled={product.inventory === 0}
-            className="w-full text-xs py-2 bg-black hover:bg-gray-800 text-white transition-colors rounded-md"
+        {/* Footer Section */}
+        <div className="p-4 pt-0">
+          <AddToCartButton
+            product={product}
+            disabled={product.inventoryCount === 0 || !product.inStock}
+            className="w-full py-2 bg-gray-900 text-white hover:bg-gray-800 rounded-md text-sm font-medium transition-colors"
           />
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   )
 }

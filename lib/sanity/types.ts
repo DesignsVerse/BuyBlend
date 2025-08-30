@@ -5,6 +5,7 @@ export interface Product {
     current: string
   }
   price: number
+  originalPrice?: number
   compareAtPrice?: number
   description?: string
   images?: Array<{
@@ -17,6 +18,8 @@ export interface Product {
   }>
   category?: Category
   inventory: number
+  inventoryCount?: number
+  inStock?: boolean
   featured: boolean
   tags?: string[]
   variants?: Array<{

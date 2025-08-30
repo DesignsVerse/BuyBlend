@@ -380,27 +380,7 @@ function FiltersPanel({
         </div>
       </div>
 
-      {/* <div>
-        <Label>Price range</Label>
-                <div className="mt-3">
-          <Slider
-            value={[priceRange[0], priceRange[1]]}
-            step={10}
-            min={PRICE_RANGE_DEFAULT[0]}
-            max={PRICE_RANGE_DEFAULT[1]}
-            onValueChange={(v) => setPriceRange([v[0] as number, v[1] as number])}
-            onValueCommit={(v) => {
-              setFilters({ minPrice: v[0] as number, maxPrice: v[1] as number });
-              onApplied?.();
-            }}
-          />
-          <div className="mt-2 flex items-center justify-between text-sm text-gray-700">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}</span>
-          </div>
-        </div>
-        </div>
-      </div> */}
+     
 
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">

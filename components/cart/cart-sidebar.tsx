@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { Minus, Plus, Trash2, X, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/lib/cart/cart-context"
@@ -188,9 +189,11 @@ export function CartSidebar() {
 
         {/* Buttons */}
         <div className="space-y-3">
-          <Button className="w-full bg-black hover:bg-gray-800 rounded-sm h-12 font-normal">
-            Proceed to Checkout
-          </Button>
+          <Link href="/checkout">
+            <Button className="w-full bg-black hover:bg-gray-800 rounded-sm h-12 font-normal">
+              Proceed to Checkout
+            </Button>
+          </Link>
           <Button
             variant="outline"
             className="w-full bg-white border-gray-300 text-gray-600 hover:bg-gray-50 rounded-sm h-10 font-normal"

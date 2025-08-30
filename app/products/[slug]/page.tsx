@@ -54,7 +54,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const mainImage = product.images?.[0] ? getImageUrl(product.images[0], 600, 600) : "/diverse-products-still-life.png"
 
-  const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price
+  const hasDiscount = product.originalPrice && product.originalPrice !== product.price
+  const discountPercent = hasDiscount && product.originalPrice
+    ? Math.round(((Math.abs(product.originalPrice - product.price)) / Math.max(product.originalPrice, product.price)) * 100)
+    : 0
+  const isPriceIncreased = product.originalPrice && product.originalPrice < product.price
 
   return (
     <div className="min-h-screen">
@@ -101,11 +105,44 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div>
               <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
               {product.category && <p className="text-gray-600">{product.category.name}</p>}
+              {hasDiscount && (
+                <div className={`inline-block mt-2 text-white px-3 py-1 text-sm font-bold rounded-full ${isPriceIncreased ? 'bg-red-500' : 'bg-red-500'}`}>
+                  {isPriceIncreased ? `+${discountPercent}%` : `-${discountPercent}%`}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-3xl font-bold">${product.price}</span>
-              {hasDiscount && <span className="text-xl text-gray-500 line-through">${product.compareAtPrice}</span>}
+              {hasDiscount ? (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    {isPriceIncreased ? (
+                      <>
+                        <span className="text-3xl font-bold text-gray-900">₹{product.originalPrice}</span>
+                        <span className="text-xl text-red-600 relative">
+                          ₹{product.price}
+                          <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-red-600 transform -translate-y-1/2"></div>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-3xl font-bold text-red-600">₹{product.originalPrice}</span>
+                        <span className="text-xl text-gray-500 relative">
+                          ₹{product.price}
+                          <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gray-500 transform -translate-y-1/2"></div>
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  {!isPriceIncreased && (
+                    <div className="text-sm text-green-600 font-medium">
+                      You save ₹{product.originalPrice && product.originalPrice - product.price}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <span className="text-3xl font-bold text-gray-900">₹{product.price}</span>
+              )}
             </div>
 
             {product.description && (

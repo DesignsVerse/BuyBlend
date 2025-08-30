@@ -25,19 +25,19 @@ export const queries = {
   allProducts: `*[_type == "product"] | order(_createdAt desc) {
     _id,
     name,
-    slug,
+    "slug": slug.current,
     price,
-    compareAtPrice,
+    originalPrice,
     description,
-    images,
+    "images": images[].asset->url,
     category->{
       _id,
       name,
-      slug
+      "slug": slug.current
     },
-    inventory,
+    inventoryCount,
     featured,
-    tags,
+    inStock,
     _createdAt
   }`,
 
@@ -45,20 +45,19 @@ export const queries = {
   productBySlug: `*[_type == "product" && slug.current == $slug][0] {
     _id,
     name,
-    slug,
+    "slug": slug.current,
     price,
-    compareAtPrice,
+    originalPrice,
     description,
-    images,
+    "images": images[].asset->url,
     category->{
       _id,
       name,
-      slug
+      "slug": slug.current
     },
-    inventory,
+    inventoryCount,
     featured,
-    tags,
-    variants,
+    inStock,
     _createdAt
   }`,
 
@@ -66,22 +65,27 @@ export const queries = {
   allCategories: `*[_type == "category"] | order(name asc) {
     _id,
     name,
-    slug,
+    "slug": slug.current,
     description,
-    image
+    "image": image.asset->url
   }`,
 
   // Get featured products
   featuredProducts: `*[_type == "product" && featured == true] | order(_createdAt desc) {
     _id,
     name,
-    slug,
+    "slug": slug.current,
     price,
-    compareAtPrice,
-    images,
+    originalPrice,
+    description,
+    "images": images[].asset->url,
     category->{
       name,
-      slug
-    }
+      "slug": slug.current
+    },
+    inventoryCount,
+    featured,
+    inStock,
+    _createdAt
   }`,
 }

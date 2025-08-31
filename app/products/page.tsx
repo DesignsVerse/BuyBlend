@@ -1,4 +1,5 @@
 "use client"
+
 import { Suspense, useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { client, queries } from "@/lib/sanity/client";
@@ -475,6 +476,24 @@ function ProductsPageInner() {
               </SelectContent>
             </Select>
           </div>
+        </div>
+      </div>
+
+      {/* All Categories Section */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">All Categories</h2>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <Badge
+              key={cat._id}
+              variant="outline"
+              className="cursor-pointer capitalize hover:bg-gray-100"
+              onClick={() => setFilters({ categories: [cat.slug.current] })}
+            >
+              {cat.name}
+            </Badge>
+          ))}
+          {categories.length === 0 && <p className="text-gray-600">No categories available.</p>}
         </div>
       </div>
 

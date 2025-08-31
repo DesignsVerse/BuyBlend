@@ -5,7 +5,13 @@ import { mockProducts } from "@/lib/sanity/mock-data"
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const products = await client.fetch(queries.allProducts)
+    // 👇 Always fetch fresh data from Sanity (no cache)
+    const products = await client.fetch(
+      queries.allProducts,
+      {},
+      { cache: "no-store" }
+    )
+
     return products && products.length > 0 ? products : mockProducts
   } catch (error) {
     console.error("Error fetching products:", error)
@@ -29,7 +35,9 @@ export default async function ProductsPage() {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-600 text-lg">No products found. Add some products in your Sanity Studio!</p>
+              <p className="text-gray-600 text-lg">
+                No products found. Add some products in your Sanity Studio!
+              </p>
             </div>
           )}
         </div>

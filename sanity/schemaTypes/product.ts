@@ -39,6 +39,11 @@ export const product = defineType({
       title: "Description",
       type: "text",
     }),
+      defineField({
+      name: "type",
+      title: "type",
+      type: "text",
+    }),
     defineField({
       name: "price",
       title: "Price",
@@ -72,12 +77,6 @@ export const product = defineType({
     defineField({
       name: "inventory",
       title: "Inventory Count",
-      type: "number",
-      validation: (rule) => rule.min(0),
-    }),
-    defineField({
-      name: "inventoryCount",
-      title: "Inventory Count (Alternative)",
       type: "number",
       validation: (rule) => rule.min(0),
     }),

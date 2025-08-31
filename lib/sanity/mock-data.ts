@@ -28,6 +28,7 @@ export const mockProducts: Product[] = [
     images: ["/wireless-headphones.png"],
     category: mockCategories[0],
     inventory: 50,
+    
     featured: true,
     tags: ["electronics", "audio", "wireless"],
     _createdAt: "2024-01-15T10:00:00Z",

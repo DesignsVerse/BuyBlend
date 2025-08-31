@@ -3,12 +3,13 @@ import type { Product } from "@/lib/sanity/types"
 import { ProductCard } from "@/components/Home/product-card"
 import { mockProducts } from "@/lib/sanity/mock-data"
 import { HeroSection } from "@/components/Home/hero"
-import { FeaturedProductsSection } from "@/components/Home/product"
+import { FeaturedProductsSection } from "@/components/Home/bestseller"
 import { TrustBadgesSection } from "@/components/Home/trustbadges"
 import CustomProductCard from "@/components/Home/feature"
 import Testimonials from "@/components/Home/testimonial"
 import CategoriesSection from "@/components/Home/category"
 import JewelryStore from "@/components/Home/jewelrystore"
+import VideoProductShowcase from "@/components/Home/video"
 
 async function getProducts(): Promise<Product[]> {
   try {
@@ -41,7 +42,7 @@ export default async function HomePage() {
       <FeaturedProductsSection featuredProducts={featuredProducts} />
       <CustomProductCard />
       <JewelryStore/>
-      <section className="py-16 bg-gray-50">
+      {/* <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">All Products</h2>
           {allProducts.length > 0 ? (
@@ -56,7 +57,8 @@ export default async function HomePage() {
             </div>
           )}
         </div>
-      </section>
+      </section> */}
+      <VideoProductShowcase/>
       <Testimonials />
     </div>
   )

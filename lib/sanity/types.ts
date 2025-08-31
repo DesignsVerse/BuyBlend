@@ -8,19 +8,33 @@ export interface Product {
   originalPrice?: number
   compareAtPrice?: number
   description?: string
-  images?: Array<{
-    _key: string
-    asset: {
-      _ref: string
-      _type: string
-    }
-    alt?: string
-  }>
+
+  // 👇 Now supports both images & videos
+  media?: Array<
+    | {
+        _key: string
+        _type: "image"
+        asset: {
+          _ref: string
+          _type: string
+        }
+        alt?: string
+      }
+    | {
+        _key: string
+        _type: "file"
+        asset: {
+          _ref: string
+          _type: string
+        }
+      }
+  >
+
   category?: Category
   inventory: number
-  inventoryCount?: number
   inStock?: boolean
   featured: boolean
+  type?: string
   tags?: string[]
   variants?: Array<{
     name: string

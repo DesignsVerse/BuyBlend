@@ -15,7 +15,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [isImageLoaded, setIsImageLoaded] = useState(false)
+  const [isMediaLoaded, setIsMediaLoaded] = useState(false)
   const { toggleItem, isInWishlist } = useWishlist()
   const isWishlisted = isInWishlist(product._id)
 
@@ -27,18 +27,23 @@ export function ProductCard({ product }: ProductCardProps) {
     [product.slug, product.name]
   )
 
-  const imageUrl = useMemo(() => {
-    if (!product.images?.[0]) return "/fallback-product.png"
-    
-    const image = product.images[0]
-    if (typeof image === "string") return image
-    
+  // ✅ Get first media (image or video)
+  const firstMedia = useMemo(() => product.media?.[0], [product.media])
+
+  const mediaUrl = useMemo(() => {
+    if (!firstMedia) return "/fallback-product.png"
+
     try {
-      return urlFor(image)?.width(400)?.height(400)?.url() ?? "/fallback-product.png"
+      if (firstMedia._type === "image") {
+        return urlFor(firstMedia.asset)?.width(400)?.height(400)?.url() ?? "/fallback-product.png"
+      }
+      if (firstMedia._type === "file") {
+        return urlFor(firstMedia.asset)?.url() ?? "/fallback-product.png"
+      }
     } catch {
       return "/fallback-product.png"
     }
-  }, [product.images])
+  }, [firstMedia])
 
   const hasDiscount = useMemo(() => 
     product.originalPrice && product.originalPrice !== product.price,
@@ -85,22 +90,42 @@ export function ProductCard({ product }: ProductCardProps) {
       )}
 
       <div className="relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-        {/* Image Section */}
+        {/* Media Section */}
         <div className="relative aspect-square overflow-hidden">
-          <Image
-            src={imageUrl}
+          {firstMedia?._type === "image" ? (
+            <Image
+            src={mediaUrl ?? "/fallback-product.png"}   // ✅ undefined ko fallback de diya
             alt={product.name}
             fill
             className={`object-cover transition-transform duration-500 ${
-              isImageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+              isMediaLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
             } group-hover:scale-110`}
-            onLoad={() => setIsImageLoaded(true)}
+            onLoad={() => setIsMediaLoaded(true)}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             priority={product.featured}
           />
+          
+          ) : firstMedia?._type === "file" ? (
+            <video
+              src={mediaUrl}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+              onLoadedData={() => setIsMediaLoaded(true)}
+            />
+          ) : (
+            <Image
+              src="/fallback-product.png"
+              alt={product.name}
+              fill
+              className="object-cover"
+            />
+          )}
 
           {/* Loading Skeleton */}
-          {!isImageLoaded && (
+          {!isMediaLoaded && (
             <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 animate-pulse" />
           )}
 
@@ -129,7 +154,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 name: product.name,
                 price: product.price,
                 slug: productSlug,
-                image: imageUrl,
+                image: mediaUrl,
               })}
             >
               <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
@@ -145,7 +170,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 {isPriceIncreased ? `+${discountPercent}%` : `-${discountPercent}%`}
               </span>
             )}
-            {product.inventoryCount === 0 && (
+            {product.inventory === 0 && (
               <span className="bg-gray-600 text-white px-2 py-1 text-xs font-semibold rounded-full">
                 Sold Out
               </span>
@@ -211,7 +236,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="p-4 pt-0">
           <AddToCartButton
             product={product}
-            disabled={product.inventoryCount === 0 || !product.inStock}
+            disabled={product.inventory === 0 || !product.inStock}
             className="w-full py-2 bg-gray-900 text-white hover:bg-gray-800 rounded-md text-sm font-medium transition-colors"
           />
         </div>

@@ -22,70 +22,104 @@ export const urlFor = (source: any) => {
 // GROQ queries for ecommerce
 export const queries = {
   // Get all products
-  allProducts: `*[_type == "product"] | order(_createdAt desc) {
-    _id,
-    name,
-    "slug": slug.current,
-    price,
-    originalPrice,
-    description,
-    "images": images[].asset->url,
-    category->{
+
+    // Get all products
+    allProducts: `*[_type == "product"] | order(_createdAt desc) {
       _id,
       name,
-      "slug": slug.current
-    },
-    inventoryCount,
-    featured,
-    inStock,
-    _createdAt
-  }`,
-
-  // Get product by slug
-  productBySlug: `*[_type == "product" && slug.current == $slug][0] {
-    _id,
-    name,
-    "slug": slug.current,
-    price,
-    originalPrice,
-    description,
-    "images": images[].asset->url,
-    category->{
+      slug,
+      price,
+      originalPrice,
+      description,
+      media[]{    // 👈 images + videos both
+        _key,
+        _type,
+        asset,
+        alt
+      },
+      category->{
+        _id,
+        name,
+        slug,
+        description,
+        image{
+          asset,
+          alt
+        }
+      },
+      inventory,
+      featured,
+      inStock,
+      type,
+      _createdAt
+    }`,
+  
+    // Get product by slug
+    productBySlug: `*[_type == "product" && slug.current == $slug][0] {
       _id,
       name,
-      "slug": slug.current
-    },
-    inventoryCount,
-    featured,
-    inStock,
-    _createdAt
-  }`,
-
-  // Get all categories
-  allCategories: `*[_type == "category"] | order(name asc) {
-    _id,
-    name,
-    "slug": slug.current,
-    description,
-    "image": image.asset->url
-  }`,
-
-  // Get featured products
-  featuredProducts: `*[_type == "product" && featured == true] | order(_createdAt desc) {
-    _id,
-    name,
-    "slug": slug.current,
-    price,
-    originalPrice,
-    description,
-    "images": images[].asset->url,
-    category->{
+      slug,
+      price,
+      originalPrice,
+      description,
+      media[]{
+        _key,
+        _type,
+        asset,
+        alt
+      },
+      category->{
+        _id,
+        name,
+        slug,
+        description,
+        image{
+          asset,
+          alt
+        }
+      },
+      inventory,
+      featured,
+      inStock,
+      type,
+      _createdAt
+    }`,
+  
+    // Get all categories
+    allCategories: `*[_type == "category"] | order(name asc) {
+      _id,
       name,
-      "slug": slug.current
-    },
-    inventoryCount,
-    featured,
-    inStock,
-    _createdAt
-  }`,
-}
+      slug,
+      description,
+      image{
+        asset,
+        alt
+      }
+    }`,
+  
+    // Get featured products
+    featuredProducts: `*[_type == "product" && featured == true] | order(_createdAt desc) {
+      _id,
+      name,
+      slug,
+      price,
+      originalPrice,
+      description,
+      media[]{
+        _key,
+        _type,
+        asset,
+        alt
+      },
+      category->{
+        _id,
+        name,
+        slug
+      },
+      inventory,
+      featured,
+      inStock,
+      type,
+      _createdAt
+    }`,
+  }  

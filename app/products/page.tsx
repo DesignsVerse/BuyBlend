@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { client, queries } from "@/lib/sanity/client";
 import type { Product, Category } from "@/lib/sanity/types";
+import { mockProducts, mockCategories } from "@/lib/sanity/mock-data";
 import { ProductCard } from "@/components/Home/product-card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,10 +36,9 @@ const PRICE_RANGE_DEFAULT: [number, number] = [0, 2000];
 async function fetchCategories(): Promise<Category[]> {
   try {
     const categories = await client.fetch<Category[]>(queries.allCategories);
-    return categories || [];
-  } catch (error) {
-    console.error("Failed to fetch categories:", error);
-    return [];
+    return categories && categories.length > 0 ? categories : (mockCategories as unknown as Category[]);
+  } catch {
+    return mockCategories as unknown as Category[];
   }
 }
 
@@ -115,10 +115,69 @@ async function fetchProductsWithCount(filters: ProductFiltersState) {
       client.fetch<Product[]>(queryForPage, params),
       client.fetch<number>(queryForCount, params),
     ]);
-    return { items: items || [], total: total || 0 };
-  } catch (error) {
-    console.error("Failed to fetch products:", error);
-    return { items: [], total: 0 };
+
+    if (!items || items.length === 0) {
+      // Local mock fallback with client-side filtering
+      let data = [...(mockProducts as Product[])];
+
+      if (filters.q && filters.q.trim()) {
+        const q = filters.q.trim().toLowerCase();
+        data = data.filter(
+          (p) => p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q)
+        );
+      }
+      if (filters.categories.length > 0) {
+        const set = new Set(filters.categories);
+        data = data.filter((p) => p.category && set.has(p.category.slug.current));
+      }
+      if (typeof filters.minPrice === "number") data = data.filter((p) => p.price >= filters.minPrice!);
+      if (typeof filters.maxPrice === "number") data = data.filter((p) => p.price <= filters.maxPrice!);
+      if (filters.inStock) data = data.filter((p) => (p.inventory || 0) > 0);
+      if (filters.featured) data = data.filter((p) => p.featured);
+
+      if (filters.sort === "price_asc") data.sort((a, b) => a.price - b.price);
+      else if (filters.sort === "price_desc") data.sort((a, b) => b.price - a.price);
+      else data.sort((a, b) => new Date(b._createdAt).getTime() - new Date(a._createdAt).getTime());
+
+      const totalLocal = data.length;
+      if (filters.perPage === "all") {
+        return { items: data, total: totalLocal };
+      }
+      const per = typeof filters.perPage === "number" ? filters.perPage : DEFAULT_PER_PAGE;
+      const start = (filters.page - 1) * per;
+      const end = start + per;
+      return { items: data.slice(start, end), total: totalLocal };
+    }
+
+    return { items, total };
+  } catch {
+    // Fallback on error
+    let data = [...(mockProducts as Product[])];
+    if (filters.q && filters.q.trim()) {
+      const q = filters.q.trim().toLowerCase();
+      data = data.filter((p) => p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q));
+    }
+    if (filters.categories.length > 0) {
+      const set = new Set(filters.categories);
+      data = data.filter((p) => p.category && set.has(p.category.slug.current));
+    }
+    if (typeof filters.minPrice === "number") data = data.filter((p) => p.price >= filters.minPrice!);
+    if (typeof filters.maxPrice === "number") data = data.filter((p) => p.price <= filters.maxPrice!);
+    if (filters.inStock) data = data.filter((p) => (p.inventory || 0) > 0);
+    if (filters.featured) data = data.filter((p) => p.featured);
+
+    if (filters.sort === "price_asc") data.sort((a, b) => a.price - b.price);
+    else if (filters.sort === "price_desc") data.sort((a, b) => b.price - a.price);
+    else data.sort((a, b) => new Date(b._createdAt).getTime() - new Date(a._createdAt).getTime());
+
+    const totalLocal = data.length;
+    if (filters.perPage === "all") {
+      return { items: data, total: totalLocal };
+    }
+    const per = typeof filters.perPage === "number" ? filters.perPage : DEFAULT_PER_PAGE;
+    const start = (filters.page - 1) * per;
+    const end = start + per;
+    return { items: data.slice(start, end), total: totalLocal };
   }
 }
 
@@ -239,7 +298,7 @@ function useAllCategories() {
         if (mounted) setCategories(res);
       })
       .catch(() => {
-        if (mounted) setCategories([]);
+        if (mounted) setCategories(mockCategories as unknown as Category[]);
       });
     return () => {
       mounted = false;
@@ -321,23 +380,7 @@ function FiltersPanel({
         </div>
       </div>
 
-      <div>
-        <Label>Price Range</Label>
-        <div className="mt-4">
-          <Slider
-            min={PRICE_RANGE_DEFAULT[0]}
-            max={PRICE_RANGE_DEFAULT[1]}
-            step={10}
-            value={priceRange}
-            onValueChange={setPriceRange}
-            onValueCommit={(v) => setFilters({ minPrice: v[0], maxPrice: v[1] })}
-          />
-          <div className="flex justify-between mt-2 text-sm text-gray-600">
-            <span>₹{priceRange[0]}</span>
-            <span>₹{priceRange[1]}</span>
-          </div>
-        </div>
-      </div>
+     
 
       <div className="grid grid-cols-2 gap-3">
         <div className="flex items-center gap-2">
@@ -448,7 +491,7 @@ function ProductsPageInner() {
             ))}
             {typeof filters.minPrice === "number" || typeof filters.maxPrice === "number" ? (
               <Badge variant="secondary">
-                Price: ₹{filters.minPrice ?? PRICE_RANGE_DEFAULT[0]} - ₹{filters.maxPrice ?? PRICE_RANGE_DEFAULT[1]}
+                Price: ${filters.minPrice ?? PRICE_RANGE_DEFAULT[0]} - ${filters.maxPrice ?? PRICE_RANGE_DEFAULT[1]}
               </Badge>
             ) : null}
             {filters.inStock && <Badge variant="secondary">In Stock</Badge>}

@@ -31,7 +31,9 @@ export const queries = {
       price,
       originalPrice,
       description,
-      media[]{    // 👈 images + videos both
+      highlights,        
+    styleTips, 
+      media[]{    
         _key,
         _type,
         asset,

@@ -36,6 +36,8 @@ export interface Product {
   featured: boolean
   type?: string
   tags?: string[]
+  highlights?: string[]
+  styleTips?: string
   variants?: Array<{
     name: string
     value: string

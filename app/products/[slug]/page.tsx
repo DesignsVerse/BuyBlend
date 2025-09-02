@@ -1,10 +1,9 @@
-
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { client, queries, urlFor } from "@/lib/sanity/client"
 import type { Product } from "@/lib/sanity/types"
 import { AddToCartButton } from "@/components/cart/add-to-cart-button"
-import { Star, Truck, Shield, RotateCw, Check } from "lucide-react"
+import { Star, Truck, Shield, RotateCw, Check, Heart, Share2 } from "lucide-react"
 
 interface ProductPageProps {
   params: {
@@ -72,6 +71,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
+        {/* Breadcrumbs */}
+        <nav className="flex mb-6 text-sm text-gray-500">
+          <ol className="flex items-center space-x-2">
+            <li>Home</li>
+            <li>/</li>
+            <li>Products</li>
+            {product.category && (
+              <>
+                <li>/</li>
+              </>
+            )}
+            <li>/</li>
+            <li className="text-gray-900 font-medium truncate max-w-xs">{product.name}</li>
+          </ol>
+        </nav>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* ✅ Product Media Section */}
           <div className="space-y-4">
@@ -107,6 +122,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   {discountPercent}% OFF
                 </div>
               )}
+              
+              {/* Favorite and Share Buttons */}
+              <div className="absolute top-4 right-4 flex flex-col gap-2">
+                <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors">
+                  <Heart className="h-5 w-5 text-gray-600" />
+                </button>
+                <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors">
+                  <Share2 className="h-5 w-5 text-gray-600" />
+                </button>
+              </div>
             </div>
 
             {/* Thumbnail Gallery */}
@@ -158,7 +183,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div>
               {/* Category & Tags */}
               <div className="flex items-center gap-2 mb-3">
-                
+                {product.category && (
+                  <span className="text-sm text-blue-600 font-medium capitalize">
+                  </span>
+                )}
                 {product.tags && product.tags.slice(0, 2).map(tag => (
                   <span key={tag} className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
                     #{tag}
@@ -177,6 +205,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   ))}
                 </div>
                 <span className="text-sm text-gray-500">(42 reviews)</span>
+                <span className="text-sm text-blue-600 font-medium ml-4">142 purchased</span>
               </div>
               
               {/* Price Section */}
@@ -217,6 +246,29 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 )}
               </div>
               
+              {/* Product Highlights */}
+              {product.highlights && product.highlights.length > 0 && (
+                <div className="mb-6">
+                  <h2 className="text-lg font-semibold mb-3">Product Highlights</h2>
+                  <ul className="space-y-2">
+                    {product.highlights.map((highlight, index) => (
+                      <li key={index} className="flex items-start">
+                        <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700">{highlight}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {/* Style Tips */}
+              {product.styleTips && (
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                  <h2 className="text-lg font-semibold mb-2 text-blue-800">Style Tips</h2>
+                  <p className="text-blue-700 italic">"{product.styleTips}"</p>
+                </div>
+              )}
+              
               {/* Product Description */}
               <div className="mb-6">
                 <h2 className="text-lg font-semibold mb-2">Description</h2>
@@ -228,15 +280,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             {/* Variants Selection */}
             {product.variants && product.variants.length > 0 && (
-              <div className="space-y-4">
+              <div className="space-y-4 py-4 border-t border-gray-200">
+                <h3 className="text-lg font-semibold">Options</h3>
                 {product.variants.map((variant, index) => (
                   <div key={index}>
                     <h3 className="font-medium mb-2">{variant.name}</h3>
                     <div className="flex flex-wrap gap-2">
                       <button className="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:border-blue-500 transition-colors">
                         {variant.value}
+                        {variant.price && (
+                          <span className="ml-2 text-sm text-gray-500">+₹{variant.price}</span>
+                        )}
                       </button>
                     </div>
+                    {variant.inventory !== undefined && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        {variant.inventory > 0 
+                          ? `${variant.inventory} available` 
+                          : "Out of stock"}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -245,10 +308,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {/* Add to Cart Section */}
             <div className="pt-4 border-t border-gray-200">
               <AddToCartButton product={product} />
+              
+              {/* Delivery Estimate */}
+              <div className="mt-4 flex items-center text-sm text-gray-600">
+                <Truck className="h-4 w-4 mr-2" />
+                <span>Free delivery expected by {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+              </div>
             </div>
 
             {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 py-4">
+            <div className="grid grid-cols-3 gap-4 py-4 border-t border-gray-200">
               <div className="flex flex-col items-center text-center p-3 bg-gray-50 rounded-lg">
                 <Truck className="h-6 w-6 text-blue-600 mb-2" />
                 <span className="text-sm font-medium">Free Shipping</span>
@@ -265,6 +334,59 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <span className="text-xs text-gray-500">100% secure payment</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Additional Information Section */}
+        <div className="mt-12 bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-2xl font-bold mb-6">Product Details</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Specifications */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Specifications</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between border-b pb-2">
+                  <span className="text-gray-600">Category</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="text-gray-600">Product Type</span>
+                  <span className="font-medium">{product.type || "N/A"}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="text-gray-600">Inventory</span>
+                  <span className="font-medium">{product.inventory} units</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="text-gray-600">SKU</span>
+                  <span className="font-medium">{product._id.slice(-8).toUpperCase()}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="text-gray-600">Added On</span>
+                  <span className="font-medium">
+                    {new Date(product._createdAt).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Tags */}
+            {product.tags && product.tags.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Tags</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.tags.map((tag, index) => (
+                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

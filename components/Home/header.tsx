@@ -71,8 +71,8 @@ export function SiteHeader() {
                   <Link href="/products/bracelets" className="block py-2 px-4 hover:bg-gray-50 rounded">Bracelets</Link>
                 </div>
               </div>
-              <Link href="/new-arrivals" className="text-sm font-medium hover:text-gray-600 transition-colors">
-                New Arrivals
+              <Link href="/earrings" className="text-sm font-medium hover:text-gray-600 transition-colors">
+                Earrings
               </Link>
               <Link href="/about" className="text-sm font-medium hover:text-gray-600 transition-colors">
                 About

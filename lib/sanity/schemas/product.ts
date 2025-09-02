@@ -19,44 +19,32 @@ export const product = {
       },
       validation: (Rule: any) => Rule.required(),
     },
-
-    // 👇 images + videos both
     {
-      name: "media",
-      title: "Product Media",
+      name: "images",
+      title: "Product Images",
       type: "array",
       of: [
         {
           type: "image",
-          options: { hotspot: true },
-          fields: [{ name: "alt", title: "Alt Text", type: "string" }],
-        },
-        {
-          type: "file",
-          title: "Video File",
+          options: {
+            hotspot: true,
+          },
+          fields: [
+            {
+              name: "alt",
+              title: "Alt Text",
+              type: "string",
+            },
+          ],
         },
       ],
     },
-
     {
       name: "description",
       title: "Description",
       type: "text",
       rows: 4,
     },
-    {
-      name: "highlights",
-      title: "Highlights",
-      type: "array",
-      of: [{ type: "string" }],
-    },
-    {
-      name: "styleTips",
-      title: "Style Tips",
-      type: "text",
-      rows: 3,
-    },
-
     {
       name: "price",
       title: "Price",
@@ -75,21 +63,24 @@ export const product = {
       type: "number",
       validation: (Rule: any) => Rule.min(0),
     },
-
     {
       name: "category",
       title: "Category",
       type: "reference",
       to: [{ type: "category" }],
     },
-
     {
       name: "inventory",
       title: "Inventory Count",
       type: "number",
       validation: (Rule: any) => Rule.required().min(0),
     },
-
+    {
+      name: "inventoryCount",
+      title: "Inventory Count (Alternative)",
+      type: "number",
+      validation: (Rule: any) => Rule.min(0),
+    },
     {
       name: "inStock",
       title: "In Stock",
@@ -111,7 +102,6 @@ export const product = {
         layout: "tags",
       },
     },
-
     {
       name: "variants",
       title: "Product Variants",
@@ -120,20 +110,35 @@ export const product = {
         {
           type: "object",
           fields: [
-            { name: "name", title: "Variant Name", type: "string" },
-            { name: "value", title: "Variant Value", type: "string" },
-            { name: "price", title: "Variant Price", type: "number" },
-            { name: "inventory", title: "Variant Inventory", type: "number" },
+            {
+              name: "name",
+              title: "Variant Name",
+              type: "string",
+            },
+            {
+              name: "value",
+              title: "Variant Value",
+              type: "string",
+            },
+            {
+              name: "price",
+              title: "Variant Price",
+              type: "number",
+            },
+            {
+              name: "inventory",
+              title: "Variant Inventory",
+              type: "number",
+            },
           ],
         },
       ],
     },
   ],
-
   preview: {
     select: {
       title: "name",
-      media: "media.0",
+      media: "images.0",
       subtitle: "price",
     },
     prepare(selection: any) {
@@ -141,7 +146,7 @@ export const product = {
       return {
         title,
         media,
-        subtitle: subtitle ? `$${subtitle}` : "No Price",
+        subtitle: `$${subtitle}`,
       }
     },
   },

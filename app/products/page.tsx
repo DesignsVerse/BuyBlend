@@ -1,4 +1,4 @@
-// app/products/page.tsx (ya jaha tum ProductsPage banate ho)
+// app/products/page.tsx
 import { client, queries } from "@/lib/sanity/client"
 import type { Product, Category } from "@/lib/sanity/types"
 import { mockProducts } from "@/lib/sanity/mock-data"
@@ -36,7 +36,7 @@ export default async function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <section className="py-12">
+      <section className="py-6 md:py-12">
         <div className="container mx-auto px-4">
           {/* Client Component */}
           <ProductsPageClient allProducts={allProducts} categories={categories} />

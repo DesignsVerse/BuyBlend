@@ -1,7 +1,7 @@
 // app/products/earrings/page.tsx
 import { client } from "@/lib/sanity/client"
 import type { Product, Category } from "@/lib/sanity/types"
-import ProductsPageClient from "@/app/products/products-client" // client component
+import ProductsPageClient from "@/app/products/products-client"
 import { notFound } from "next/navigation"
 
 // Fetch all earrings products
@@ -32,38 +32,33 @@ async function getEarringsProducts(): Promise<Product[]> {
   }
 }
 
-// Fetch categories (sirf earrings ke related, ya poore bhi le sakte ho)
-async function getCategories(): Promise<Category[]> {
+// Fetch unique types inside earrings
+async function getEarringTypes(): Promise<Category[]> {
   try {
-    return await client.fetch(
-      `*[_type == "category" && slug.current == "earring"]{
-        _id,
-        name,
-        slug
-      }`,
-      {},
-      { cache: "no-store" }
+    const types = await client.fetch(
+      `array::unique(*[_type == "product" && category->slug.current == "earring" && defined(type)].type)`
     )
+    // Convert simple string list into Category-like objects
+    return types.map((t: string, i: number) => ({
+      _id: String(i),
+      name: t,
+      slug: { current: t }   
+    }))
   } catch (error) {
-    console.error("Error fetching categories:", error)
+    console.error("Error fetching earring types:", error)
     return []
   }
 }
 
 export default async function EarringsPage() {
   const products = await getEarringsProducts()
-  const categories = await getCategories()
+  const categories = await getEarringTypes()
 
   if (!products || products.length === 0) return notFound()
 
-  return (
+  return ( 
     <div className="min-h-screen bg-gray-50">
-      <section className="py-6 md:py-12">
-        <div className="container mx-auto px-4">
-          {/* Client Component */}
-          <ProductsPageClient allProducts={products} categories={categories} />
-          </div>
-      </section>
+      <ProductsPageClient allProducts={products} categories={categories} />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { createClient } from "@sanity/client"
 import imageUrlBuilder from "@sanity/image-url"
+import { getFile } from "@sanity/asset-utils"
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "demo-project"
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production"
@@ -12,8 +13,14 @@ export const client = createClient({
   token: process.env.SANITY_API_TOKEN,
 })
 
-const builder = imageUrlBuilder(client)
 
+
+const builder = imageUrlBuilder(client)
+export const fileUrl = (source: any) => {
+  if (!source?.asset?._ref) return null
+  const file = getFile(source, { projectId, dataset })
+  return file.asset.url
+}
 export const urlFor = (source: any) => {
   if (!source) return null
   return builder.image(source)

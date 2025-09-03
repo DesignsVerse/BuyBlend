@@ -4,6 +4,10 @@ import { client, queries, urlFor } from "@/lib/sanity/client"
 import type { Product } from "@/lib/sanity/types"
 import { AddToCartButton } from "@/components/cart/add-to-cart-button"
 import { Star, Truck, Shield, RotateCw, Check, Heart, Share2 } from "lucide-react"
+import { ProductMediaSlider } from "@/components/products/product-media-slider"
+import { TestimonialSection } from "@/components/products/TestimonialSection"
+import { FeaturedProductsSection } from "@/components/Home/bestseller"
+import CustomProductCard from "@/components/Home/feature"
 
 interface ProductPageProps {
   params: {
@@ -50,17 +54,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   // ✅ Media Handling
   const mediaItems = product.media || []
-  const mainMedia = mediaItems[0] || null
 
   // Handle pricing: prefer compareAtPrice over originalPrice for discounts
   const effectiveOriginalPrice = product.compareAtPrice || product.originalPrice
   const hasDiscount = effectiveOriginalPrice && effectiveOriginalPrice !== product.price
   const discountPercent =
-  effectiveOriginalPrice && product.price
-    ? Math.round(
-        (( product.price - effectiveOriginalPrice) / product.price) * 100
+    effectiveOriginalPrice && product.price
+      ? Math.round(
+        ((product.price - effectiveOriginalPrice) / product.price) * 100
       )
-    : 0
+      : 0
   const isPriceIncreased =
     effectiveOriginalPrice && effectiveOriginalPrice < product.price
 
@@ -70,7 +73,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumbs */}
         <nav className="flex mb-6 text-sm text-gray-500">
           <ol className="flex items-center space-x-2">
@@ -89,101 +92,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* ✅ Product Media Section */}
           <div className="space-y-4">
-            {/* Main Media Display */}
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-white shadow-md">
-              {mainMedia?._type === "image" ? (
-                <Image
-                  src={getMediaUrl(mainMedia, 800, 800)}
-                  alt={mainMedia.alt || product.name}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              ) : mainMedia?._type === "file" ? (
-                <video
-                  src={getMediaUrl(mainMedia)}
-                  controls
-                  className="w-full h-full object-cover"
-                  poster="/placeholder.svg"
-                />
-              ) : (
-                <Image
-                  src="/placeholder.svg"
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-              )}
-              
-              {/* Discount Badge */}
-              {hasDiscount && !isPriceIncreased && (
-                <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  {discountPercent}% OFF
-                </div>
-              )}
-              
-              {/* Featured Badge */}
-              {product.featured && (
-                <div className="absolute top-4 left-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold mt-10">
-                  Featured
-                </div>
-              )}
-              
-              {/* Favorite and Share Buttons */}
-              <div className="absolute top-4 right-4 flex flex-col gap-2">
-                <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors">
-                  <Heart className="h-5 w-5 text-gray-600" />
-                </button>
-                <button className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors">
-                  <Share2 className="h-5 w-5 text-gray-600" />
-                </button>
-              </div>
-            </div>
-
-            {/* Thumbnail Gallery */}
-            {mediaItems.length > 1 && (
-              <div className="grid grid-cols-4 gap-3">
-                {mediaItems.map((item, index) => (
-                  <div
-                    key={item._key || index}
-                    className="relative aspect-square overflow-hidden rounded-lg bg-white shadow-sm cursor-pointer border-2 border-transparent hover:border-blue-400 transition-colors"
-                  >
-                    {item._type === "image" ? (
-                      <Image
-                        src={getMediaUrl(item, 150, 150)}
-                        alt={item.alt || `${product.name} ${index + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : item._type === "file" ? (
-                      <div className="relative w-full h-full flex items-center justify-center">
-                        <video
-                          src={getMediaUrl(item)}
-                          className="w-full h-full object-cover"
-                          muted
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="bg-black bg-opacity-40 rounded-full p-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <Image
-                        src="/placeholder.svg"
-                        alt={product.name}
-                        fill
-                        className="object-cover"
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            <ProductMediaSlider mediaItems={mediaItems} product={product} />
           </div>
 
           {/* ✅ Product Details Section */}
@@ -207,10 +117,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   </span>
                 ))}
               </div>
-              
+
               {/* Product name */}
               <h1 className="text-3xl font-bold text-gray-900 mb-3">{product.name}</h1>
-              
+
               {/* Rating (placeholder) */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex">
@@ -221,43 +131,41 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <span className="text-sm text-gray-500">(42 reviews)</span>
                 <span className="text-sm text-blue-600 font-medium ml-4">142 purchased</span>
               </div>
-              
+
               {/* Price Section */}
               <div className="flex items-center gap-3 mb-6">
-  {hasDiscount ? (
-    <>
-      {/* Original Price (line-through) */}
-      <span className=" text-3xl font-bold text-gray-900">
-        ₹{effectiveOriginalPrice?.toLocaleString("en-IN")}
-      </span>
+                {hasDiscount ? (
+                  <>
+                    {/* Original Price (line-through) */}
+                    <span className="text-xl line-through text-gray-500">
+                      ₹{effectiveOriginalPrice?.toLocaleString("en-IN")}
+                    </span>
 
-      {/* Current Price (highlighted) */}
-      <span className="text-xl line-through text-gray-500">
-        ₹{product.price.toLocaleString("en-IN")}
-      </span>
+                    {/* Current Price (highlighted) */}
+                    <span className="text-3xl font-bold text-gray-900">
+                      ₹{product.price.toLocaleString("en-IN")}
+                    </span>
 
-      {/* Discount Badge */}
-      <span
-  className={`text-sm font-semibold px-2 py-1 rounded ${
-    isPriceIncreased
-      ? "bg--100 text-green-600"
-      : "bg-green-100 text-green-600"
-  }`}
->
-  {isPriceIncreased
-    ? `${discountPercent}% OFF`
-    : `${discountPercent}% OFF`}
-</span>
-    </>
-  ) : (
-    // If no discount, just show price
-    <span className="text-3xl font-bold text-gray-900">
-      ₹{product.price.toLocaleString("en-IN")}
-    </span>
-  )}
-</div>
+                    {/* Discount Badge */}
+                    <span
+                      className={`text-sm font-semibold px-2 py-1 rounded ${isPriceIncreased
+                        ? "bg-green-100 text-green-600"
+                        : "bg-green-100 text-green-600"
+                        }`}
+                    >
+                      {isPriceIncreased
+                        ? `${discountPercent}% OFF`
+                        : `${discountPercent}% OFF`}
+                    </span>
+                  </>
+                ) : (
+                  // If no discount, just show price
+                  <span className="text-3xl font-bold text-gray-900">
+                    ₹{product.price.toLocaleString("en-IN")}
+                  </span>
+                )}
+              </div>
 
-              
               {/* Stock Status */}
               <div className="mb-6">
                 {isOutOfStock ? (
@@ -277,7 +185,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   </div>
                 )}
               </div>
-              
+
               {/* Product Highlights */}
               {product.highlights && product.highlights.length > 0 && (
                 <div className="mb-6">
@@ -292,7 +200,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   </ul>
                 </div>
               )}
-              
+
               {/* Style Tips */}
               {product.styleTips && (
                 <div className="mb-6 p-4 bg-blue-50 rounded-lg">
@@ -300,7 +208,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   <p className="text-blue-700 italic">"{product.styleTips}"</p>
                 </div>
               )}
-              
+
               {/* Product Description */}
               <div className="mb-6">
                 <h2 className="text-lg font-semibold mb-2">Description</h2>
@@ -326,8 +234,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       </div>
                       {variant.inventory !== undefined && (
                         <p className="text-sm text-gray-500 mt-1">
-                          {variant.inventory > 0 
-                            ? `${variant.inventory} available` 
+                          {variant.inventory > 0
+                            ? `${variant.inventory} available`
                             : "Out of stock"}
                         </p>
                       )}
@@ -340,7 +248,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {/* Add to Cart Section */}
             <div className="pt-4 border-t border-gray-200">
               <AddToCartButton product={product} disabled={isOutOfStock} />
-              
+
               {/* Delivery Estimate */}
               <div className="mt-4 flex items-center text-sm text-gray-600">
                 <Truck className="h-4 w-4 mr-2" />
@@ -368,6 +276,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           </div>
         </div>
+        
+        {/* Testimonial Section - Full Width */}
+        <div className="mt-16">
+          <TestimonialSection />
+        </div>
+        <div className="mt-16">
+        <CustomProductCard />
+        </div>
+
       </div>
     </div>
   )

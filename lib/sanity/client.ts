@@ -64,6 +64,9 @@ export const queries = {
       price,
       originalPrice,
       description,
+          highlights,
+    styleTips,
+
       media[]{
         _key,
         _type,

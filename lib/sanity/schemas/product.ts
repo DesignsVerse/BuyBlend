@@ -19,32 +19,51 @@ export const product = {
       },
       validation: (Rule: any) => Rule.required(),
     },
+
+    // Media (images + videos)
     {
-      name: "images",
-      title: "Product Images",
+      name: "media",
+      title: "Media",
       type: "array",
       of: [
         {
           type: "image",
-          options: {
-            hotspot: true,
-          },
+          options: { hotspot: true },
           fields: [
-            {
-              name: "alt",
-              title: "Alt Text",
-              type: "string",
-            },
+            { name: "alt", title: "Alt Text", type: "string" },
           ],
         },
+        { type: "file", title: "Video" },
       ],
     },
+
     {
       name: "description",
       title: "Description",
       type: "text",
       rows: 4,
     },
+
+    // ✅ Highlights
+    {
+      name: "highlights",
+      title: "Highlights",
+      type: "array",
+      of: [{ type: "string" }],
+      description: "Key features or selling points (bullet points)",
+      validation: (Rule: any) => Rule.min(1),
+    },
+
+    // ✅ Style Tips
+    {
+      name: "styleTips",
+      title: "Style Tips",
+      type: "text",
+      rows: 3,
+      description: "Short tips on how to style or wear this product",
+    },
+
+    // Pricing
     {
       name: "price",
       title: "Price",
@@ -52,17 +71,14 @@ export const product = {
       validation: (Rule: any) => Rule.required().min(0),
     },
     {
-      name: "originalPrice",
-      title: "Original Price",
-      type: "number",
-      validation: (Rule: any) => Rule.min(0),
-    },
-    {
       name: "compareAtPrice",
       title: "Compare at Price",
       type: "number",
+      description: "Used for showing discount pricing",
       validation: (Rule: any) => Rule.min(0),
     },
+
+    // Category & tags
     {
       name: "category",
       title: "Category",
@@ -70,16 +86,19 @@ export const product = {
       to: [{ type: "category" }],
     },
     {
+      name: "tags",
+      title: "Tags",
+      type: "array",
+      of: [{ type: "string" }],
+      options: { layout: "tags" },
+    },
+
+    // Inventory
+    {
       name: "inventory",
       title: "Inventory Count",
       type: "number",
       validation: (Rule: any) => Rule.required().min(0),
-    },
-    {
-      name: "inventoryCount",
-      title: "Inventory Count (Alternative)",
-      type: "number",
-      validation: (Rule: any) => Rule.min(0),
     },
     {
       name: "inStock",
@@ -93,15 +112,8 @@ export const product = {
       type: "boolean",
       initialValue: false,
     },
-    {
-      name: "tags",
-      title: "Tags",
-      type: "array",
-      of: [{ type: "string" }],
-      options: {
-        layout: "tags",
-      },
-    },
+
+    // Variants
     {
       name: "variants",
       title: "Product Variants",
@@ -110,35 +122,37 @@ export const product = {
         {
           type: "object",
           fields: [
+            { name: "name", title: "Variant Name", type: "string" },
+            { name: "value", title: "Variant Value", type: "string" },
+            { name: "price", title: "Variant Price", type: "number" },
+            { name: "inventory", title: "Variant Inventory", type: "number" },
             {
-              name: "name",
-              title: "Variant Name",
-              type: "string",
-            },
-            {
-              name: "value",
-              title: "Variant Value",
-              type: "string",
-            },
-            {
-              name: "price",
-              title: "Variant Price",
-              type: "number",
-            },
-            {
-              name: "inventory",
-              title: "Variant Inventory",
-              type: "number",
+              name: "image",
+              title: "Variant Image",
+              type: "image",
+              options: { hotspot: true },
             },
           ],
         },
       ],
     },
+
+    // SEO fields
+    {
+      name: "seo",
+      title: "SEO",
+      type: "object",
+      fields: [
+        { name: "metaTitle", title: "Meta Title", type: "string" },
+        { name: "metaDescription", title: "Meta Description", type: "text", rows: 2 },
+      ],
+    },
   ],
+
   preview: {
     select: {
       title: "name",
-      media: "images.0",
+      media: "media.0",
       subtitle: "price",
     },
     prepare(selection: any) {
@@ -146,7 +160,7 @@ export const product = {
       return {
         title,
         media,
-        subtitle: `$${subtitle}`,
+        subtitle: subtitle ? `$${subtitle}` : "No price set",
       }
     },
   },

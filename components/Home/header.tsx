@@ -10,8 +10,10 @@ export function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const { state: wishlistState } = useWishlist()
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,6 +29,20 @@ export function SiteHeader() {
     }
   }, [isSearchOpen])
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
@@ -37,11 +53,20 @@ export function SiteHeader() {
     }
   }
 
+  // Toggle dropdown on click for mobile
+  const toggleDropdown = (dropdownName: string) => {
+    if (activeDropdown === dropdownName) {
+      setActiveDropdown(null)
+    } else {
+      setActiveDropdown(dropdownName)
+    }
+  }
+
   return (
     <>
-      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? "border-b border-gray-200 bg-white/95 backdrop-blur" : "bg-white/80 backdrop-blur"}`}>
+      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? "border-b border-gray-200 bg-[#fff3f3]/95 backdrop-blur" : "bg-[#fff3f3]/80 backdrop-blur"}`}>
         {/* Top announcement bar - full width */}
-        <div className="bg-black text-white text-center py-2 text-xs">
+        <div className="bg-black text-[#fff3f3] text-center py-2 text-xs">
           Free shipping on all orders over $500 | Use code FIRST10 for 10% off
         </div>
 
@@ -57,23 +82,62 @@ export function SiteHeader() {
               <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors">
                 Home
               </Link>
-              <div className="relative group">
-                <Link href="/products" className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center">
+              
+              {/* Products Dropdown */}
+              <div 
+                className="relative group" 
+                ref={dropdownRef}
+                onMouseEnter={() => setActiveDropdown("products")}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <button 
+                  className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center"
+                  onClick={() => toggleDropdown("products")}
+                >
                   Products
                   <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                </Link>
-                <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-md p-4 w-48 mt-2 border border-gray-100">
+                </button>
+                <div 
+                  className={`absolute bg-[#fff3f3] shadow-lg rounded-md p-4 w-48 mt-2 border border-gray-100 ${activeDropdown === "products" ? "block" : "hidden"}`}
+                  style={{ top: "100%", left: 0 }}
+                >
                   <Link href="/products/rings" className="block py-2 px-4 hover:bg-gray-50 rounded">Rings</Link>
                   <Link href="/products/necklaces" className="block py-2 px-4 hover:bg-gray-50 rounded">Necklaces</Link>
-                  <Link href="/products/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded">Earrings</Link>
+                  <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded">Earrings</Link>
                   <Link href="/products/bracelets" className="block py-2 px-4 hover:bg-gray-50 rounded">Bracelets</Link>
                 </div>
               </div>
-              <Link href="/earrings" className="text-sm font-medium hover:text-gray-600 transition-colors">
-                Earrings
-              </Link>
+              
+              {/* Earrings Dropdown */}
+              <div 
+                className="relative group" 
+                ref={dropdownRef}
+                onMouseEnter={() => setActiveDropdown("earrings")}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <button 
+                  className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center"
+                  onClick={() => toggleDropdown("earrings")}
+                >
+                  <Link href="/collection/earrings/">Earrings</Link>
+
+                  <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div 
+                  className={`absolute bg-[#fff3f3] shadow-lg rounded-md p-4 w-48 mt-2 border border-gray-100 ${activeDropdown === "earrings" ? "block" : "hidden"}`}
+                  style={{ top: "100%", left: 0 }}
+                >
+                  <Link href="/collection/earrings/stud" className="block py-2 px-4 hover:bg-gray-50 rounded">Studs</Link>
+                  <Link href="/collection/earrings/western" className="block py-2 px-4 hover:bg-gray-50 rounded">western</Link>
+                  <Link href="/collection/earrings/korean" className="block py-2 px-4 hover:bg-gray-50 rounded">Korean</Link>
+                  <Link href="/collection/earrings/jhumkas" className="block py-2 px-4 hover:bg-gray-50 rounded">Jhumkas</Link>
+                </div>
+              </div>
+             
               <Link href="/about" className="text-sm font-medium hover:text-gray-600 transition-colors">
                 About
               </Link>
@@ -94,7 +158,7 @@ export function SiteHeader() {
                 <Link href="/wishlist" className="relative p-1 transition-transform hover:scale-110">
                   <Heart className="h-5 w-5" />
                   {wishlistState.itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-black text-xs text-white">
+                    <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-black text-xs text-[#fff3f3]">
                       {wishlistState.itemCount}
                     </span>
                   )}
@@ -119,21 +183,62 @@ export function SiteHeader() {
 
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t absolute w-full h-screen z-40">
+          <div className="md:hidden bg-[#fff3f3] border-t absolute w-full h-screen z-40">
             <div className="container mx-auto px-4 py-6">
               <div className="flex flex-col space-y-6">
                 <Link href="/" className="text-lg font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>
                   Home
                 </Link>
-                <Link href="/products" className="text-lg font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                  Collections
-                </Link>
-                <Link href="/new-arrivals" className="text-lg font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>
-                  New Arrivals
-                </Link>
+                
+                {/* Mobile Products Dropdown */}
+                <div>
+                  <button 
+                    className="text-lg font-medium py-2 flex items-center justify-between w-full"
+                    onClick={() => toggleDropdown("mobile-products")}
+                  >
+                    <span>Products</span>
+                    <svg className={`transform ${activeDropdown === "mobile-products" ? "rotate-180" : ""} h-5 w-5`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {activeDropdown === "mobile-products" && (
+                    <div className="pl-4 mt-2 flex flex-col space-y-3">
+                      <Link href="/products/rings" className="block py-1" onClick={() => setIsMobileMenuOpen(false)}>Rings</Link>
+                      <Link href="/products/necklaces" className="block py-1" onClick={() => setIsMobileMenuOpen(false)}>Necklaces</Link>
+                      <Link href="/products/earrings" className="block py-1" onClick={() => setIsMobileMenuOpen(false)}>Earrings</Link>
+                      <Link href="/products/bracelets" className="block py-1" onClick={() => setIsMobileMenuOpen(false)}>Bracelets</Link>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Mobile Earrings Dropdown */}
+                <div>
+                  <button 
+                    className="text-lg font-medium py-2 flex items-center justify-between w-full"
+                    onClick={() => toggleDropdown("mobile-earrings")}
+                  >
+                    <span>Earrings</span>
+                    <svg className={`transform ${activeDropdown === "mobile-earrings" ? "rotate-180" : ""} h-5 w-5`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {activeDropdown === "mobile-earrings" && (
+                    <div className="pl-4 mt-2 flex flex-col space-y-3">
+                      <Link href="/collection/stud" className="block py-1" onClick={() => setIsMobileMenuOpen(false)}>Studs</Link>
+                      <Link href="/collection/hoops" className="block py-1" onClick={() => setIsMobileMenuOpen(false)}>Hoops</Link>
+                      <Link href="/collection/danglers" className="block py-1" onClick={() => setIsMobileMenuOpen(false)}>Danglers</Link>
+                      <Link href="/collection/jhumkas" className="block py-1" onClick={() => setIsMobileMenuOpen(false)}>Jhumkas</Link>
+                    </div>
+                  )}
+                </div>
+                
                 <Link href="/about" className="text-lg font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>
                   About
                 </Link>
+                <Link href="/contact" className="text-lg font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>
+                  Contact Us
+                </Link>
+                
                 <div className="border-t pt-4 mt-4 flex flex-col space-y-4">
                   <button 
                     className="flex items-center space-x-2 text-lg"
@@ -165,7 +270,7 @@ export function SiteHeader() {
         <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
           <div className="absolute inset-0" onClick={() => setIsSearchOpen(false)} />
           
-          <div className="relative z-10 bg-white shadow-2xl">
+          <div className="relative z-10 bg-[#fff3f3] shadow-2xl">
             <div className="container mx-auto px-4 py-4">
               <form onSubmit={handleSearchSubmit} className="flex items-center">
                 <div className="relative flex-1">
@@ -182,7 +287,7 @@ export function SiteHeader() {
                 
                 <button
                   type="submit"
-                  className="ml-4 bg-black text-white p-3 rounded-full hover:bg-gray-800 transition-colors"
+                  className="ml-4 bg-black text-[#fff3f3] p-3 rounded-full hover:bg-gray-800 transition-colors"
                 >
                   <ArrowRight className="h-5 w-5" />
                 </button>
@@ -209,7 +314,7 @@ export function SiteHeader() {
                         setSearchQuery(item)
                         searchInputRef.current?.focus()
                       }}
-                      className="px-3 py-1 bg-white border border-gray-200 rounded-full text-sm hover:bg-gray-50 transition-colors"
+                      className="px-3 py-1 bg-[#fff3f3] border border-gray-200 rounded-full text-sm hover:bg-gray-50 transition-colors"
                     >
                       {item}
                     </button>
@@ -244,6 +349,26 @@ export function SiteHeader() {
 
         input:focus::placeholder {
           opacity: 0.5;
+        }
+
+        /* CSS for dropdown gap fix */
+        .group .absolute {
+          display: none;
+        }
+
+        .group:hover .absolute {
+          display: block;
+        }
+
+        /* Create an invisible gap filler between menu item and dropdown */
+        .group .absolute::before {
+          content: '';
+          position: absolute;
+          top: -10px;
+          left: 0;
+          width: 100%;
+          height: 10px;
+          background: transparent;
         }
       `}</style>
     </>

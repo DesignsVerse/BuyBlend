@@ -52,21 +52,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const mediaItems = product.media || []
   const mainMedia = mediaItems[0] || null
 
-  const hasDiscount = product.originalPrice && product.originalPrice !== product.price
+  // Handle pricing: prefer compareAtPrice over originalPrice for discounts
+  const effectiveOriginalPrice = product.compareAtPrice || product.originalPrice
+  const hasDiscount = effectiveOriginalPrice && effectiveOriginalPrice !== product.price
   const discountPercent =
-    hasDiscount && product.originalPrice
-      ? Math.round(
-          ((Math.abs(product.originalPrice - product.price)) /
-            Math.max(product.originalPrice, product.price)) *
-            100
-        )
-      : 0
+  effectiveOriginalPrice && product.price
+    ? Math.round(
+        (( product.price - effectiveOriginalPrice) / product.price) * 100
+      )
+    : 0
   const isPriceIncreased =
-    product.originalPrice && product.originalPrice < product.price
+    effectiveOriginalPrice && effectiveOriginalPrice < product.price
 
   // Check stock status
-  const isOutOfStock = product.inventory <= 0
-  const isLowStock = product.inventory > 0 && product.inventory <= 10
+  const isOutOfStock = !product.inStock || product.inventory <= 0
+  const isLowStock = product.inStock && product.inventory > 0 && product.inventory <= 10
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -77,9 +77,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <li>Home</li>
             <li>/</li>
             <li>Products</li>
-            {product.category && (
+            {product.category && product.category.name && (
               <>
                 <li>/</li>
+                <li>{product.category.name}</li>
               </>
             )}
             <li>/</li>
@@ -120,6 +121,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {hasDiscount && !isPriceIncreased && (
                 <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                   {discountPercent}% OFF
+                </div>
+              )}
+              
+              {/* Featured Badge */}
+              {product.featured && (
+                <div className="absolute top-4 left-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-bold mt-10">
+                  Featured
                 </div>
               )}
               
@@ -181,20 +189,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
           {/* ✅ Product Details Section */}
           <div className="flex flex-col space-y-6">
             <div>
-              {/* Category & Tags */}
-              <div className="flex items-center gap-2 mb-3">
-                {product.category && (
+              {/* Category, Type & Tags */}
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                {product.category && product.category.name && (
                   <span className="text-sm text-blue-600 font-medium capitalize">
+                    {product.category.name}
                   </span>
                 )}
-                {product.tags && product.tags.slice(0, 2).map(tag => (
+                {product.type && (
+                  <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {product.type}
+                  </span>
+                )}
+                {product.tags && product.tags.slice(0, 3).map((tag) => (
                   <span key={tag} className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
                     #{tag}
                   </span>
                 ))}
               </div>
               
-              {/* Product Title */}
+              {/* Product name */}
               <h1 className="text-3xl font-bold text-gray-900 mb-3">{product.name}</h1>
               
               {/* Rating (placeholder) */}
@@ -210,21 +224,39 @@ export default async function ProductPage({ params }: ProductPageProps) {
               
               {/* Price Section */}
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl font-bold text-gray-900">
-                  ₹{product.price.toLocaleString('en-IN')}
-                </span>
-                
-                {hasDiscount && (
-                  <>
-                    <span className="text-xl line-through text-gray-500">
-                      ₹{product.originalPrice?.toLocaleString('en-IN')}
-                    </span>
-                    <span className={`text-sm font-semibold px-2 py-1 rounded ${isPriceIncreased ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}>
-                      {isPriceIncreased ? `+${discountPercent}%` : `-${discountPercent}%`}
-                    </span>
-                  </>
-                )}
-              </div>
+  {hasDiscount ? (
+    <>
+      {/* Original Price (line-through) */}
+      <span className=" text-3xl font-bold text-gray-900">
+        ₹{effectiveOriginalPrice?.toLocaleString("en-IN")}
+      </span>
+
+      {/* Current Price (highlighted) */}
+      <span className="text-xl line-through text-gray-500">
+        ₹{product.price.toLocaleString("en-IN")}
+      </span>
+
+      {/* Discount Badge */}
+      <span
+  className={`text-sm font-semibold px-2 py-1 rounded ${
+    isPriceIncreased
+      ? "bg--100 text-green-600"
+      : "bg-green-100 text-green-600"
+  }`}
+>
+  {isPriceIncreased
+    ? `${discountPercent}% OFF`
+    : `${discountPercent}% OFF`}
+</span>
+    </>
+  ) : (
+    // If no discount, just show price
+    <span className="text-3xl font-bold text-gray-900">
+      ₹{product.price.toLocaleString("en-IN")}
+    </span>
+  )}
+</div>
+
               
               {/* Stock Status */}
               <div className="mb-6">
@@ -276,38 +308,38 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   {product.description || "No description available for this product."}
                 </p>
               </div>
-            </div>
 
-            {/* Variants Selection */}
-            {product.variants && product.variants.length > 0 && (
-              <div className="space-y-4 py-4 border-t border-gray-200">
-                <h3 className="text-lg font-semibold">Options</h3>
-                {product.variants.map((variant, index) => (
-                  <div key={index}>
-                    <h3 className="font-medium mb-2">{variant.name}</h3>
-                    <div className="flex flex-wrap gap-2">
-                      <button className="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:border-blue-500 transition-colors">
-                        {variant.value}
-                        {variant.price && (
-                          <span className="ml-2 text-sm text-gray-500">+₹{variant.price}</span>
-                        )}
-                      </button>
+              {/* Variants Selection */}
+              {product.variants && product.variants.length > 0 && (
+                <div className="space-y-4 py-4 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold">Options</h3>
+                  {product.variants.map((variant, index) => (
+                    <div key={index}>
+                      <h4 className="font-medium mb-2">{variant.name}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        <button className="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:border-blue-500 transition-colors">
+                          {variant.value}
+                          {variant.price && (
+                            <span className="ml-2 text-sm text-gray-500">+₹{variant.price.toLocaleString('en-IN')}</span>
+                          )}
+                        </button>
+                      </div>
+                      {variant.inventory !== undefined && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          {variant.inventory > 0 
+                            ? `${variant.inventory} available` 
+                            : "Out of stock"}
+                        </p>
+                      )}
                     </div>
-                    {variant.inventory !== undefined && (
-                      <p className="text-sm text-gray-500 mt-1">
-                        {variant.inventory > 0 
-                          ? `${variant.inventory} available` 
-                          : "Out of stock"}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Add to Cart Section */}
             <div className="pt-4 border-t border-gray-200">
-              <AddToCartButton product={product} />
+              <AddToCartButton product={product} disabled={isOutOfStock} />
               
               {/* Delivery Estimate */}
               <div className="mt-4 flex items-center text-sm text-gray-600">
@@ -334,59 +366,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <span className="text-xs text-gray-500">100% secure payment</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Additional Information Section */}
-        <div className="mt-12 bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-2xl font-bold mb-6">Product Details</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Specifications */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Specifications</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between border-b pb-2">
-                  <span className="text-gray-600">Category</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="text-gray-600">Product Type</span>
-                  <span className="font-medium">{product.type || "N/A"}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="text-gray-600">Inventory</span>
-                  <span className="font-medium">{product.inventory} units</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="text-gray-600">SKU</span>
-                  <span className="font-medium">{product._id.slice(-8).toUpperCase()}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="text-gray-600">Added On</span>
-                  <span className="font-medium">
-                    {new Date(product._createdAt).toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric'
-                    })}
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Tags */}
-            {product.tags && product.tags.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold mb-4">Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {product.tags.map((tag, index) => (
-                    <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

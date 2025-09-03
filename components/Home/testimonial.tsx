@@ -45,7 +45,7 @@ function TestimonialCard({
   return (
     <motion.div
       whileHover={enableTilt ? { y: -3 } : undefined}
-      className="min-w-[320px] max-w-[380px] bg-white border border-gray-200 rounded-xl p-6 sm:p-7 md:p-8 shadow-sm hover:shadow-md transition-shadow duration-300"
+      className="min-w-[320px] max-w-[380px] bg-[#fff3f3] border border-gray-200 rounded-xl p-6 sm:p-7 md:p-8 shadow-sm hover:shadow-md transition-shadow duration-300"
     >
       <div className="flex items-center mb-5">
         <Image
@@ -80,7 +80,7 @@ const Testimonials: React.FC = () => {
   }, []);
 
   return (
-    <section className="py-14 sm:py-16 bg-white">
+    <section className="py-14 sm:py-16 bg-[#fff3f3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl sm:text-4xl font-bold text-center text-black mb-8 sm:mb-12">
           What Our Customers Say

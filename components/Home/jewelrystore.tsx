@@ -2,22 +2,22 @@ import Image from 'next/image';
 
 const images = [
   {
-    src: 'https://images.unsplash.com/photo-1608043152269-231dba7a32a2?auto=format&fit=crop&w=600&q=80',
+    src: '/new/1.jpg',
     title: 'LUXURY GOLD',
     alt: 'Luxury gold jewelry collection'
   },
   {
-    src: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=600&q=80',
+    src: '/new/2.jpg',
     title: 'BESTSELLERS',
     alt: 'Bestselling jewelry pieces'
   },
   {
-    src: 'https://images.unsplash.com/photo-1606761568499-6d2451b23c66?auto=format&fit=crop&w=600&q=80',
+    src: '/new/3.jpg',
     title: 'DIAMOND ELEGANCE',
     alt: 'Diamond jewelry collection'
   },
   {
-    src: 'https://images.unsplash.com/photo-1606760227091-3dd44d7f8876?auto=format&fit=crop&w=600&q=80',
+    src: '/new/5.jpg',
     title: 'EVERYDAY ESSENTIALS',
     alt: 'Essential daily wear jewelry'
   },

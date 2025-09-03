@@ -118,14 +118,14 @@ export function HeroSection() {
       {/* Navigation Arrows */}
       <button
         onClick={goToPrevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-2 text-white transition-all hover:bg-black/50"
+        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-2 text-[#fff3f3] transition-all hover:bg-black/50"
         aria-label="Previous slide"
       >
         <ChevronLeft size={30} />
       </button>
       <button
         onClick={goToNextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-2 text-white transition-all hover:bg-black/50"
+        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-2 text-[#fff3f3] transition-all hover:bg-black/50"
         aria-label="Next slide"
       >
         <ChevronRight size={30} />
@@ -139,7 +139,7 @@ export function HeroSection() {
               key={index}
               onClick={() => goToSlide(index)}
               className={`h-3 w-3 rounded-full transition-all ${
-                currentSlide === index ? "bg-white" : "bg-white/50"
+                currentSlide === index ? "bg-[#fff3f3]" : "bg-[#fff3f3]/50"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

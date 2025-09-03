@@ -15,44 +15,44 @@ const categories: Category[] = [
   { 
     slug: "necklaces", 
     title: "Necklaces", 
-    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500&h=500&fit=crop", 
+    image: "/new/8.jpg", 
     description: "Elegant neckpieces for every occasion"
   },
   { 
     slug: "earrings", 
     title: "Earrings", 
-    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500&h=500&fit=crop", 
+    image: "/new/2.jpg", 
     description: "Sparkling ear adornments"
   },
   { 
     slug: "rings", 
     title: "Rings", 
-    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&h=500&fit=crop", 
+    image: "/new/6.jpg", 
     description: "Symbols of love and commitment"
   },
   { 
     slug: "bangles", 
     title: "Bangles", 
-    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=500&h=500&fit=crop", 
+    image: "/new/3.jpg", 
     description: "Traditional and contemporary designs"
   },
   { 
     slug: "bracelets", 
     title: "Bracelets", 
-    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&h=500&fit=crop", 
+    image: "/new/5.jpg", 
     description: "Delicate wrist accessories"
   },
   { 
     slug: "brooches", 
     title: "Brooches", 
-    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&h=500&fit=crop", 
+    image: "/new/4.jpg", 
     description: "Statement pieces for any outfit"
   },
 ];
 
 export default function CategoriesSection() {
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-12 md:py-16 bg-gradient-to-b from-gray-50 to-[#fff3f3]">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div 
@@ -87,7 +87,7 @@ export default function CategoriesSection() {
               >
                 <Link
                   href={`/category/${category.slug}`}
-                  className="block rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
+                  className="block rounded-xl overflow-hidden bg-[#fff3f3] shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
                 >
                   {/* Image Container */}
                   <div className="relative aspect-square overflow-hidden">
@@ -137,7 +137,7 @@ export default function CategoriesSection() {
               >
                 <Link
                   href={`/category/${category.slug}`}
-                  className="block rounded-xl overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
+                  className="block rounded-xl overflow-hidden bg-[#fff3f3] shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
                 >
                   {/* Image Container */}
                   <div className="relative aspect-square overflow-hidden">
@@ -185,7 +185,7 @@ export default function CategoriesSection() {
         >
           <Link
             href="/collections"
-            className="inline-flex items-center bg-black text-white px-5 py-2.5 md:px-6 md:py-3 rounded-sm hover:bg-gray-800 transition-colors font-medium text-sm md:text-base"
+            className="inline-flex items-center bg-black text-[#fff3f3] px-5 py-2.5 md:px-6 md:py-3 rounded-sm hover:bg-gray-800 transition-colors font-medium text-sm md:text-base"
           >
             View All Categories
             <ChevronRight className="h-4 w-4 ml-2" />

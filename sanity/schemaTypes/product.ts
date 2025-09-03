@@ -21,24 +21,38 @@ export const product = defineType({
       },
       validation: (rule) => rule.required(),
     }),
-    defineField({
-      name: "images",
-      title: "Images",
-      type: "array",
-      of: [
-        {
-          type: "image",
-          options: {
-            hotspot: true,
-          },
-        },
-      ],
-    }),
+  defineField({
+    name: "media",
+    title: "Media",
+    type: "array",
+    of: [
+      { type: "image", options: { hotspot: true } },
+      { type: "file", title: "Video" }
+    ],
+  }),
+
     defineField({
       name: "description",
       title: "Description",
       type: "text",
     }),
+    defineField({
+      name: "highlights",
+      title: "Highlights",
+      type: "array",
+      of: [{ type: "string" }],
+      description: "Key features or selling points of the product (bullet points)",
+      validation: (Rule) => Rule.required().min(1),
+    }),
+
+    defineField({
+      name: "styleTips",
+      title: "Style Tips",
+      type: "text",
+      rows: 3,
+      description: "Short tips on how to style or wear this product",
+    }),
+
       defineField({
       name: "type",
       title: "type",

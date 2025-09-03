@@ -1,7 +1,5 @@
-// app/products/page.tsx
 import { client, queries } from "@/lib/sanity/client"
 import type { Product, Category } from "@/lib/sanity/types"
-import { mockProducts } from "@/lib/sanity/mock-data"
 import ProductsPageClient from "./products-client"
 
 async function getProducts(): Promise<Product[]> {
@@ -11,10 +9,10 @@ async function getProducts(): Promise<Product[]> {
       {},
       { cache: "no-store" }
     )
-    return products && products.length > 0 ? products : mockProducts
+    return products || []
   } catch (error) {
     console.error("Error fetching products:", error)
-    return mockProducts
+    return []
   }
 }
 

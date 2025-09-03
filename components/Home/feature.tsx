@@ -6,11 +6,13 @@ import { ProductCard } from "@/components/Home/product-card";
 import type { Product } from "@/lib/sanity/types";
 import { client, queries } from "@/lib/sanity/client";
 import { mockProducts } from "@/lib/sanity/mock-data";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ProductShowcase: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -85,92 +87,182 @@ const ProductShowcase: React.FC = () => {
     return () => observer.disconnect();
   }, [products.length]);
 
+  // Auto-scroll functionality
+  useEffect(() => {
+    if (!isHovered && products.length > 0) {
+      const interval = setInterval(() => {
+        const nextIndex = (activeIndex + 1) % products.length;
+        scrollToIndex(nextIndex);
+      }, 4000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [activeIndex, isHovered, products.length, scrollToIndex]);
+
   return (
-    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          {/* Left side - Featured image (hidden on mobile) */}
-          <div className="hidden lg:block lg:w-2/5 relative rounded-lg overflow-hidden shadow-lg">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-amber-50/20 to-gray-50 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-amber-200/10 rounded-full translate-x-1/3 -translate-y-1/3 blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-rose-200/10 rounded-full -translate-x-1/3 translate-y-1/3 blur-3xl"></div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
+          {/* Left side - Featured image */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+            className="w-full lg:w-2/5 relative rounded-2xl overflow-hidden shadow-2xl"
+          >
             <div className="aspect-[3/4] w-full relative">
               <Image
-                src="/images/hero/home-gemstone.png"
+                src="/new/8.jpg"
                 alt="Find what's meant to be yours"
                 fill
                 className="object-cover"
                 priority
+                sizes="(max-width: 1024px) 100vw, 40vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
                 <div className="text-center w-full">
-                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
-                    Find Gemstone what&apos;s meant to be yours
-                  </h2>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="inline-flex items-center justify-center mb-3 bg-amber-500/20 backdrop-blur-sm rounded-full px-4 py-1.5 border border-amber-400/30"
+                  >
+                    <Sparkles className="h-4 w-4 text-amber-300 mr-2" />
+                    <span className="text-xs font-medium text-amber-100 uppercase tracking-wider">
+                      Exclusive Collection
+                    </span>
+                  </motion.div>
+                  
+                  <motion.h2 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-3xl md:text-4xl font-serif font-bold text-white mb-4 leading-tight"
+                  >
+                    Discover Your Perfect Gemstone
+                  </motion.h2>
+                  
+                  <motion.p 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="text-amber-100/90 text-sm max-w-md mx-auto mb-6"
+                  >
+                    Each piece is meticulously crafted to bring out the natural beauty and energy of these precious stones.
+                  </motion.p>
+                  
+                  <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.9 }}
+                    className="inline-flex items-center bg-white text-gray-900 px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl"
+                  >
+                    Explore Collection
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </motion.button>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Right side - Products */}
-          <div className="w-full md:mt-16 lg:w-3/5">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold text-black">Featured Products</h3>
-              <Link href="/products" className="text-black hover:underline font-medium">
+          {/* Right side - Products - Centered with left side */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="w-full lg:w-3/5 flex flex-col justify-center"
+          >
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h3 className="text-2xl md:text-3xl font-serif font-bold text-gray-900 mb-2">Featured Collection</h3>
+                <p className="text-gray-600 text-sm">Handpicked selections of our finest gemstones</p>
+              </div>
+              <Link 
+                href="/products" 
+                className="text-gray-700 hover:text-gray-900 font-medium flex items-center group text-sm"
+              >
                 VIEW ALL
+                <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
 
-            <div className="relative">
-              {/* Prev button - now visible on mobile too (smaller size) */}
-              <button
-                aria-label="Scroll left"
-                className="flex items-center justify-center absolute left-1 sm:-left-3 top-1/2 -translate-y-1/2 z-10 bg-black text-white p-2 sm:p-2.5 rounded-full opacity-90 hover:opacity-100 active:scale-95"
-                onClick={goPrev}
-              >
-                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
+            <div 
+              className="relative"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {/* Navigation buttons */}
+              <AnimatePresence>
+                {isHovered && (
+                  <>
+                    <motion.button
+                      aria-label="Scroll left"
+                      className="flex items-center justify-center absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:shadow-xl border border-gray-100 backdrop-blur-sm"
+                      onClick={goPrev}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </motion.button>
+                    <motion.button
+                      aria-label="Scroll right"
+                      className="flex items-center justify-center absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:shadow-xl border border-gray-100 backdrop-blur-sm"
+                      onClick={goNext}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </motion.button>
+                  </>
+                )}
+              </AnimatePresence>
 
               {/* Scroller with snap */}
               <div
                 ref={scrollerRef}
-                className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-4 hide-scrollbar"
+                className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 hide-scrollbar pb-4 px-1"
               >
-                {products.map((product) => (
-                  <div
+                {products.map((product, index) => (
+                  <motion.div
                     key={product._id}
-                    className="snap-center snap-always shrink-0 w-full basis-full sm:w-1/2 sm:basis-1/2 lg:w-1/3 lg:basis-1/3"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="snap-center snap-always shrink-0 w-full basis-full sm:w-[45%] sm:basis-[45%] lg:w-[30%] lg:basis-[30%]"
                   >
                     <ProductCard product={product} />
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
-              {/* Next button - visible on mobile too */}
-              <button
-                aria-label="Scroll right"
-                className="flex items-center justify-center absolute right-1 sm:-right-3 top-1/2 -translate-y-1/2 z-10 bg-black text-white p-2 sm:p-2.5 rounded-full opacity-90 hover:opacity-100 active:scale-95"
-                onClick={goNext}
-              >
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
+              {/* Dots pagination */}
+              <div className="mt-8 flex items-center justify-center gap-2">
+                {products.map((_, i) => {
+                  const isActive = i === activeIndex;
+                  return (
+                    <button
+                      key={i}
+                      aria-label={`Go to slide ${i + 1}`}
+                      onClick={() => scrollToIndex(i)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        isActive ? "w-6 bg-amber-500" : "w-2 bg-gray-300 hover:bg-gray-400"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
             </div>
-
-            {/* Dots pagination (mobile + desktop) */}
-            <div className="mt-5 flex items-center justify-center gap-2">
-              {products.map((_, i) => {
-                const isActive = i === activeIndex;
-                return (
-                  <button
-                    key={i}
-                    aria-label={`Go to slide ${i + 1}`}
-                    onClick={() => scrollToIndex(i)}
-                    className={[
-                      "h-2.5 rounded-full transition-all duration-200",
-                      isActive ? "w-5 bg-black" : "w-2.5 bg-gray-300 hover:bg-gray-400",
-                    ].join(" ")}
-                  />
-                );
-              })}
-            </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 

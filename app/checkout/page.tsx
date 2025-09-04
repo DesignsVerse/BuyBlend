@@ -157,7 +157,7 @@ export default function CheckoutPage() {
                         <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="font-medium">Rs. {(item.price * item.quantity).toFixed(2)}</p>
                       </div>
                     </div>
                   ))}
@@ -167,20 +167,20 @@ export default function CheckoutPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span>${cartState.total.toFixed(2)}</span>
+                      <span>Rs. {cartState.total.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Shipping</span>
-                      <span>{calculateShipping() === 0 ? "FREE" : `$${calculateShipping().toFixed(2)}`}</span>
+                      <span>{calculateShipping() === 0 ? "FREE" : `Rs. $${calculateShipping().toFixed(2)}`}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Tax (GST)</span>
-                      <span>${calculateTax().toFixed(2)}</span>
+                      <span>Rs. {calculateTax().toFixed(2)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span>
-                      <span>${totalAmount.toFixed(2)}</span>
+                      <span>Rs. {totalAmount.toFixed(2)}</span>
                     </div>
                   </div>
                   
@@ -400,7 +400,7 @@ export default function CheckoutPage() {
                       disabled={isProcessing}
                       className="flex-1"
                     >
-                      {isProcessing ? "Processing..." : `Place Order - $${totalAmount.toFixed(2)}`}
+                      {isProcessing ? "Processing..." : `Place Order - Rs. ${totalAmount.toFixed(2)}`}
                     </Button>
                   </div>
                 </CardContent>
@@ -428,7 +428,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex justify-between">
                         <span>Total:</span>
-                        <span>${totalAmount.toFixed(2)}</span>
+                        <span>Rs. {totalAmount.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -477,7 +477,7 @@ export default function CheckoutPage() {
                         <p className="text-sm font-medium truncate">{item.name}</p>
                         <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm font-medium">Rs. {(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   ))}
                   
@@ -486,27 +486,27 @@ export default function CheckoutPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Subtotal</span>
-                      <span>${cartState.total.toFixed(2)}</span>
+                      <span>Rs. {cartState.total.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Shipping</span>
-                      <span>{calculateShipping() === 0 ? "FREE" : `$${calculateShipping().toFixed(2)}`}</span>
+                      <span>{calculateShipping() === 0 ? "FREE" : `Rs. $${calculateShipping().toFixed(2)}`}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Tax (GST)</span>
-                      <span>${calculateTax().toFixed(2)}</span>
+                      <span>Rs. {calculateTax().toFixed(2)}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between font-semibold">
                       <span>Total</span>
-                      <span>${totalAmount.toFixed(2)}</span>
+                      <span>Rs. {totalAmount.toFixed(2)}</span>
                     </div>
                   </div>
                   
                   {calculateShipping() > 0 && (
                     <div className="bg-amber-50 p-3 rounded-md border border-amber-100">
                       <p className="text-xs text-amber-800 text-center">
-                        Add ${(500 - cartState.total).toFixed(2)} more for free shipping
+                        Add Rs. {(500 - cartState.total).toFixed(2)} more for free shipping
                       </p>
                     </div>
                   )}

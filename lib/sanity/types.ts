@@ -31,6 +31,7 @@ export interface Product {
   >
 
   category?: Category
+  
   inventory: number
   inStock?: boolean
   featured: boolean

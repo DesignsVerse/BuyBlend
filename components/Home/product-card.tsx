@@ -5,7 +5,7 @@ import type { Product } from "@/lib/sanity/types"
 import { urlFor } from "@/lib/sanity/client"
 import { Button } from "@/components/ui/button"
 import { AddToCartButton } from "@/components/cart/add-to-cart-button"
-import { Eye, Heart, Sparkles, Gem, Crown } from "lucide-react"
+import { Heart, Sparkles, Gem, Crown } from "lucide-react"
 import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
@@ -19,15 +19,14 @@ export function ProductCard({ product }: ProductCardProps) {
   const { toggleItem, isInWishlist } = useWishlist()
   const isWishlisted = isInWishlist(product._id)
 
-  // Memoized values
-  const productSlug = useMemo(() => 
-    product.slug?.current || 
-    product.name?.toLowerCase().replace(/\s+/g, '-') || 
-    'product',
+  const productSlug = useMemo(
+    () =>
+      product.slug?.current ||
+      product.name?.toLowerCase().replace(/\s+/g, "-") ||
+      "product",
     [product.slug, product.name]
   )
 
-  // ✅ Get first media (image or video)
   const firstMedia = useMemo(() => product.media?.[0], [product.media])
 
   const mediaUrl = useMemo(() => {
@@ -35,7 +34,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
     try {
       if (firstMedia._type === "image") {
-        return urlFor(firstMedia.asset)?.width(400)?.height(400)?.url() ?? "/fallback-product.png"
+        return (
+          urlFor(firstMedia.asset)?.width(400)?.height(400)?.url() ??
+          "/fallback-product.png"
+        )
       }
       if (firstMedia._type === "file") {
         return urlFor(firstMedia.asset)?.url() ?? "/fallback-product.png"
@@ -45,66 +47,63 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   }, [firstMedia])
 
-  const hasDiscount = useMemo(() => 
-    product.originalPrice && product.originalPrice !== product.price,
+  const hasDiscount = useMemo(
+    () => product.originalPrice && product.originalPrice !== product.price,
     [product.originalPrice, product.price]
   )
 
-  const discountPercent = useMemo(() => 
-    hasDiscount && product.originalPrice
-      ? Math.round(((Math.abs(product.originalPrice - product.price)) / 
-         Math.max(product.originalPrice, product.price)) * 100)
-      : 0,
+  const discountPercent = useMemo(
+    () =>
+      hasDiscount && product.originalPrice
+        ? Math.round(
+            (Math.abs(product.originalPrice - product.price) /
+              Math.max(product.originalPrice, product.price)) *
+              100
+          )
+        : 0,
     [hasDiscount, product.originalPrice, product.price]
   )
 
-  const isPriceIncreased = useMemo(() => 
-    product.originalPrice && product.originalPrice < product.price,
+  const isPriceIncreased = useMemo(
+    () => product.originalPrice && product.originalPrice < product.price,
     [product.originalPrice, product.price]
   )
 
-  const productTier = useMemo(() => 
-    product.price > 1000 ? "luxury" : 
-    product.price > 500 ? "premium" : "standard",
+  const productTier = useMemo(
+    () =>
+      product.price > 1000
+        ? "luxury"
+        : product.price > 500
+        ? "premium"
+        : "standard",
     [product.price]
   )
 
   return (
-    <motion.div 
-      className="group relative"
+    <motion.div
+      className="group relative h-full"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
     >
-      {/* Tier Badges */}
-      {productTier === "luxury" && (
-        <span className="absolute -top-2 -right-2 z-10 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center">
-          <Crown className="w-3 h-3 mr-1" /> Luxury
-        </span>
-      )}
-      {productTier === "premium" && (
-        <span className="absolute -top-2 -right-2 z-10 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center">
-          <Gem className="w-3 h-3 mr-1" /> Premium
-        </span>
-      )}
-
-      <div className="relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+      <div className="relative bg-white dark:bg-black rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-800 flex flex-col h-full">
         {/* Media Section */}
         <div className="relative aspect-square overflow-hidden">
           {firstMedia?._type === "image" ? (
             <Image
-            src={mediaUrl ?? "/fallback-product.png"}   // ✅ undefined ko fallback de diya
-            alt={product.name}
-            fill
-            className={`object-cover transition-transform duration-500 ${
-              isMediaLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-            } group-hover:scale-110`}
-            onLoad={() => setIsMediaLoaded(true)}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            priority={product.featured}
-          />
-          
+              src={mediaUrl ?? "/fallback-product.png"}
+              alt={product.name}
+              fill
+              className={`object-cover transition-transform duration-500 ${
+                isMediaLoaded
+                  ? "opacity-100 scale-100"
+                  : "opacity-0 scale-105"
+              } group-hover:scale-110`}
+              onLoad={() => setIsMediaLoaded(true)}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              priority={product.featured}
+            />
           ) : firstMedia?._type === "file" ? (
             <video
               src={mediaUrl}
@@ -124,120 +123,115 @@ export function ProductCard({ product }: ProductCardProps) {
             />
           )}
 
-          {/* Loading Skeleton */}
           {!isMediaLoaded && (
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 animate-pulse" />
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 animate-pulse" />
           )}
 
-          {/* Quick Actions */}
-          <div className="absolute top-2 right-2 flex gap-1">
+          {/* ✅ Hide quick actions on mobile */}
+          <div className="absolute top-2 right-2 flex gap-1 hidden md:flex">
             <Button
               variant="ghost"
               size="icon"
               className="h-8 w-8 rounded-full bg-white/80 hover:bg-white shadow-md"
               asChild
             >
-              <Link href={`/products/${productSlug}`}>
-                <Eye className="w-4 h-4 text-gray-700" />
-              </Link>
             </Button>
             <Button
               variant="ghost"
               size="icon"
               className={`h-8 w-8 rounded-full shadow-md ${
-                isWishlisted 
-                  ? 'bg-red-500 text-white hover:bg-red-600' 
-                  : 'bg-white/80 hover:bg-white text-gray-700'
+                isWishlisted
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-white/80 hover:bg-white text-gray-700"
               }`}
-              onClick={() => toggleItem({
-                id: product._id,
-                name: product.name,
-                price: product.price,
-                slug: productSlug,
-                image: mediaUrl,
-              })}
+              onClick={() =>
+                toggleItem({
+                  id: product._id,
+                  name: product.name,
+                  price: product.price,
+                  slug: productSlug,
+                  image: mediaUrl,
+                })
+              }
             >
-              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
+              <Heart
+                className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`}
+              />
             </Button>
           </div>
 
-          {/* Status Badges */}
-          <div className="absolute top-2 left-2 space-y-1">
-            {hasDiscount && (
-              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                isPriceIncreased ? 'bg-red-500' : 'bg-green-500'
-              } text-white`}>
-                {isPriceIncreased ? `+${discountPercent}%` : `-${discountPercent}%`}
-              </span>
-            )}
+          {/* ✅ Hide badges on mobile */}
+          <div className="absolute top-2 left-2 space-y-1 hidden md:block">
+          {hasDiscount && (
+  <span className="px-2 py-1 text-xs font-semibold rounded-full bg-black text-white">
+    {discountPercent}% Off
+  </span>
+)}
+
             {product.inventory === 0 && (
               <span className="bg-gray-600 text-white px-2 py-1 text-xs font-semibold rounded-full">
                 Sold Out
               </span>
             )}
-            {product.featured && (
-              <span className="bg-blue-500 text-white px-2 py-1 text-xs font-semibold rounded-full flex items-center">
-                <Sparkles className="w-3 h-3 mr-1" /> Featured
-              </span>
-            )}
+            
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="p-4 flex flex-col gap-2">
-          {/* Category */}
-          {product.category?.name && (
-            <span className="text-xs text-gray-500 uppercase tracking-wide">
-              {product.category.name}
-            </span>
-          )}
+        <div className="p-4 flex flex-col gap-2 flex-grow">
+          {/* ✅ Hide category/desc on mobile */}
+          <span className="text-xs text-gray-500 uppercase tracking-wide hidden md:block">
+            {product.category?.name}
+          </span>
 
-          {/* Product Name */}
           <Link href={`/products/${productSlug}`}>
-            <h3 className="text-base font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white hover:text-blue-600 transition-colors line-clamp-2 min-h-[2rem]">
               {product.name}
             </h3>
           </Link>
 
-          {/* Description */}
-          {product.description && (
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {product.description}
-            </p>
-          )}
+          
 
-          {/* Price Section */}
+          {/* Price */}
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1">
               {hasDiscount ? (
                 <>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-900">
-                      ₹{isPriceIncreased ? product.originalPrice : product.price}
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">
+                      Rs.
+                      {isPriceIncreased
+                        ? product.originalPrice
+                        : product.price}
                     </span>
-                    <span className="text-sm text-gray-500 line-through">
-                      ₹{isPriceIncreased ? product.price : product.originalPrice}
+                    <span className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                      Rs.
+                      {isPriceIncreased
+                        ? product.price
+                        : product.originalPrice}
                     </span>
                   </div>
                   {!isPriceIncreased && (
                     <span className="text-xs text-green-600">
-                      Save ₹{product.originalPrice! - product.price}
+                      Save Rs. {product.originalPrice! - product.price}
                     </span>
                   )}
                 </>
               ) : (
-                <span className="text-lg font-bold text-gray-900">₹{product.price}</span>
+                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                  Rs. {product.price}
+                </span>
               )}
             </div>
           </div>
         </div>
 
-        {/* Footer Section */}
+        {/* Footer */}
         <div className="p-4 pt-0">
           <AddToCartButton
             product={product}
             disabled={product.inventory === 0 || !product.inStock}
-            className="w-full py-2 bg-gray-900 text-white hover:bg-gray-800 rounded-md text-sm font-medium transition-colors"
+            className="w-full py-2 bg-black text-white hover:bg-gray-800 rounded-md text-sm font-medium transition-colors"
           />
         </div>
       </div>

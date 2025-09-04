@@ -139,7 +139,7 @@ export function TestimonialSection({ productSlug }: { productSlug: string }) {
                   <div>
                     <p className="font-semibold text-gray-900">{testimonial.name}</p>
                     <p className="text-sm text-gray-500">{testimonial.role}</p>
-                    <p className="text-xs text-gray-400 mt-1">{testimonial.date}</p>
+                    {/* <p className="text-xs text-gray-400 mt-1">{testimonial.date}</p> */}
                   </div>
                 </div>
 

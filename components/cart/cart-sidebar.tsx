@@ -1,8 +1,9 @@
+
 "use client"
 
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, Trash2, X, Sparkles } from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag, Lock, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/lib/cart/cart-context"
 import { motion, AnimatePresence } from "framer-motion"
@@ -13,12 +14,10 @@ export function CartSidebar() {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
-    // Small delay for animation when component mounts
     const timer = setTimeout(() => setIsVisible(true), 100)
     return () => clearTimeout(timer)
   }, [])
 
-  // Track activity when user interacts with cart
   const handleInteraction = () => {
     trackActivity()
   }
@@ -29,33 +28,20 @@ export function CartSidebar() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col items-center justify-center h-full text-center p-8"
+        className="flex flex-col items-center justify-center h-full text-center p-8 bg-white"
       >
         <div className="relative mb-6">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
-            <svg 
-              className="w-12 h-12 text-gray-400" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-              />
-            </svg>
-          </div>
-          <div className="absolute -top-2 -right-2">
-            <Sparkles className="h-6 w-6 text-amber-400" />
+            <ShoppingBag className="w-12 h-12 text-gray-400" />
           </div>
         </div>
-        <h3 className="text-xl font-serif font-light mb-2">Your Cart is Empty</h3>
-        <p className="text-gray-500 mb-6">Add exquisite pieces to begin your collection</p>
-        <Button className="bg-black hover:bg-gray-800 rounded-sm px-6">
-          Continue Shopping
-        </Button>
+        <h3 className="text-2xl font-serif font-light text-black mb-2">Your Cart is Empty</h3>
+        <p className="text-gray-600 mb-6">Discover our curated collection and add elegance to your cart.</p>
+        <Link href="/products">
+          <Button className="bg-black hover:bg-gray-800 text-white rounded-sm px-8 py-3 font-medium">
+            Explore Collection
+          </Button>
+        </Link>
       </motion.div>
     )
   }
@@ -65,138 +51,138 @@ export function CartSidebar() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col h-full"
+      className="flex flex-col h-full bg-white"
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-100">
-        <h2 className="text-xl font-serif font-light">Your Cart</h2>
+      <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center">
-          <span className="text-xs text-gray-500 mr-2">{state.itemCount} items</span>
-          <Sparkles className="h-4 w-4 text-amber-400" />
+          <ShoppingBag className="h-5 w-5 text-gray-700 mr-3" />
+          <h2 className="text-xl font-serif font-light text-black">Your Cart</h2>
+        </div>
+        <div className="flex items-center">
+          <span className="text-sm text-gray-600 mr-2">{state.itemCount} items</span>
+          <ShoppingBag className="h-4 w-4 text-black" />
         </div>
       </div>
 
-      {/* Cart Items */}
-      <div className="flex-1 overflow-y-auto py-2 px-4">
-        <AnimatePresence>
-          {state.items.map((item) => (
-            <motion.div
-              key={item.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.3 }}
-              className="flex items-center p-4 mb-3 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
-            >
-              {/* Product Image */}
-              <div className="relative h-20 w-20 overflow-hidden rounded-md flex-shrink-0">
-                <Image
-                  src={item.image || "/placeholder.svg?height=80&width=80"}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-              </div>
+      {/* Cart Items - Vertical Scroll */}
+      <div className="flex-1 overflow-y-auto py-4 px-6 pb-48"> {/* Added pb-48 to prevent overlap */}
+        <div className="flex flex-col space-y-4 min-h-[200px]"> {/* Added min-h-[200px] */}
+          <AnimatePresence>
+            {state.items.map((item) => (
+              <motion.div
+                key={item.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 0.3 }}
+                className="w-full bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow p-4 flex items-center"
+              >
+                {/* Product Image */}
+                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md">
+                  <Image
+                    src={item.image || "/placeholder.svg?height=80&width=80"}
+                    alt={item.name || "Product Image"}
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "/placeholder.svg?height=80&width=80"
+                    }}
+                  />
+                </div>
 
-              {/* Product Details */}
-              <div className="flex-1 min-w-0 ml-4">
-                <h4 className="text-sm font-medium truncate">{item.name}</h4>
-                <p className="text-sm text-gray-600 mt-1">${item.price.toFixed(2)}</p>
+                {/* Product Details */}
+                <div className="ml-4 flex-1">
+                  <h4 className="text-sm font-medium text-black truncate">{item.name || "Unnamed Product"}</h4>
+                  <p className="text-sm text-gray-600 mt-1">₹{(item.price || 0).toLocaleString("en-IN")}</p>
 
-                {/* Quantity Controls */}
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center space-x-2">
+                  {/* Quantity Controls */}
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8 rounded-full bg-transparent border-gray-300 hover:border-black"
+                        onClick={() => {
+                          const newQty = Math.max(item.quantity - 1, 1)
+                          updateQuantity(item.id, newQty)
+                          handleInteraction()
+                        }}
+                      >
+                        <Minus className="h-4 w-4 text-black" />
+                      </Button>
+                      <span className="text-sm font-medium w-6 text-center text-black">{item.quantity}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8 rounded-full bg-transparent border-gray-300 hover:border-black"
+                        onClick={() => {
+                          updateQuantity(item.id, item.quantity + 1)
+                          handleInteraction()
+                        }}
+                      >
+                        <Plus className="h-4 w-4 text-black" />
+                      </Button>
+                    </div>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
-                      className="h-7 w-7 rounded-full bg-transparent border-gray-300"
+                      className="h-8 w-8 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full"
                       onClick={() => {
-                        updateQuantity(item.id, item.quantity - 1)
+                        removeItem(item.id)
                         handleInteraction()
                       }}
                     >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-
-                    <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
-
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7 rounded-full bg-transparent border-gray-300"
-                      onClick={() => {
-                        updateQuantity(item.id, item.quantity + 1)
-                        handleInteraction()
-                      }}
-                    >
-                      <Plus className="h-3 w-3" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full"
-                    onClick={() => {
-                      removeItem(item.id)
-                      handleInteraction()
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Cart Summary */}
+      {/* Cart Summary - Sticky */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
-        className="border-t border-gray-100 bg-gray-50 p-6 space-y-5"
+        className="sticky bottom-0 border-t border-gray-200 bg-gray-50 p-6 space-y-5"
       >
-        {/* Subtotal
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Subtotal</span>
-          <span className="font-medium">${state.subtotal?.toFixed(2) || state.total.toFixed(2)}</span>
-        </div>
-
-        
-        <div className="flex justify-between text-sm">
-          <span className="text-gray-600">Shipping</span>
-          <span className="font-medium">{state.subtotal > 500 ? "FREE" : "$15.00"}</span>
-        </div> */}
+        {/* Free Shipping Progress */}
+        {state.total < 500 && (
+          <div className="bg-gray-100 p-3 rounded-lg border border-gray-200">
+            <div className="flex justify-between text-xs text-gray-600 mb-2">
+              <span>Free shipping on orders above ₹500</span>
+              <span>₹{(500 - state.total).toLocaleString("en-IN")} more</span>
+            </div>
+            <div className="w-full bg-gray-300 rounded-full h-2">
+              <div 
+                className="bg-black h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${Math.min((state.total / 500) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Total */}
-        <div className="flex justify-between text-base font-medium pt-3 border-t border-gray-200">
-          <span>Total</span>
-          <span>${state.total.toFixed(2)}</span>
+        <div className="flex justify-between text-base font-medium text-black pt-3 border-t border-gray-200">
+          <span>Total Amount</span>
+          <span>₹{state.total.toLocaleString("en-IN")}</span>
         </div>
-
-        {/* Promo message */}
-        {/* {state.subtotal < 500 && (
-          <div className="bg-amber-50 p-3 rounded-md border border-amber-100">
-            <p className="text-xs text-amber-800 text-center">
-              Add ${(500 - state.subtotal).toFixed(2)} more for free shipping
-            </p>
-          </div>
-        )} */}
 
         {/* Buttons */}
         <div className="space-y-3">
           <Link href="/checkout">
-            <Button className="w-full bg-black hover:bg-gray-800 rounded-sm h-12 font-normal">
+            <Button className="w-full bg-black hover:bg-gray-800 text-white rounded-sm h-12 font-medium">
               Proceed to Checkout
             </Button>
           </Link>
           <Button
             variant="outline"
-            className="w-full bg-white border-gray-300 text-gray-600 hover:bg-gray-50 rounded-sm h-10 font-normal"
+            className="w-full bg-white border-gray-300 text-black hover:bg-gray-100 rounded-sm h-10 font-medium"
             onClick={() => {
               clearCart()
               handleInteraction()
@@ -206,13 +192,21 @@ export function CartSidebar() {
           </Button>
         </div>
 
-        {/* Security badge */}
-        <div className="flex items-center justify-center pt-2">
-          <div className="flex items-center text-xs text-gray-500">
-            <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-            Secure Checkout
+        {/* Security & Trust Badges */}
+        <div className="pt-4 border-t border-gray-200">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="flex flex-col items-center">
+              <Lock className="h-4 w-4 text-gray-600 mb-1" />
+              <span className="text-xs text-gray-600">Secure</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <Sparkles className="h-4 w-4 text-gray-600 mb-1" />
+              <span className="text-xs text-gray-600">Premium</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <ShoppingBag className="h-4 w-4 text-gray-600 mb-1" />
+              <span className="text-xs text-gray-600">Quality</span>
+            </div>
           </div>
         </div>
       </motion.div>

@@ -21,17 +21,24 @@ export function AddToCartButton({ product, disabled, className }: AddToCartButto
   const { toast } = useToast()
 
   const getImageUrl = useCallback(() => {
-    if (!product.images?.[0]) return "/fallback-product.png"
-    
-    const image = product.images[0]
-    if (typeof image === "string") return image
-    
+    const firstMedia = product.media?.[0]
+    if (!firstMedia) return "/fallback-product.png"
+
     try {
-      return urlFor(image).width(200).height(200).url() ?? "/fallback-product.png"
-    } catch {
+      if (firstMedia._type === "image") {
+        return urlFor(firstMedia.asset)?.width(200)?.height(200)?.url() ?? "/fallback-product.png"
+      }
+
+      if (firstMedia._type === "file") {
+        return urlFor(firstMedia.asset)?.url() ?? "/fallback-product.png"
+      }
+
+      return "/fallback-product.png"
+    } catch (error) {
+      console.error("Error generating image URL:", error)
       return "/fallback-product.png"
     }
-  }, [product.images])
+  }, [product.media])
 
   const handleAddToCart = useCallback(async () => {
     if (disabled || status !== "idle") return
@@ -41,28 +48,24 @@ export function AddToCartButton({ product, disabled, className }: AddToCartButto
     try {
       const imageUrl = getImageUrl()
 
-      // Add item to cart
       addItem({
         id: product._id,
-        name: product.name,
-        price: product.price,
-        slug: product.slug?.current || product.name.toLowerCase().replace(/\s+/g, '-'),
+        name: product.name || "Unnamed Product",
+        price: product.price || 0,
+        slug: product.slug?.current || product.name?.toLowerCase().replace(/\s+/g, '-') || product._id,
         image: imageUrl,
       })
 
-      // Track cart activity
       trackActivity()
 
-      // Show success toast
       setStatus("added")
       toast({
         title: "Added to Cart",
-        description: `${product.name} has been added to your cart.`,
-        className: "bg-green-50 border-green-200 text-green-900",
+        description: `${product.name || "Item"} has been added to your cart.`,
+        className: "bg-gray-50 border-gray-200 text-black",
         duration: 3000,
       })
 
-      // Send analytics
       try {
         await fetch("/api/analytics/add-to-cart", {
           method: "POST",
@@ -71,8 +74,8 @@ export function AddToCartButton({ product, disabled, className }: AddToCartButto
             sessionId: state.sessionId,
             userId: state.userId,
             productId: product._id,
-            productName: product.name,
-            price: product.price,
+            productName: product.name || "Unnamed Product",
+            price: product.price || 0,
             timestamp: new Date().toISOString(),
           }),
         })
@@ -80,15 +83,13 @@ export function AddToCartButton({ product, disabled, className }: AddToCartButto
         console.error("Analytics error:", error)
       }
 
-      // Reset status after 2 seconds
       setTimeout(() => setStatus("idle"), 2000)
-
     } catch (error) {
       console.error("Error adding to cart:", error)
       toast({
         title: "Error",
         description: "Failed to add item to cart. Please try again.",
-        variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-900",
         duration: 3000,
       })
       setStatus("idle")
@@ -115,11 +116,10 @@ export function AddToCartButton({ product, disabled, className }: AddToCartButto
       onClick={handleAddToCart}
       disabled={disabled || status !== "idle"}
       className={cn(
-        "w-full py-3 rounded-lg font-medium transition-all duration-200",
-        "bg-gradient-to-r from-gray-900 to-gray-800 text-white",
-        "hover:from-gray-800 hover:to-gray-700",
-        "disabled:from-gray-300 disabled:to-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
-        status === "added" && "bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600",
+        "w-full py-3 rounded-sm font-medium transition-all duration-200",
+        "bg-black text-white hover:bg-gray-800",
+        "disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
+        status === "added" && "bg-gray-700 hover:bg-gray-600",
         "shadow-sm hover:shadow-md active:shadow-sm",
         className
       )}

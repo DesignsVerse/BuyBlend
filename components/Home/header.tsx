@@ -85,30 +85,33 @@ export function SiteHeader() {
               
               {/* Products Dropdown */}
               <div 
-                className="relative group" 
-                ref={dropdownRef}
-                onMouseEnter={() => setActiveDropdown("products")}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <button 
-                  className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center"
-                  onClick={() => toggleDropdown("products")}
-                >
-                  Products
-                  <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div 
-                  className={`absolute bg-[#fff3f3] shadow-lg rounded-md p-4 w-48 mt-2 border border-gray-100 ${activeDropdown === "products" ? "block" : "hidden"}`}
-                  style={{ top: "100%", left: 0 }}
-                >
-                  <Link href="/products/rings" className="block py-2 px-4 hover:bg-gray-50 rounded">Rings</Link>
-                  <Link href="/products/necklaces" className="block py-2 px-4 hover:bg-gray-50 rounded">Necklaces</Link>
-                  <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded">Earrings</Link>
-                  <Link href="/products/bracelets" className="block py-2 px-4 hover:bg-gray-50 rounded">Bracelets</Link>
-                </div>
-              </div>
+  className="relative group" 
+  ref={dropdownRef}
+  onMouseEnter={() => setActiveDropdown("products")}
+  onMouseLeave={() => setActiveDropdown(null)}
+>
+  <button 
+    className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center gap-1"
+    onClick={() => toggleDropdown("products")}
+  >
+    <Link href="/products">Products</Link>
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  {/* Dropdown menu */}
+  <div 
+    className={`absolute bg-[#fff3f3] shadow-lg rounded-md p-4 w-48 mt-2 border border-gray-100 ${activeDropdown === "products" ? "block" : "hidden"}`}
+    style={{ top: "100%", left: 0 }}
+  >
+    <Link href="/products/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded">Pendant</Link>
+    <Link href="/products/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded">Earrings</Link>
+    <Link href="/products/combos" className="block py-2 px-4 hover:bg-gray-50 rounded">Combos</Link>
+    <Link href="/products/rings" className="block py-2 px-4 hover:bg-gray-50 rounded">Rings</Link>
+  </div>
+</div>
+
               
               {/* Earrings Dropdown */}
               <div 
@@ -196,8 +199,8 @@ export function SiteHeader() {
                     className="text-lg font-medium py-2 flex items-center justify-between w-full"
                     onClick={() => toggleDropdown("mobile-products")}
                   >
-                    <span>Products</span>
-                    <svg className={`transform ${activeDropdown === "mobile-products" ? "rotate-180" : ""} h-5 w-5`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <Link href="/products">Product</Link>
+                      <svg className={`transform ${activeDropdown === "mobile-products" ? "rotate-180" : ""} h-5 w-5`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>

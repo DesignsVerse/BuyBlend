@@ -11,7 +11,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 
 export default function CustomerLove() {
   return (
-    <div className="max-w-6xl mx-auto py-12 px-4">
+    <div className="max-w-6xl mx-auto py- px-4">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800">Customer Love</h2>
         <div className="flex gap-2">

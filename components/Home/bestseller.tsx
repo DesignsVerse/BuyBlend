@@ -67,7 +67,7 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
   }
 
   return (
-    <section className="py-16 bg-gradient-to-br from-white via-amber-50/30 to-gray-50 relative overflow-hidden">
+    <section className="py-16 bg-white relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-amber-200/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-rose-200/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>

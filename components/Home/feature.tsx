@@ -100,10 +100,8 @@ const ProductShowcase: React.FC = () => {
   }, [activeIndex, isHovered, products.length, scrollToIndex]);
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-white via-amber-50/20 to-gray-50 relative overflow-hidden">
+    <section className="py-10 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-amber-200/10 rounded-full translate-x-1/3 -translate-y-1/3 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-rose-200/10 rounded-full -translate-x-1/3 translate-y-1/3 blur-3xl"></div>
       
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">

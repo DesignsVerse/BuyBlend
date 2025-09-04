@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { X, VolumeX, Volume2, Pause, Play, ChevronLeft, ChevronRight, ShoppingBag, ChevronDown, ChevronUp } from 'lucide-react'
-import { products} from '@/data/videos/product-video'
+import { products } from '@/data/videos/product-video'
 
 export default function VideoShowcaseReels() {
   const [activeIndex, setActiveIndex] = useState(0)
@@ -24,10 +24,10 @@ export default function VideoShowcaseReels() {
     const checkMobile = () => {
       setIsMobileView(window.innerWidth < 768)
     }
-    
+
     checkMobile()
     window.addEventListener('resize', checkMobile)
-    
+
     return () => {
       window.removeEventListener('resize', checkMobile)
     }
@@ -83,14 +83,14 @@ export default function VideoShowcaseReels() {
     popupVideoRefs.current.forEach((video, index) => {
       if (video) {
         video.muted = isMuted
-        if (index === activePopupIndex && isReelMode) {
-          video.play().catch(() => {})
+        if (index === activePopupIndex) {
+          video.play().catch(() => { })
         } else {
           video.pause()
         }
       }
     })
-  }, [activePopupIndex, isMuted, isReelMode])
+  }, [activePopupIndex, isMuted])
 
   // Scroll to center in popup
   useEffect(() => {
@@ -121,21 +121,6 @@ export default function VideoShowcaseReels() {
       return () => slider.removeEventListener('scroll', handleScroll)
     }
   }, [handleScroll])
-
-  // Handle touch events for mobile swipe in reel mode
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!isReelMode) return
-    const touchY = e.targetTouches[0].clientY
-    setActiveIndex(prev => {
-      if (touchY < window.innerHeight / 2) {
-        // Swipe up - next video
-        return Math.min(products.length - 1, prev + 1)
-      } else {
-        // Swipe down - previous video
-        return Math.max(0, prev - 1)
-      }
-    })
-  }
 
   const toggleMute = () => {
     setIsMuted(!isMuted)
@@ -213,16 +198,16 @@ export default function VideoShowcaseReels() {
 
           <div className="flex gap-8 overflow-x-auto pb-6 scrollbar-hide">
             {products.map((product, index) => (
-              <div 
+              <div
                 key={product.id}
                 className="flex-shrink-0 w-80 bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-100 cursor-pointer"
                 onClick={() => openPopup(index)}
               >
-                <div className="relative h-80">
+                <div className="relative h-120">
                   <video
-        ref={el => { videoRefs.current[index] = el }}
-        src={product.video}
-                            className="w-full h-full object-cover"
+                    ref={el => { videoRefs.current[index] = el }}
+                    src={product.video}
+                    className="w-full h-full object-cover"
                     autoPlay
                     muted
                     loop
@@ -230,7 +215,7 @@ export default function VideoShowcaseReels() {
                     preload="auto"
                   />
                 </div>
-                
+
                 <div className="p-4 bg-white">
                   <h3 className="font-medium text-sm mb-2 line-clamp-2 text-gray-900">{product.title}</h3>
                   <div className="flex items-center justify-between">
@@ -256,9 +241,8 @@ export default function VideoShowcaseReels() {
               <button
                 key={index}
                 onClick={() => goToIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  index === activeIndex ? 'bg-gray-900' : 'bg-gray-300'
-                }`}
+                className={`w-3 h-3 rounded-full transition-all ${index === activeIndex ? 'bg-gray-900' : 'bg-gray-300'
+                  }`}
                 aria-label={`Go to product ${index + 1}`}
               />
             ))}
@@ -266,7 +250,7 @@ export default function VideoShowcaseReels() {
         </div>
       </div>
 
-      {/* Mobile View - Grid Layout (Same as Desktop) */}
+      {/* Mobile View - Grid Layout */}
       <div className="block md:hidden py-8">
         <div className="container mx-auto px-4">
           <div className="text-center mb-6">
@@ -275,121 +259,223 @@ export default function VideoShowcaseReels() {
           </div>
 
           <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
-  {products.map((product, index) => (
-    <div 
-      key={product.id}
-      className="flex-shrink-0 w-64 bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer"
-      onClick={() => openPopup(index)}
-    >
-      <div className="relative h-64 w-64">
-        <video
-ref={el => { videoRefs.current[index] = el }}
-src={product.video}
-          className="w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-        />
-      </div>
-      
-      <div className="p-3 bg-white">
-        <h3 className="font-medium text-sm mb-1 line-clamp-2 text-gray-900">{product.title}</h3>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-1">
-            <span className="font-bold text-gray-900 text-sm">₹{product.discountPrice || product.price}</span>
-            {product.discountPrice && (
-              <span className="text-gray-500 line-through text-sm">₹{product.price}</span>
-            )}
+            {products.map((product, index) => (
+              <div
+                key={product.id}
+                className="flex-shrink-0 w-74 bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer"
+                onClick={() => openPopup(index)}
+              >
+                <div className="relative h-120">
+                  <video
+                    ref={el => { videoRefs.current[index] = el }}
+                    src={product.video}
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                  />
+                </div>
+
+                <div className="p-3 bg-white">
+                  <h3 className="font-medium text-sm mb-1 line-clamp-2 text-gray-900">{product.title}</h3>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-1">
+                      <span className="font-bold text-gray-900 text-sm">₹{product.discountPrice || product.price}</span>
+                      {product.discountPrice && (
+                        <span className="text-gray-500 line-through text-xs">₹{product.price}</span>
+                      )}
+                    </div>
+                    <button className="bg-gray-900 text-white p-2 rounded text-xs font-medium hover:bg-gray-800 transition-colors">
+                      <ShoppingBag className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <button className="bg-gray-900 text-white px-3 py-1 rounded text-sm font-medium hover:bg-gray-800 transition-colors">
-            <ShoppingBag className="w-4 h-4" />
+        </div>
+      </div>
+
+      {/* Mobile Reel Popup */}
+      {isPopupOpen && isMobileView && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-start overflow-hidden">
+          {/* Close Button */}
+          <button
+            onClick={closePopup}
+            className="absolute top-4 right-4 z-50 bg-black/50 text-white rounded-full p-2"
+          >
+            <X className="h-6 w-6" />
           </button>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
 
-        </div>
-      </div>
+          {/* Vertical Scrollable Reel */}
+          <div
+            ref={sliderRef}
+            className="w-full h-full overflow-y-scroll snap-y snap-mandatory scroll-smooth"
+          >
+            {products.map((product, index) => (
+              <div
+                key={product.id}
+                className="w-full h-screen snap-start relative flex items-center justify-center"
+              >
+                <video
+                  ref={el => { popupVideoRefs.current[index] = el }}
+                  src={product.video}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  loop
+                  muted={isMuted}
+                  playsInline
+                />
 
-      {isPopupOpen && isReelMode && (
-  <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-start overflow-hidden">
-    {/* Close Button */}
-    <button
-      onClick={closePopup}
-      className="absolute top-4 right-4 z-50 bg-black/50 text-white rounded-full p-2"
-    >
-      <X className="h-6 w-6" />
-    </button>
+                {/* Right Side Navigation Center */}
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
+                  <button
+                    onClick={prevProduct}
+                    className="bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors"
+                  >
+                    <ChevronUp className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={nextProduct}
+                    className="bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors"
+                  >
+                    <ChevronDown className="w-6 h-6" />
+                  </button>
+                </div>
 
-    {/* Vertical Scrollable Reel */}
-    <div
-      ref={sliderRef}
-      className="w-full h-full overflow-y-scroll snap-y snap-mandatory scroll-smooth"
-    >
-      {products.map((product, index) => (
-        <div
-          key={product.id}
-          className="w-full h-screen snap-start relative flex items-center justify-center"
-        >
-          <video
-ref={el => { popupVideoRefs.current[index] = el }}
-src={product.video}
-            className="w-full h-full object-cover"
-            autoPlay
-            loop
-            muted={isMuted}
-            playsInline
-          />
+                {/* Bottom Info Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
+                  <h3 className="font-medium text-lg">{product.title}</h3>
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-bold">₹{product.discountPrice || product.price}</span>
+                      {product.discountPrice && (
+                        <span className="line-through text-gray-300 text-sm">₹{product.price}</span>
+                      )}
+                    </div>
+                    <button className="bg-white text-black px-3 py-2 rounded-md font-medium flex items-center gap-1">
+                      <ShoppingBag className="w-4 h-4" /> Shop Now
+                    </button>
+                  </div>
+                </div>
 
-          {/* Right Side Navigation Center */}
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
-            <button
-              onClick={prevProduct}
-              className="bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors"
-            >
-              <ChevronUp className="w-6 h-6" />
-            </button>
-            <button
-              onClick={nextProduct}
-              className="bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors"
-            >
-              <ChevronDown className="w-6 h-6" />
-            </button>
+                {/* Mute Button */}
+                <button
+                  onClick={toggleMute}
+                  className="absolute bottom-20 right-4 bg-black/50 text-white rounded-full p-2"
+                >
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </button>
+              </div>
+            ))}
           </div>
+        </div>
+      )}
 
-          {/* Bottom Info Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
-            <h3 className="font-medium text-lg">{product.title}</h3>
-            <div className="flex justify-between items-center mt-2">
-              <div className="flex items-center space-x-2">
-                <span className="font-bold">₹{product.discountPrice || product.price}</span>
-                {product.discountPrice && (
-                  <span className="line-through text-gray-300 text-sm">{product.price}</span>
+      {/* Desktop Popup */}
+      {isPopupOpen && !isMobileView && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center overflow-hidden">
+          <div className="w-full max-w-6xl max-h-[90vh] bg-white rounded-xl overflow-hidden">
+            {/* Close Button */}
+            <button
+              onClick={closePopup}
+              className="absolute top-4 right-4 z-50 bg-black/50 text-white rounded-full p-2"
+            >
+              <X className="h-6 w-6" />
+            </button>
+
+            <div className="flex h-[80vh]">
+              {/* Video Section */}
+              <div className="flex-1 relative bg-black">
+                <video
+                  ref={el => { popupVideoRefs.current[activePopupIndex] = el }}
+                  src={products[activePopupIndex].video}
+                  className="w-full h-full object-contain"
+                  autoPlay
+                  loop
+                  muted={isMuted}
+                  playsInline
+                />
+
+                {/* Navigation Arrows */}
+                {products.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevProduct}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 text-gray-800 rounded-full p-2 hover:bg-white transition-colors"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                      onClick={nextProduct}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 text-gray-800 rounded-full p-2 hover:bg-white transition-colors"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+
+                {/* Mute Button */}
+                <button
+                  onClick={toggleMute}
+                  className="absolute bottom-4 right-4 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition-colors"
+                >
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                </button>
+              </div>
+
+              {/* Product Info Section */}
+              <div className="w-96 p-6 bg-white overflow-y-auto">
+                <h2 className="text-2xl font-bold mb-4">{products[activePopupIndex].title}</h2>
+                <p className="text-gray-600 mb-6">{products[activePopupIndex].description}</p>
+                
+                <div className="flex items-center mb-6">
+                  <span className="text-2xl font-bold text-gray-900">
+                    ₹{products[activePopupIndex].discountPrice || products[activePopupIndex].price}
+                  </span>
+                  {products[activePopupIndex].discountPrice && (
+                    <span className="text-lg line-through text-gray-500 ml-2">
+                      ₹{products[activePopupIndex].price}
+                    </span>
+                  )}
+                </div>
+
+                <button className="w-full bg-gray-900 text-white py-3 rounded-md font-medium flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors">
+                  <ShoppingBag className="w-5 h-5" /> Add to Cart
+                </button>
+
+                {/* Thumbnail Navigation */}
+                {products.length > 1 && (
+                  <div className="mt-8">
+                    <h3 className="font-medium mb-3">More Videos</h3>
+                    <div className="grid grid-cols-3 gap-2">
+                      {products.map((product, index) => (
+                        <button
+                          key={product.id}
+                          onClick={() => setActivePopupIndex(index)}
+                          className={`relative aspect-video overflow-hidden rounded-lg border-2 transition-all ${
+                            index === activePopupIndex ? 'border-gray-900' : 'border-transparent'
+                          }`}
+                        >
+                          <video
+                            src={product.video}
+                            className="w-full h-full object-cover"
+                            muted
+                            loop
+                            playsInline
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
-              <button className="bg-white text-black px-3 py-2 rounded-md font-medium flex items-center gap-1">
-                <ShoppingBag className="w-4 h-4" /> Shop Now
-              </button>
             </div>
           </div>
-
-          {/* Mute Button */}
-          <button
-            onClick={toggleMute}
-            className="absolute bottom-20 right-4 bg-black/50 text-white rounded-full p-2"
-          >
-            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-          </button>
         </div>
-      ))}
-    </div>
-  </div>
-)}
-
+      )}
 
       <style jsx>{`
         .scrollbar-hide {

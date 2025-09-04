@@ -113,7 +113,7 @@ export default function ProductsPageClient({
 
   return (
     <div className="min-h-screen bg-white">
-      <TopMarquee />
+      
       <div className="container mx-auto py-8 md:px-12 px-4 max-w-full">
         {/* Mobile Filter Toggle Button */}
         <div className="lg:hidden flex items-center justify-between mb-6">
@@ -137,7 +137,7 @@ export default function ProductsPageClient({
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters - Desktop */}
           <aside className="hidden lg:block lg:w-80 bg-white rounded-xl shadow-md border border-gray-200 p-6 h-fit sticky top-30">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-">
               <h3 className="text-lg font-semibold flex items-center text-gray-900">
                 <SlidersHorizontal className="mr-2 h-5 w-5 text-gray-700" />
                 Filter & Sort
@@ -151,7 +151,7 @@ export default function ProductsPageClient({
             </div>
 
             {/* Search */}
-            <div className="mb-8">
+            <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -167,7 +167,7 @@ export default function ProductsPageClient({
 
             {/* Type Filters */}
             {categories.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Earring Type</h4>
                 <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
                   {categories.map((cat) => (
@@ -192,7 +192,7 @@ export default function ProductsPageClient({
             )}
 
             {/* Price Range */}
-            <div className="mb-8">
+            <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-700 mb-3">Price Range</h4>
               <div className="px-2 relative">
                 <div className="relative h-2 bg-gray-200 rounded-lg">
@@ -238,10 +238,10 @@ export default function ProductsPageClient({
             </div>
 
             {/* Availability */}
-            <div className="mb-8">
+            <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-700 mb-3">Product Status</h4>
-              <div className="space-y-3">
-                {[
+              <div className="grid grid-cols-2 gap-2">
+              {[
                   { id: "inStock", label: "In Stock", checked: availability.inStock },
                   { id: "onSale", label: "On Sale", checked: availability.onSale },
                   { id: "featured", label: "Featured", checked: availability.featured },
@@ -286,7 +286,7 @@ export default function ProductsPageClient({
                 </div>
 
                 {/* Search */}
-                <div className="mb-8">
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -302,7 +302,7 @@ export default function ProductsPageClient({
 
                 {/* Type Filters */}
                 {categories.length > 0 && (
-                  <div className="mb-8">
+                  <div className="mb-4">
                     <h4 className="text-sm font-medium text-gray-700 mb-3">Earring Type</h4>
                     <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
                       {categories.map((cat) => (
@@ -327,7 +327,7 @@ export default function ProductsPageClient({
                 )}
 
                 {/* Price Range */}
-                <div className="mb-8">
+                <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">Price Range</h4>
                   <div className="px-2 relative">
                     <div className="relative h-2 bg-gray-200 rounded-lg">
@@ -373,7 +373,7 @@ export default function ProductsPageClient({
                 </div>
 
                 {/* Availability */}
-                <div className="mb-8">
+                <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">Product Status</h4>
                   <div className="space-y-3">
                     {[

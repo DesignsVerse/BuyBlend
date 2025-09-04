@@ -52,7 +52,7 @@ const categories: Category[] = [
 
 export default function CategoriesSection() {
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-b from-gray-50 to-[#fff3f3]">
+    <section className="py-12 md:py-16 bg-white">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div 

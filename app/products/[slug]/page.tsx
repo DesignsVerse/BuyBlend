@@ -8,6 +8,9 @@ import { ProductMediaSlider } from "@/components/products/product-media-slider"
 import { TestimonialSection } from "@/components/products/TestimonialSection"
 import { FeaturedProductsSection } from "@/components/Home/bestseller"
 import CustomProductCard from "@/components/Home/feature"
+import RecommendedProducts from "@/components/products/recommended-products"
+import ReviewSection from "@/components/products/user-review-section"
+import  CustomerLove from "@/components/products/customer-images"
 
 interface ProductPageProps {
   params: {
@@ -46,9 +49,10 @@ async function getProduct(slug: string): Promise<Product | null> {
     return null
   }
 }
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params  // <- await params here
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await getProduct(params.slug)
+  const product = await getProduct(slug)
 
   if (!product) notFound()
 
@@ -75,21 +79,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Breadcrumbs */}
-        <nav className="flex mb-6 text-sm text-gray-500">
-          <ol className="flex items-center space-x-2">
-            <li>Home</li>
-            <li>/</li>
-            <li>Products</li>
-            {product.category && product.category.name && (
-              <>
-                <li>/</li>
-                <li>{product.category.name}</li>
-              </>
-            )}
-            <li>/</li>
-            <li className="text-gray-900 font-medium truncate max-w-xs">{product.name}</li>
-          </ol>
-        </nav>
+          {/* <nav className="flex mb-6 text-sm text-gray-500">
+            <ol className="flex items-center space-x-2">
+              <li>Home</li>
+              <li>/</li>
+              <li>Products</li>
+              {product.category && product.category.name && (
+                <>
+                  <li>/</li>
+                  <li>{product.category.name}</li>
+                </>
+              )}
+              <li>/</li>
+              <li className="text-gray-900 font-medium truncate max-w-xs">{product.name}</li>
+            </ol>
+          </nav> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           <div className="space-y-4">
@@ -136,6 +140,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div className="flex items-center gap-3 mb-6">
                 {hasDiscount ? (
                   <>
+                  <div className="flex-col">
                     {/* Original Price (line-through) */}
                     <span className="text-xl line-through text-gray-500">
                       ₹{effectiveOriginalPrice?.toLocaleString("en-IN")}
@@ -157,6 +162,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
                         ? `${discountPercent}% OFF`
                         : `${discountPercent}% OFF`}
                     </span>
+                     {/* Add to Cart Section */}
+            <div className="pt-4 border-t border-gray-200">
+              <AddToCartButton product={product} disabled={isOutOfStock} />
+
+              {/* Delivery Estimate */}
+              <div className="mt-4 flex items-center text-sm text-gray-600">
+                <Truck className="h-4 w-4 mr-2" />
+                <span>Free delivery expected by {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+              </div>
+            </div>
+                    </div>
                   </>
                 ) : (
                   // If no discount, just show price
@@ -276,13 +292,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           </div>
         </div>
-        
+        <CustomerLove />
+
+        <RecommendedProducts
+          type={product.type ?? ""}
+          currentSlug={product.slug?.current ?? ""}
+        />
+
         {/* Testimonial Section - Full Width */}
+       
+        <ReviewSection productName={slug.replace(/-/g, " ")} />
         <div className="mt-16">
-          <TestimonialSection />
+          <CustomProductCard />
         </div>
         <div className="mt-16">
-        <CustomProductCard />
+          <TestimonialSection productSlug={slug} />
         </div>
 
       </div>

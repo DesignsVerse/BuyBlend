@@ -14,7 +14,6 @@ export const client = createClient({
 })
 
 
-
 const builder = imageUrlBuilder(client)
 export const fileUrl = (source: any) => {
   if (!source?.asset?._ref) return null
@@ -134,4 +133,15 @@ export const queries = {
       type,
       _createdAt
     }`,
+    productsByType: `*[_type == "product" && type == $type && slug.current != $currentSlug][0...10]{
+      _id,
+      name,
+      slug,
+      price,
+      originalPrice,
+      "image": media[0].asset->url,
+      category->{
+        name
+      }
+    }`
   }  

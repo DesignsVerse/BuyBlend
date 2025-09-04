@@ -1,206 +1,195 @@
 "use client"
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { Star, ChevronLeft, ChevronRight, Quote, Sparkles } from "lucide-react"
-import { testimonials, Testimonial } from "@/data/products/testimonials-data"
 
-export function TestimonialSection() {
+import { useState, useEffect, useRef } from "react"
+import { productTestimonials } from "@/data/products/testimonials-data"
+import { Star, ChevronLeft, ChevronRight, Quote, Sparkles } from "lucide-react"
+
+export function TestimonialSection({ productSlug }: { productSlug: string }) {
+  const testimonials = productTestimonials[productSlug] || []
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [direction, setDirection] = useState<'left'|'right'>('right')
-  const [isMobile, setIsMobile] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1024)
-    }
-    checkIsMobile()
-    window.addEventListener("resize", checkIsMobile)
-    return () => window.removeEventListener("resize", checkIsMobile)
-  }, [])
+  if (!testimonials.length) {
+    return null
+  }
 
-  const handlePrev = () => {
+  // Group testimonials into sets of 3
+  const testimonialGroups = []
+  for (let i = 0; i < testimonials.length; i += 3) {
+    testimonialGroups.push(testimonials.slice(i, i + 3))
+  }
+
+  const currentGroup = testimonialGroups[currentIndex] || []
+
+  const nextSlide = () => {
     if (isTransitioning) return
-    setDirection('left')
     setIsTransitioning(true)
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev === 0 ? Math.ceil(testimonials.length / 3) - 1 : prev - 1))
+      setCurrentIndex((prev) => (prev === testimonialGroups.length - 1 ? 0 : prev + 1))
       setIsTransitioning(false)
     }, 300)
   }
 
-  const handleNext = () => {
+  const prevSlide = () => {
     if (isTransitioning) return
-    setDirection('right')
     setIsTransitioning(true)
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev === Math.ceil(testimonials.length / 3) - 1 ? 0 : prev + 1))
+      setCurrentIndex((prev) => (prev === 0 ? testimonialGroups.length - 1 : prev - 1))
       setIsTransitioning(false)
     }, 300)
   }
 
-  // Auto-rotate testimonials
+  // Auto-slide functionality
   useEffect(() => {
-    const interval = setInterval(() => {
-      handleNext()
-    }, 6000)
-    return () => clearInterval(interval)
-  }, [])
-
-  // Get current testimonials to display (3 for desktop, 1 for mobile)
-  const getCurrentTestimonials = () => {
-    if (isMobile) {
-      return [testimonials[currentIndex]]
-    }
+    if (isHovered) return // Pause when hovered
     
-    const startIndex = currentIndex * 3
-    return [
-      testimonials[startIndex % testimonials.length],
-      testimonials[(startIndex + 1) % testimonials.length],
-      testimonials[(startIndex + 2) % testimonials.length]
-    ]
-  }
+    intervalRef.current = setInterval(() => {
+      nextSlide()
+    }, 5000) // Change slide every 5 seconds
 
-  const currentTestimonials = getCurrentTestimonials()
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [isHovered, testimonialGroups.length])
+
+  const goToSlide = (index: number) => {
+    if (isTransitioning) return
+    setIsTransitioning(true)
+    setTimeout(() => {
+      setCurrentIndex(index)
+      setIsTransitioning(false)
+    }, 300)
+  }
 
   return (
-    <section className="relative bg-white py-16 md:py-24 overflow-hidden">
+    <section 
+      className="relative bg-gradient-to-br from-gray-50 to-white py-16 md:py-20 overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-5">
         <div className="absolute top-10 left-10 w-40 h-40 bg-black rounded-full"></div>
         <div className="absolute bottom-10 right-10 w-32 h-32 bg-black rounded-full"></div>
         <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-black rounded-full"></div>
       </div>
-      
+
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center mb-4">
+            <Sparkles className="w-5 h-5 text-gray-700 mr-2" />
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Customer Experiences</h2>
+            <Sparkles className="w-5 h-5 text-gray-700 ml-2" />
           </div>
-          <p className="text-gray-600 mx-auto">
-            Discover what our valued customers have to say about their experience with our products
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Discover what our valued customers have to say about their experience with this product
           </p>
         </div>
 
-        {/* Testimonial Cards Container */}
+        {/* Testimonial Carousel */}
         <div className="relative max-w-7xl mx-auto">
-          {/* Cards Grid - 3 columns on desktop, 1 on mobile */}
-          <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-opacity duration-500 ${
+          {/* Navigation Arrows */}
+          <button
+            onClick={prevSlide}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 group z-10"
+            aria-label="Previous testimonials"
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-700 group-hover:text-black transition-colors" />
+          </button>
+          
+          <button
+            onClick={nextSlide}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white shadow-xl rounded-full p-3 hover:bg-gray-50 transition-all duration-300 group z-10"
+            aria-label="Next testimonials"
+          >
+            <ChevronRight className="w-6 h-6 text-gray-700 group-hover:text-black transition-colors" />
+          </button>
+
+          {/* Testimonial Grid */}
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-500 ${
             isTransitioning ? 'opacity-0' : 'opacity-100'
           }`}>
-            {currentTestimonials.map((testimonial, index) => (
-              <div key={testimonial.id || index} className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-all duration-300">
+            {currentGroup.map((testimonial) => (
+              <div
+                key={testimonial.id}
+                className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 group"
+              >
                 {/* Quote Icon */}
                 <div className="absolute top-4 left-4 opacity-10">
                   <Quote className="w-10 h-10 text-black" />
                 </div>
                 
-                {/* Message */}
-                <p className="text-gray-700 italic leading-relaxed mb-6 relative z-10">
+                {/* User Info */}
+                <div className="flex items-center gap-4 mb-4 relative z-10">
+                  <div className="relative">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 group-hover:border-gray-300 transition-colors"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-gray-800 rounded-full flex items-center justify-center">
+                      <div className="w-3 h-3 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+                    <p className="text-xs text-gray-400 mt-1">{testimonial.date}</p>
+                  </div>
+                </div>
+
+                {/* Testimonial Message */}
+                <p className="italic text-gray-700 mb-4 leading-relaxed relative z-10">
                   "{testimonial.message}"
                 </p>
 
-                {/* User Info */}
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      width={60}
-                      height={60}
-                      className="rounded-full object-cover border-2 border-gray-200"
-                    />
+                {/* Rating */}
+                {testimonial.rating && (
+                  <div className="flex items-center">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={`w-4 h-4 ${
+                          i < testimonial.rating 
+                            ? "fill-gray-800 text-gray-800" 
+                            : "fill-gray-300 text-gray-300"
+                        }`} 
+                      />
+                    ))}
+                    <span className="text-sm text-gray-600 ml-2">
+                      {testimonial.rating}/5
+                    </span>
                   </div>
-                  <div className="text-left">
-                    <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
-                    
-                    {/* Rating */}
-                    <div className="flex mt-1">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`w-4 h-4 ${
-                            i < (testimonial.rating || 0) 
-                              ? "fill-gray-800 text-gray-800" 
-                              : "fill-gray-300 text-gray-300"
-                          }`} 
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             ))}
           </div>
-
-          {/* Navigation Controls - Only show on mobile */}
-          {isMobile && (
-            <>
-              <button
-                onClick={handlePrev}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-all duration-300 group"
-                aria-label="Previous testimonial"
-              >
-                <ChevronLeft className="w-5 h-5 text-gray-700 group-hover:text-black transition-colors" />
-              </button>
-              <button
-                onClick={handleNext}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-all duration-300 group"
-                aria-label="Next testimonial"
-              >
-                <ChevronRight className="w-5 h-5 text-gray-700 group-hover:text-black transition-colors" />
-              </button>
-            </>
-          )}
         </div>
 
-        {/* Progress Indicators */}
-        <div className="flex flex-col items-center mt-10">
-          {/* Dots - Show for mobile only */}
-          {isMobile && (
-            <div className="flex justify-center gap-3 mb-4">
-              {Array.from({ length: Math.ceil(testimonials.length / 1) }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentIndex 
-                      ? "bg-gray-900 scale-125" 
-                      : "bg-gray-300 hover:bg-gray-400"
-                  }`}
-                  aria-label={`Go to testimonial ${index + 1}`}
-                />
-              ))}
-            </div>
-          )}
-          
-          {/* Dots - Show for desktop (grouped by 3) */}
-          {!isMobile && (
-            <div className="flex justify-center gap-3 mb-4">
-              {Array.from({ length: Math.ceil(testimonials.length / 3) }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index === currentIndex 
-                      ? "bg-gray-900 scale-125" 
-                      : "bg-gray-300 hover:bg-gray-400"
-                  }`}
-                  aria-label={`Go to testimonial group ${index + 1}`}
-                />
-              ))}
-            </div>
-          )}
-          
-          {/* Counter */}
-          <div className="text-sm text-gray-500">
-            {!isMobile ? `Showing ${currentIndex * 3 + 1}-${Math.min((currentIndex * 3) + 3, testimonials.length)} of ${testimonials.length}` : `${currentIndex + 1} of ${testimonials.length}`}
+        {/* Pagination Dots */}
+        <div className="flex justify-center mt-10">
+          <div className="flex gap-2">
+            {testimonialGroups.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === currentIndex 
+                    ? "bg-gray-900 scale-125" 
+                    : "bg-gray-300 hover:bg-gray-400"
+                }`}
+                aria-label={`Go to testimonial group ${index + 1}`}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Trust Badges */}
+        {/* Trust Indicators */}
         <div className="flex flex-wrap justify-center gap-8 mt-12 pt-8 border-t border-gray-200">
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-900">500+</div>

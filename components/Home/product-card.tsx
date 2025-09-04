@@ -128,7 +128,7 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
 
           {/* ✅ Hide quick actions on mobile */}
-          <div className="absolute top-2 right-2 flex gap-1 hidden md:flex">
+          <div className="absolute top-2 right-2 gap-1 hidden md:flex">
             <Button
               variant="ghost"
               size="icon"

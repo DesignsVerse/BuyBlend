@@ -84,7 +84,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const discountPercent =
     effectiveOriginalPrice && product.price
       ? Math.round(
-        ((effectiveOriginalPrice - product.price) / effectiveOriginalPrice) * 100
+        ((effectiveOriginalPrice - product.price) /  product.price) * 100
       )
       : 0
 
@@ -104,7 +104,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
 
             {/* Product Details Section */}
-            <div className="flex flex-col space-y-8">
+            <div className="flex flex-col space-y-3">
               {/* Category & Tags */}
               <div className="flex items-center gap-2 flex-wrap">
                 {product.category && product.category.name && (
@@ -125,7 +125,24 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </div>
 
               {/* Product Name */}
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{product.name}</h1>
+              
+<h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+  {product.name}
+</h1>
+
+{/* ✅ Desktop Description - Just below Name */}
+{product.description && (
+  <p className="text-sm text-gray-600 leading-relaxed max-w-2xl  hidden lg:block">
+    {product.description}
+  </p>
+)}
+
+{/* ✅ Mobile / Tablet Description */}
+<div className="border-t border-gray-200 lg:hidden">
+  <p className="text-sm text-gray-700 leading-relaxed">
+    {product.description || "No description available for this product."}
+  </p>
+</div>
 
               {/* Rating & Purchase Info */}
               <div className="flex items-center gap-4">
@@ -141,24 +158,29 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
               {/* Price Section */}
               <div className="flex items-center gap-4">
-                {hasDiscount ? (
-                  <>
-                    <span className="text-3xl font-bold text-gray-900">
-                      ₹{product.price.toLocaleString("en-IN")}
-                    </span>
-                    <span className="text-xl line-through text-gray-500">
-                      ₹{effectiveOriginalPrice?.toLocaleString("en-IN")}
-                    </span>
-                    <span className="text-sm font-semibold bg-black text-white px-2 py-1 rounded">
-                      {discountPercent}% OFF
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-3xl font-bold text-gray-900">
-                    ₹{product.price.toLocaleString("en-IN")}
-                  </span>
-                )}
-              </div>
+  {hasDiscount ? (
+    <>
+      {/* Current Price */}
+      <span className="text-3xl font-bold text-gray-900">
+        ₹{product.price.toLocaleString("en-IN")}
+      </span>
+
+      {/* Original Price (Strikethrough) */}
+      <span className="text-xl line-through text-gray-500">
+        ₹{effectiveOriginalPrice?.toLocaleString("en-IN")}
+      </span>
+
+      {/* Discount Badge */}
+      <span className="text-sm font-semibold bg-green-600 text-white px-2 py-1 rounded">
+        {Math.abs(discountPercent)}% OFF
+      </span>
+    </>
+  ) : (
+    <span className="text-3xl font-bold text-gray-900">
+      ₹{product.price.toLocaleString("en-IN")}
+    </span>
+  )}
+</div>
 
               {/* Stock Status */}
               <div className="py-2">
@@ -179,6 +201,47 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   </div>
                 )}
               </div>
+{/* Add to Cart & Wishlist Section */}
+<div className="pt-4 border-t border-gray-200">
+  <div className="flex items-center gap-3">
+    {/* Add to Cart */}
+    <div className="flex-1">
+      <AddToCartButton 
+        product={product} 
+        disabled={isOutOfStock} 
+        className="w-full py-3 text-base rounded-lg"
+      />
+    </div>
+
+    {/* Wishlist Button */}
+    <button
+      className="flex-1 flex items-center justify-center py-3 text-base border rounded-lg text-gray-700 hover:text-red-500 hover:border-red-500 transition"
+    >
+      <Heart className="h-5 w-5 mr-2" />
+      Wishlist
+    </button>
+  </div>
+
+  {/* Delivery Estimate */}
+  <div className="mt-4 flex items-center text-sm text-gray-600">
+    <Truck className="h-4 w-4 mr-2" />
+    <span>
+      Free delivery by{" "}
+      {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(
+        "en-IN",
+        { weekday: "long", day: "numeric", month: "long" }
+      )}
+    </span>
+  </div>
+</div>
+
+ {/* Style Tips */}
+ {product.styleTips && (
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h2 className="text-lg font-semibold mb-2 text-gray-900">Style Tips</h2>
+                  <p className="text-gray-700 italic">"{product.styleTips}"</p>
+                </div>
+              )}
 
               {/* Product Highlights */}
               {product.highlights && product.highlights.length > 0 && (
@@ -195,13 +258,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 </div>
               )}
 
-              {/* Style Tips */}
-              {product.styleTips && (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h2 className="text-lg font-semibold mb-2 text-gray-900">Style Tips</h2>
-                  <p className="text-gray-700 italic">"{product.styleTips}"</p>
-                </div>
-              )}
+             
 
               {/* Variants Selection */}
               {product.variants && product.variants.length > 0 && (
@@ -230,16 +287,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 </div>
               )}
 
-              {/* Add to Cart Section */}
-              <div className="pt-4 border-t border-gray-200">
-                <AddToCartButton product={product} disabled={isOutOfStock} />
-
-                {/* Delivery Estimate */}
-                <div className="mt-4 flex items-center text-sm text-gray-600">
-                  <Truck className="h-4 w-4 mr-2" />
-                  <span>Free delivery by {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-                </div>
-              </div>
+           
 
               {/* Trust Badges */}
               <div className="grid grid-cols-3 gap-4 py-6 border-t border-gray-200">
@@ -262,13 +310,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </div>
           </div>
 
-          {/* Product Description */}
-          <div className="mt-12 py-8 border-t border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Description</h2>
-            <p className="text-gray-700 leading-relaxed max-w-3xl">
-              {product.description || "No description available for this product."}
-            </p>
-          </div>
+         
         </div>
 
         {/* Customer Images - Full width */}

@@ -5,14 +5,9 @@ import { ProductCard } from "@/components/Home/product-card"
 import { Product } from "@/lib/sanity/types"
 import { client } from "@/lib/sanity/client"
 import { notFound } from "next/navigation"
-import {
-  Filter,
-  Grid,
-  List,
-  ChevronDown,
-  SlidersHorizontal,
-} from "lucide-react"
+import { ChevronDown, SlidersHorizontal } from "lucide-react"
 
+// ✅ Fetch combo products
 async function getComboProducts(): Promise<Product[]> {
   try {
     return await client.fetch(
@@ -21,17 +16,8 @@ async function getComboProducts(): Promise<Product[]> {
         name,
         slug,
         price,
-        originalPrice,
-        compareAtPrice,
         media,
         description,
-        highlights,
-        category->{_id, name, slug},
-        featured,
-        inStock,
-        inventory,
-        type,
-        tags,
         _createdAt
       }`,
       {},
@@ -55,8 +41,11 @@ export default function ComboProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [sortedProducts, setSortedProducts] = useState<Product[]>([])
   const [activeSort, setActiveSort] = useState<SortOption>("featured")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [isLoading, setIsLoading] = useState(true)
+
+  // ✅ Selected products for combo
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
+  const [comboList, setComboList] = useState<Product[][]>([]) // final added combos
 
   useEffect(() => {
     setIsLoading(true)
@@ -68,10 +57,9 @@ export default function ComboProductsPage() {
     })
   }, [])
 
-  // Sorting logic
+  // ✅ Sorting logic
   useEffect(() => {
     let sorted = [...products]
-
     switch (activeSort) {
       case "newest":
         sorted.sort(
@@ -87,49 +75,48 @@ export default function ComboProductsPage() {
         sorted.sort((a, b) => (b.price || 0) - (a.price || 0))
         break
       case "name-asc":
-        sorted.sort((a, b) =>
-          (a.name || "").localeCompare(b.name || "")
-        )
+        sorted.sort((a, b) => (a.name || "").localeCompare(b.name || ""))
         break
       case "name-desc":
-        sorted.sort((a, b) =>
-          (b.name || "").localeCompare(a.name || "")
-        )
+        sorted.sort((a, b) => (b.name || "").localeCompare(a.name || ""))
         break
       default:
         break
     }
-
     setSortedProducts(sorted)
   }, [products, activeSort])
+
+  // ✅ Handle select/deselect product
+  function toggleSelect(product: Product) {
+    if (selectedProducts.find((p) => p._id === product._id)) {
+      setSelectedProducts(selectedProducts.filter((p) => p._id !== product._id))
+    } else {
+      setSelectedProducts([...selectedProducts, product])
+    }
+  }
+
+  // ✅ Remove from selected sidebar
+  function removeSelected(id: string) {
+    setSelectedProducts(selectedProducts.filter((p) => p._id !== id))
+  }
+
+  // ✅ Add combo to local list
+  function handleAddCombo() {
+    if (selectedProducts.length % 3 === 0 && selectedProducts.length > 0) {
+      setComboList([...comboList, selectedProducts])
+      setSelectedProducts([]) // reset after adding
+    }
+  }
 
   return (
     <div className="px-4 md:px-8 lg:px-12 py-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h1 className="text-2xl font-bold">Combo Collection</h1>
+        <h1 className="text-2xl font-bold">Build Your Combo</h1>
         <div className="flex items-center gap-2">
-          <button
-            className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50"
-          >
+          <button className="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-50">
             <SlidersHorizontal className="w-4 h-4" />
             Filters
-          </button>
-          <button
-            onClick={() => setViewMode("grid")}
-            className={`p-2 rounded ${
-              viewMode === "grid" ? "bg-gray-200" : ""
-            }`}
-          >
-            <Grid className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setViewMode("list")}
-            className={`p-2 rounded ${
-              viewMode === "list" ? "bg-gray-200" : ""
-            }`}
-          >
-            <List className="w-4 h-4" />
           </button>
           <div className="relative">
             <select
@@ -149,29 +136,93 @@ export default function ComboProductsPage() {
         </div>
       </div>
 
-      {/* Products */}
-      {isLoading ? (
-        <p>Loading products...</p>
-      ) : sortedProducts.length === 0 ? (
-        <p>No products found.</p>
-      ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {sortedProducts.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
+      {/* Main Layout */}
+      <div className="flex gap-6">
+        {/* Left: Products */}
+        <div className="w-3/4 grid grid-cols-3 gap-4">
+          {isLoading ? (
+            <p>Loading products...</p>
+          ) : sortedProducts.length === 0 ? (
+            <p>No products found.</p>
+          ) : (
+            sortedProducts.map((product) => {
+              const isSelected = !!selectedProducts.find(
+                (p) => p._id === product._id
+              )
+              return (
+                <div
+                  key={product._id}
+                  className={`cursor-pointer rounded-lg border p-4 transition ${
+                    isSelected
+                      ? "border-green-600 bg-green-50"
+                      : "border-gray-200"
+                  }`}
+                  onClick={() => toggleSelect(product)}
+                >
+                  <ProductCard product={product} />
+                </div>
+              )
+            })
+          )}
         </div>
-      ) : (
-        <div className="space-y-4">
-          {sortedProducts.map((product) => (
-            <div
-              key={product._id}
-              className="flex items-center gap-4 border p-4 rounded-lg"
-            >
-              <ProductCard product={product}  />
+
+        {/* Right: Combo Sidebar */}
+        <div className="w-1/4 border p-4 rounded-lg sticky top-8 h-fit">
+          <h2 className="font-bold text-lg mb-4">Your Combo</h2>
+
+          {selectedProducts.length === 0 ? (
+            <p className="text-sm text-gray-500">No products selected</p>
+          ) : (
+            <ul className="space-y-2 mb-4">
+              {selectedProducts.map((p) => (
+                <li
+                  key={p._id}
+                  className="flex justify-between items-center text-sm border-b pb-1"
+                >
+                  <span>{p.name}</span>
+                  <button
+                    onClick={() => removeSelected(p._id)}
+                    className="text-red-500 text-xs"
+                  >
+                    ✕
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Add Combo Button */}
+          <button
+            disabled={
+              selectedProducts.length % 3 !== 0 ||
+              selectedProducts.length === 0
+            }
+            onClick={handleAddCombo}
+            className={`w-full px-4 py-2 rounded-lg ${
+              selectedProducts.length % 3 === 0 &&
+              selectedProducts.length !== 0
+                ? "bg-green-600 text-white hover:bg-green-700"
+                : "bg-gray-300 text-gray-600 cursor-not-allowed"
+            }`}
+          >
+            Add Combo
+          </button>
+
+          {/* Show saved combos */}
+          {comboList.length > 0 && (
+            <div className="mt-6">
+              <h3 className="font-semibold mb-2 text-sm">Saved Combos</h3>
+              <ul className="space-y-2 text-xs">
+                {comboList.map((combo, idx) => (
+                  <li key={idx} className="border rounded p-2">
+                    Combo {idx + 1}: {combo.map((p) => p.name).join(", ")}
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))}
+          )}
         </div>
-      )}
+      </div>
     </div>
   )
 }

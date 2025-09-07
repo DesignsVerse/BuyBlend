@@ -13,10 +13,11 @@ async function getEarringsProducts(): Promise<Product[]> {
   try {
     return await client.fetch(
       `*[_type == "product" && category->slug.current == "earring"]{
-        _id,
+    _id,
         name,
         slug,
         price,
+        originalPrice,
         compareAtPrice,
         media,
         description,
@@ -25,8 +26,11 @@ async function getEarringsProducts(): Promise<Product[]> {
         featured,
         inStock,
         inventory,
-        type
-      }`,
+        type,
+        tags,
+        _createdAt
+      
+}`,
       {},
       { cache: "no-store" }
     )

@@ -1,11 +1,10 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
 import type { Product, Category } from "@/lib/sanity/types"
 import { ProductCard } from "@/components/Home/product-card"
 import { Filter, Search, ChevronDown, X, SlidersHorizontal, Sparkles } from "lucide-react"
-import { TopMarquee } from "@/components/products/offer-marquee"
+
 
 export default function ProductsPageClient({
   allProducts,
@@ -114,7 +113,87 @@ export default function ProductsPageClient({
   return (
     <div className="min-h-screen bg-white">
       
-      <div className="container mx-auto py-8 md:px-12 px-4 max-w-full">
+      <div className="container mx-auto py-4 md:px-8 px-2 max-w-full">
+        {/* ✅ Premium Top Section with Title + Sort */}
+        <div className="relative mb-8 pt-6 pb-4 border-b border-gray-100">
+          {/* Background decorative element */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-gradient-to-r from-amber-50 to-rose-50 rounded-full opacity-70 blur-3xl"></div>
+          </div>
+          
+          <div className="relative flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6">
+            {/* Left: Dynamic Heading */}
+            <div className="flex-1">
+              <div className="flex items-center mb-2">
+                <div className="w-12 h-px bg-amber-400 mr-3"></div>
+                <span className="text-xs font-medium tracking-wider text-amber-600 uppercase">
+                  Premium Collection
+                </span>
+              </div>
+              
+              <h1 className="text-3xl md:text-4xl font-serif font-light text-gray-900 tracking-tight">
+                {selectedTypes.length > 0
+                  ? categories.find(c => c.slug.current === selectedTypes[0])?.name
+                  : "All Products"}
+              </h1>
+              
+              <p className="text-base text-gray-600 mt-3 max-w-2xl leading-relaxed">
+                {selectedTypes.length > 0
+                  ? `Exquisite ${categories.find(c => c.slug.current === selectedTypes[0])?.name} crafted with precision and attention to detail. Each piece tells a story of elegance and sophistication.`
+                  : "Discover our complete collection of premium jewelry, where exceptional craftsmanship meets timeless design for the discerning individual."}
+              </p>
+              
+              <div className="flex items-center mt-4 text-sm text-gray-500">
+                <span className="flex items-center">
+                  <Sparkles className="h-4 w-4 mr-1 text-amber-500" />
+                  {filteredProducts.length} {filteredProducts.length === 1 ? 'piece' : 'pieces'} available
+                </span>
+                <span className="mx-3">•</span>
+                <span>Curated with excellence</span>
+              </div>
+            </div>
+
+            {/* Right: Sort Dropdown */}
+            <div className="relative flex-shrink-0">
+              <button
+                onClick={() => setShowSortOptions(!showSortOptions)}
+                className="flex items-center px-5 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                <SlidersHorizontal className="h-4 w-4 mr-2 text-gray-500" />
+                <span className="font-medium">Sort by</span>
+                <ChevronDown className={`h-4 w-4 ml-2 transition-transform ${showSortOptions ? 'rotate-180' : ''}`} />
+              </button>
+
+              {showSortOptions && (
+                <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-xl border border-gray-100 z-20 overflow-hidden py-2">
+                  <ul className="text-sm text-gray-700">
+                    {[
+                      { id: "featured", label: "Featured", icon: "✨" },
+                      { id: "newest", label: "Newest First", icon: "🆕" },
+                      { id: "price-low-high", label: "Price: Low to High", icon: "↗️" },
+                      { id: "price-high-low", label: "Price: High to Low", icon: "↘️" },
+                      { id: "name-a-z", label: "Name: A to Z", icon: "🔤" },
+                      { id: "name-z-a", label: "Name: Z to A", icon: "🔠" },
+                    ].map((option) => (
+                      <li key={option.id}>
+                        <button
+                          onClick={() => { setSortBy(option.id); setShowSortOptions(false) }}
+                          className={`w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center transition-colors ${
+                            sortBy === option.id ? 'bg-amber-50 text-amber-700' : ''
+                          }`}
+                        >
+                          <span className="mr-3">{option.icon}</span>
+                          <span>{option.label}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Mobile Filter Toggle Button */}
         <div className="lg:hidden flex items-center justify-between mb-6">
           <button

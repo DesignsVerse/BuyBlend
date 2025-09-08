@@ -7,7 +7,6 @@ import { Sparkles, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import { client } from "@/lib/sanity/client" // Import your Sanity client
 
 interface NewArrivalsSectionProps {
-  // Optional initial data; we'll fetch if not provided
   initialNewArrivals?: Product[]
 }
 

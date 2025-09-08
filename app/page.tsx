@@ -40,7 +40,7 @@ export default async function HomePage() {
       <HeroSection />
       <TrustBadgesSection />
       <CategoriesSection />
-      <NewArrivalsSection />
+      <NewArrivalsSection initialNewArrivals={featuredProducts} />
       <FeaturedProductsSection featuredProducts={featuredProducts} />
       <CustomProductCard />
       <JewelryStore/>

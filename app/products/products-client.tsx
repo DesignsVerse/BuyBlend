@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import type { Product, Category } from "@/lib/sanity/types"
 import { ProductCard } from "@/components/Home/product-card"
 import { Filter, Search, ChevronDown, X, SlidersHorizontal, Sparkles } from "lucide-react"
-
+import { TopMarquee } from "@/components/products/offer-marquee"
 
 export default function ProductsPageClient({
   allProducts,
@@ -101,6 +101,10 @@ export default function ProductsPageClient({
     setShowMobileFilters(false) // Close mobile filters on reset
   }
 
+  const applyFilters = () => {
+    setShowMobileFilters(false) // Close mobile filters on apply
+  }
+
   const activeFilterCount = [
     selectedTypes.length,
     activePriceRange.min !== priceRange.min ? 1 : 0,
@@ -114,6 +118,7 @@ export default function ProductsPageClient({
     <div className="min-h-screen bg-white">
       
       <div className="container mx-auto py-4 md:px-8 px-2 max-w-full">
+        <TopMarquee/>
         {/* ✅ Premium Top Section with Title + Sort */}
         <div className="relative mb-8 pt-6 pb-4 border-b border-gray-100">
           {/* Background decorative element */}
@@ -154,7 +159,7 @@ export default function ProductsPageClient({
             </div>
 
             {/* Right: Sort Dropdown */}
-            <div className="relative flex-shrink-0">
+            <div className="relative flex-shrink-0 self-end lg:self-auto">
               <button
                 onClick={() => setShowSortOptions(!showSortOptions)}
                 className="flex items-center px-5 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
@@ -215,8 +220,8 @@ export default function ProductsPageClient({
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters - Desktop */}
-          <aside className="hidden lg:block lg:w-80 bg-white rounded-xl shadow-md border border-gray-200 p-6 h-fit sticky top-30">
-            <div className="flex items-center justify-between mb-">
+          <aside className="hidden lg:block lg:w-80 bg-white rounded-xl shadow-md border border-gray-200 p-6 h-fit sticky top-20">
+            <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold flex items-center text-gray-900">
                 <SlidersHorizontal className="mr-2 h-5 w-5 text-gray-700" />
                 Filter & Sort
@@ -320,7 +325,7 @@ export default function ProductsPageClient({
             <div className="mb-4">
               <h4 className="text-sm font-medium text-gray-700 mb-3">Product Status</h4>
               <div className="grid grid-cols-2 gap-2">
-              {[
+                {[
                   { id: "inStock", label: "In Stock", checked: availability.inStock },
                   { id: "onSale", label: "On Sale", checked: availability.onSale },
                   { id: "featured", label: "Featured", checked: availability.featured },
@@ -481,13 +486,21 @@ export default function ProductsPageClient({
                   </div>
                 </div>
 
-                {/* Reset Button */}
-                <button
-                  onClick={resetFilters}
-                  className="w-full px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
-                >
-                  Reset All Filters
-                </button>
+                {/* Action Buttons */}
+                <div className="flex gap-4">
+                  <button
+                    onClick={resetFilters}
+                    className="flex-1 px-4 py-2 bg-gray-200 text-black rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    onClick={applyFilters}
+                    className="flex-1 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
               </div>
             </div>
           )}

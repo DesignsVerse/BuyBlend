@@ -4,16 +4,72 @@ import { ProductCard } from "@/components/Home/product-card"
 import type { Product } from "@/lib/sanity/types"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
+import { client } from "@/lib/sanity/client" // Import your Sanity client
 
-interface FeaturedProductsSectionProps {
-  featuredProducts: Product[]
+interface NewArrivalsSectionProps {
+  // Optional initial data; we'll fetch if not provided
+  initialNewArrivals?: Product[]
 }
 
-export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSectionProps) {
+export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSectionProps) {
   const [isHovered, setIsHovered] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const autoScrollRef = useRef<NodeJS.Timeout>()
   const [showScrollButtons, setShowScrollButtons] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState("earrings") // Default: Earrings
+  const [newArrivals, setNewArrivals] = useState<Product[]>(initialNewArrivals)
+  const [isLoading, setIsLoading] = useState(!initialNewArrivals.length)
+
+  // Categories
+  const categories = [
+    { label: "Earrings", value: "earring" },
+    { label: "Necklace", value: "necklace" },
+    { label: "Ring", value: "ring" },
+    { label: "Pendant", value: "pendant" },
+  ]
+
+  // Fetch all new arrivals if not provided (e.g., recent products across categories)
+  useEffect(() => {
+    if (!initialNewArrivals.length) {
+      const fetchNewArrivals = async () => {
+        try {
+          const data = await client.fetch(
+            `*[_type == "product"] | order(_createdAt desc) [0...20] { // Fetch recent 20 products; adjust as needed
+              _id,
+              name,
+              slug,
+              price,
+              originalPrice,
+              compareAtPrice,
+              media,
+              description,
+              highlights,
+              category->{_id, name, slug},
+              featured,
+              inStock,
+              inventory,
+              type,
+              tags,
+              _createdAt
+            }`,
+            {},
+            { cache: "no-store" }
+          )
+          setNewArrivals(data)
+          setIsLoading(false)
+        } catch (error) {
+          console.error("Error fetching new arrivals:", error)
+          setIsLoading(false)
+        }
+      }
+      fetchNewArrivals()
+    }
+  }, [initialNewArrivals.length])
+
+  // Filtered products based on selected category (using product.category.slug.current)
+  const filteredProducts = newArrivals.filter(
+    (product) => !selectedCategory || product.category?.slug?.current === selectedCategory
+  )
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -24,18 +80,19 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
     checkOverflow()
     window.addEventListener('resize', checkOverflow)
     return () => window.removeEventListener('resize', checkOverflow)
-  }, [featuredProducts])
+  }, [filteredProducts])
 
   useEffect(() => {
-    if (!isHovered && featuredProducts.length > 0) {
+    if (!isHovered && filteredProducts.length > 0) {
       autoScrollRef.current = setInterval(() => scrollRight(), 4000)
     }
     return () => {
       if (autoScrollRef.current) clearInterval(autoScrollRef.current)
     }
-  }, [isHovered, featuredProducts.length])
+  }, [isHovered, filteredProducts.length])
 
-  if (!featuredProducts || featuredProducts.length === 0) return null
+  if (isLoading) return <div className="text-center py-16">Loading new arrivals...</div>
+  if (newArrivals.length === 0) return null
 
   const scrollLeft = () => {
     if (scrollRef.current) {
@@ -53,10 +110,6 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
 
   return (
     <section className="py-16 bg-white relative overflow-hidden scrollbar-hide">
-      {/* Decorative elements */}
-      {/* <div className="absolute top-10 left-0 w-48 h-48 bg-gray-100 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
-      <div className="absolute bottom-10 right-0 w-64 h-64 bg-gray-100 rounded-full translate-x-1/3 translate-y-1/3 opacity-50"></div> */}
-      
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
         <motion.div 
@@ -73,18 +126,35 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
           >
             <Sparkles className="h-3 w-3 text-white mr-2" />
             <span className="text-xs font-medium text-white uppercase tracking-wider">
-              Featured Collection
+              New Arrivals
             </span>
           </motion.div>
           
           <h2 className="text-3xl md:text-4xl font-serif font-normal text-gray-900 mb-4">
-            Best Seller
+            Fresh Arrivals
           </h2>
           
           <p className="text-gray-600 max-w-3xl mx-auto text-sm md:text-base">
-            Discover our handpicked luxury items showcasing exceptional craftsmanship
+            Explore our latest additions in premium jewelry
           </p>
         </motion.div>
+
+        {/* Category Filters */}
+        <div className="flex justify-center gap-4 mb-8 flex-wrap">
+          {categories.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => setSelectedCategory(cat.value)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                selectedCategory === cat.value
+                  ? "bg-black text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
 
         {/* Scrollable Products Container */}
         <div 
@@ -95,16 +165,22 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
           <motion.div 
             ref={scrollRef}
             className="flex overflow-x-auto gap-6 pb-10 px-2 snap-x snap-mandatory scrollbar-hide"
-            style={{ scrollPadding: "0 50px" }} // margin left/right to prevent cut-off
+            style={{ scrollPadding: "0 50px" }}
           >
-            {featuredProducts.map((product, index) => (
-              <motion.div
-                key={product._id}
-                className="flex-shrink-0 snap-center w-[280px] sm:w-[300px] md:w-[320px] product-card"
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))}
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <motion.div
+                  key={product._id}
+                  className="flex-shrink-0 snap-center w-[280px] sm:w-[300px] md:w-[320px] product-card"
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))
+            ) : (
+              <div className="flex items-center justify-center w-full text-gray-600 py-8">
+                No new arrivals in this category yet.
+              </div>
+            )}
           </motion.div>
 
           {/* Scroll Buttons */}

@@ -10,6 +10,7 @@ import Testimonials from "@/components/Home/testimonial"
 import CategoriesSection from "@/components/Home/category"
 import JewelryStore from "@/components/Home/jewelrystore"
 import VideoProductShowcase from "@/components/Home/video"
+import { NewArrivalsSection } from "@/components/Home/newarrival"
 
 async function getProducts(): Promise<Product[]> {
   try {
@@ -39,6 +40,7 @@ export default async function HomePage() {
       <HeroSection />
       <TrustBadgesSection />
       <CategoriesSection />
+      <NewArrivalsSection />
       <FeaturedProductsSection featuredProducts={featuredProducts} />
       <CustomProductCard />
       <JewelryStore/>

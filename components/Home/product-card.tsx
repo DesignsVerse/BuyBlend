@@ -11,8 +11,8 @@ import { useWishlist } from "@/lib/wishlist/wishlist-context"
 
 interface ProductCardProps {
   product: Product
-  onSelectForCombo?: (product: Product) => void  // 👈 new prop
-  isSelected?: boolean                           // 👈 new prop
+  onSelectForCombo?: (product: Product) => void
+  isSelected?: boolean
 }
 
 export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCardProps) {
@@ -27,16 +27,13 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
       "product",
     [product.slug, product.name]
   )
-
   const firstMedia = useMemo(() => product.media?.[0], [product.media])
-
   const mediaUrl = useMemo(() => {
     if (!firstMedia) return "/fallback-product.png"
     try {
       if (firstMedia._type === "image") {
         return (
-          urlFor(firstMedia.asset)?.width(400)?.height(400)?.url() ??
-          "/fallback-product.png"
+          urlFor(firstMedia.asset)?.width(400)?.height(400)?.url() ?? "/fallback-product.png"
         )
       }
       if (firstMedia._type === "file") {
@@ -51,7 +48,6 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
     () => product.originalPrice && product.originalPrice !== product.price,
     [product.originalPrice, product.price]
   )
-
   const discountPercent = useMemo(
     () =>
       hasDiscount && product.originalPrice
@@ -79,9 +75,7 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
               src={mediaUrl ?? "/fallback-product.png"}
               alt={product.name}
               fill
-              className={`object-cover transition-transform ${
-                isMediaLoaded ? "opacity-100" : "opacity-0"
-              }`}
+              className={`object-cover transition-transform ${isMediaLoaded ? "opacity-100" : "opacity-0"}`}
               onLoad={() => setIsMediaLoaded(true)}
               priority={product.featured}
             />
@@ -117,6 +111,17 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
           >
             <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
           </button>
+
+          {/* ⭐️ Static Rating badge - left bottom */}
+          <div className="absolute left-2 bottom-2 px-2 py-1 rounded-md bg-white/95 flex items-center gap-1 shadow text-xs font-semibold z-10 min-w-[40px]"
+               style={{ boxShadow: "0 1px 4px 0 rgba(20,23,28,0.11)" }}>
+            <span className=" font-bold">4.5</span>
+            <svg aria-label="star" fill="#10847e" width="15" height="15" viewBox="0 0 20 20">
+              <path d="M10 15.27L16.18 19l-1.64-7.03L19 7.24l-7.19-.61L10 0 8.19 6.63 1 7.24l5.46 4.73L4.82 19z"/>
+            </svg>
+            <span className="font-bold text-gray-700 mx-1">|</span>
+            <span className="font-bold text-black">255</span>
+          </div>
         </div>
 
         {/* Content */}
@@ -145,27 +150,24 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
         </div>
 
         <div className="p-4 pt-0">
-  {onSelectForCombo ? (
-    // ✅ Combo ka apna button (stock check ignore)
-    <button
-      onClick={() => onSelectForCombo(product)}
-      className={`w-full py-2 rounded-md text-sm font-medium transition ${
-        isSelected
-          ? "bg-green-500 text-white"
-          : "bg-gray-200 hover:bg-gray-300"
-      }`}
-    >
-      {isSelected ? "✅ Added to Combo" : "Add to Combo"}
-    </button>
-  ) : (
-    // ✅ Normal AddToCart (stock check chalta rahega)
-    <AddToCartButton
-      product={product}
-      className="w-full py-2 bg-black text-white hover:bg-gray-800 rounded-md text-sm font-medium"
-    />
-  )}
-</div>
-
+          {onSelectForCombo ? (
+            <button
+              onClick={() => onSelectForCombo(product)}
+              className={`w-full py-2 rounded-md text-sm font-medium transition ${
+                isSelected
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              {isSelected ? "✅ Added to Combo" : "Add to Combo"}
+            </button>
+          ) : (
+            <AddToCartButton
+              product={product}
+              className="w-full py-2 bg-black text-white hover:bg-gray-800 rounded-md text-sm font-medium"
+            />
+          )}
+        </div>
       </div>
     </motion.div>
   )

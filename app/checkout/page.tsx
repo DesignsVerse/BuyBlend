@@ -61,7 +61,7 @@ export default function CheckoutPage() {
   }
 
   const calculateShipping = () => {
-    return cartState.total >= 500 ? 0 : 15
+    return cartState.total >= 299 ? 0 : 69
   }
 
   const calculateTax = () => {
@@ -146,7 +146,7 @@ export default function CheckoutPage() {
                     <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                       <div className="relative h-16 w-16 overflow-hidden rounded-md">
                         <Image
-                          src={item.image || "/placeholder.svg"}
+                          src={item.image || "/placeholder.svg?height=80&width=80"}
                           alt={item.name}
                           fill
                           className="object-cover"
@@ -171,7 +171,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between">
                       <span>Shipping</span>
-                      <span>{calculateShipping() === 0 ? "FREE" : `Rs. $${calculateShipping().toFixed(2)}`}</span>
+                      <span>{calculateShipping() === 0 ? "FREE" : `Rs. ${calculateShipping().toFixed(2)}`}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Tax (GST)</span>
@@ -490,7 +490,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Shipping</span>
-                      <span>{calculateShipping() === 0 ? "FREE" : `Rs. $${calculateShipping().toFixed(2)}`}</span>
+                      <span>{calculateShipping() === 0 ? "FREE" : `Rs. ${calculateShipping().toFixed(2)}`}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Tax (GST)</span>
@@ -506,7 +506,7 @@ export default function CheckoutPage() {
                   {calculateShipping() > 0 && (
                     <div className="bg-amber-50 p-3 rounded-md border border-amber-100">
                       <p className="text-xs text-amber-800 text-center">
-                        Add Rs. {(500 - cartState.total).toFixed(2)} more for free shipping
+                        Add Rs. {(299 - cartState.total).toFixed(2)} more for free shipping
                       </p>
                     </div>
                   )}

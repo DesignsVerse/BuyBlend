@@ -1,4 +1,3 @@
-
 "use client"
 
 import Image from "next/image"
@@ -152,18 +151,22 @@ export function CartSidebar() {
         className="sticky bottom-0 border-t border-gray-200 bg-gray-50 p-6 space-y-5"
       >
         {/* Free Shipping Progress */}
-        {state.total < 500 && (
+        {state.total < 299 ? (
           <div className="bg-gray-100 p-3 rounded-lg border border-gray-200">
             <div className="flex justify-between text-xs text-gray-600 mb-2">
-              <span>Free shipping on orders above ₹500</span>
-              <span>₹{(500 - state.total).toLocaleString("en-IN")} more</span>
+              <span>Free shipping on orders above ₹299</span>
+              <span>₹{(299 - state.total).toLocaleString("en-IN")} more</span>
             </div>
             <div className="w-full bg-gray-300 rounded-full h-2">
               <div 
                 className="bg-black h-2 rounded-full transition-all duration-300" 
-                style={{ width: `${Math.min((state.total / 500) * 100, 100)}%` }}
+                style={{ width: `${Math.min((state.total / 299) * 100, 100)}%` }}
               />
             </div>
+          </div>
+        ) : (
+          <div className="bg-green-100 p-3 rounded-lg border border-green-200 text-green-700 text-sm font-medium">
+            🎉 Free shipping applied!
           </div>
         )}
 

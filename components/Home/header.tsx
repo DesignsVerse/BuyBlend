@@ -102,6 +102,7 @@ export function SiteHeader() {
         {/* Top announcement bar */}
         <div className="bg-black text-[#fff3f3] text-center py-2 text-xs">
           Free shipping on all orders over $500 | Use code FIRST10 for 10% off
+          
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

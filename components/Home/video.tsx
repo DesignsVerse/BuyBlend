@@ -196,11 +196,11 @@ export default function VideoShowcaseReels() {
             <p className="text-gray-600">Video Collection</p>
           </div>
 
-          <div className="flex gap-8 overflow-x-auto pb-6 scrollbar-hide">
+          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
             {products.map((product, index) => (
               <div
                 key={product.id}
-                className="flex-shrink-0 w-80 bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-100 cursor-pointer"
+                className="flex-shrink-0 w-80 bg-white  overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-100 cursor-pointer"
                 onClick={() => openPopup(index)}
               >
                 <div className="relative h-120">
@@ -235,18 +235,6 @@ export default function VideoShowcaseReels() {
             ))}
           </div>
 
-          {/* Navigation Dots */}
-          <div className="flex justify-center mt-8 space-x-2">
-            {products.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all ${index === activeIndex ? 'bg-gray-900' : 'bg-gray-300'
-                  }`}
-                aria-label={`Go to product ${index + 1}`}
-              />
-            ))}
-          </div>
         </div>
       </div>
 
@@ -262,7 +250,7 @@ export default function VideoShowcaseReels() {
             {products.map((product, index) => (
               <div
                 key={product.id}
-                className="flex-shrink-0 w-74 bg-white rounded-lg overflow-hidden shadow-md border border-gray-100 cursor-pointer"
+                className="flex-shrink-0 w-74 bg-white  overflow-hidden shadow-md border border-gray-100 cursor-pointer"
                 onClick={() => openPopup(index)}
               >
                 <div className="relative h-120">

@@ -3,12 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ChevronRight, Sparkles } from "lucide-react";
+import { useState } from "react";
 
 type Category = {
   slug: string;
   title: string;
   image: string;
   description: string;
+  featured?: boolean;
 };
 
 const categories: Category[] = [
@@ -16,7 +18,8 @@ const categories: Category[] = [
     slug: "necklaces", 
     title: "Necklaces", 
     image: "/new/8.jpg", 
-    description: "Elegant neckpieces for every occasion"
+    description: "Elegant neckpieces for every occasion",
+    featured: true
   },
   { 
     slug: "earrings", 
@@ -28,7 +31,8 @@ const categories: Category[] = [
     slug: "rings", 
     title: "Rings", 
     image: "/new/6.jpg", 
-    description: "Symbols of love and commitment"
+    description: "Symbols of love and commitment",
+    featured: true
   },
   { 
     slug: "bangles", 
@@ -51,146 +55,237 @@ const categories: Category[] = [
 ];
 
 export default function CategoriesSection() {
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+  
+  const imageHoverVariants = {
+    rest: { scale: 1 },
+    hover: { scale: 1.05 }
+  };
+  
+  const contentHoverVariants = {
+    rest: { y: 0 },
+    hover: { y: -5 }
+  };
+
   return (
-    <section className="py-12 md:py-16 bg-white">
-      <div className="container mx-auto px-4">
+    <section className="py-16 md:py-20 bg-white relative overflow-hidden">
+      {/* Decorative elements */}
+      {/* <div className="absolute top-0 left-0 w-72 h-72 bg-amber-200/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-rose-200/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div> */}
+      
+      <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-10 md:mb-12"
+          viewport={{ once: true, margin: "-100px" }}
+          className="text-center mb-6"
         >
-          <div className="inline-flex items-center justify-center mb-4">
+          <motion.div 
+            className="inline-flex items-center justify-center mb-4"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
             <Sparkles className="h-5 w-5 text-amber-500 mr-2" />
             <span className="text-sm font-medium text-amber-600 uppercase tracking-wider">Collections</span>
-          </div>
-          <h2 className="text-2xl md:text-3xl font-light text-gray-900 mb-4 font-serif">Discover Our Collections</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
-            Explore our exquisite range of jewelry categories, each crafted with precision and love
+          </motion.div>
+          
+          <h2 className="text-3xl md:text-4xl font-light text-gray-900 mb-4 font-serif">
+            Discover Our <span className="font-medium">Exquisite</span> Collections
+          </h2>
+          
+          <p className="text-gray-600 max-w-3xl mx-auto text-sm md:text-base">
+            Explore our carefully curated jewelry categories, each piece meticulously crafted to perfection
           </p>
         </motion.div>
 
         {/* Categories Grid */}
-        <div className="flex flex-col items-center">
-          {/* Top row with 4 cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-5xl mb-4 md:mb-6">
-            {categories.slice(0, 4).map((category, index) => (
+        <motion.div 
+          className="flex flex-col items-center"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+        >
+          {/* ✅ Mobile Layout: sab ek sath 2x2 grid */}
+          <div className="grid grid-cols-2 gap-4 w-full max-w-6xl md:hidden">
+            {categories.map((category) => (
               <motion.div
                 key={category.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group"
+                className="group relative"
               >
                 <Link
                   href={`/category/${category.slug}`}
-                  className="block rounded-xl overflow-hidden bg-[#fff3f3] shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
+                  className="block overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
                 >
-                  {/* Image Container */}
                   <div className="relative aspect-square overflow-hidden">
                     <Image
                       src={category.image}
                       alt={category.title}
                       fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                      className="object-cover"
                     />
-                    
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Hover Effect */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
                   </div>
-
-                  {/* Content */}
-                  <div className="p-3 md:p-4 text-center">
-                    <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1 group-hover:text-amber-600 transition-colors">
+                  <div className="p-3 text-center">
+                    <h3 className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-amber-600 transition-colors">
                       {category.title}
                     </h3>
-                    <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3 line-clamp-1">
-                      {category.description}
-                    </p>
-                    <div className="flex items-center justify-center text-xs text-amber-600 font-medium">
-                      <span>Explore</span>
-                      <ChevronRight className="h-3 w-3 ml-1 transform group-hover:translate-x-1 transition-transform" />
-                    </div>
                   </div>
                 </Link>
               </motion.div>
             ))}
           </div>
-          
-          {/* Bottom row with 2 centered cards */}
-          <div className="grid grid-cols-2 md:flex md:justify-center gap-4 md:gap-6 w-full max-w-5xl">
-            {categories.slice(4, 6).map((category, index) => (
-              <motion.div
-                key={category.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: (index + 4) * 0.1 }}
-                viewport={{ once: true }}
-                className="group md:w-1/4"
-              >
-                <Link
-                  href={`/category/${category.slug}`}
-                  className="block rounded-xl overflow-hidden bg-[#fff3f3] shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
+
+          {/* ✅ Desktop Layout */}
+          <div className="hidden md:flex flex-col items-center w-full">
+            {/* Regular (upar) */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-4 w-full max-w-6xl mb-4 mx-auto">
+              {categories.filter(cat => !cat.featured).map((category) => (
+                <motion.div
+                  key={category.slug}
+                  className="group relative"
                 >
-                  {/* Image Container */}
-                  <div className="relative aspect-square overflow-hidden">
-                    <Image
-                      src={category.image}
-                      alt={category.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                    />
-                    
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Hover Effect */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-3 md:p-4 text-center">
-                    <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1 group-hover:text-amber-600 transition-colors">
-                      {category.title}
-                    </h3>
-                    <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-3 line-clamp-1">
-                      {category.description}
-                    </p>
-                    <div className="flex items-center justify-center text-xs text-amber-600 font-medium">
-                      <span>Explore</span>
-                      <ChevronRight className="h-3 w-3 ml-1 transform group-hover:translate-x-1 transition-transform" />
+                  <Link
+                    href={`/category/${category.slug}`}
+                    className="block  overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
+                  >
+                    <div className="relative aspect-square overflow-hidden">
+                      <motion.div
+                        variants={imageHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        className="h-full w-full"
+                      >
+                        <Image
+                          src={category.image}
+                          alt={category.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </motion.div>
                     </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+                    <div className="p-4 text-center">
+                      <h3 className="font-semibold text-gray-900 text-sm md:text-base mb-1 group-hover:text-amber-600 transition-colors">
+                        {category.title}
+                      </h3>
+                      <div className="flex items-center justify-center text-xs text-amber-600 font-medium">
+                        <span>Explore</span>
+                        <ChevronRight className="h-3 w-3 ml-1 transform group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Featured (neeche) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-6xl mx-auto">
+              {categories.filter(cat => cat.featured).map((category) => (
+                <motion.div
+                  key={category.slug}
+                  className="group relative"
+                >
+                  <Link
+                    href={`/category/${category.slug}`}
+                    className="block  overflow-hidden bg-gradient-to-br from-amber-50 to-rose-50 shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 relative"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
+                    
+                    <div className="flex flex-col md:flex-row h-full">
+                      {/* Image */}
+                      <div className="relative aspect-square md:aspect-auto md:w-1/2 overflow-hidden">
+                        <motion.div
+                          variants={imageHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
+                          className="h-full w-full"
+                        >
+                          <Image
+                            src={category.image}
+                            alt={category.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                          />
+                        </motion.div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500" />
+                        <div className="absolute top-4 left-4 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">
+                          Featured
+                        </div>
+                      </div>
+                      {/* Content */}
+                      <motion.div 
+                        variants={contentHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        className="p-6 md:p-8 flex flex-col justify-center md:w-1/2"
+                      >
+                        <h3 className="font-semibold text-gray-900 text-xl md:text-2xl mb-2 group-hover:text-amber-600 transition-colors">
+                          {category.title}
+                        </h3>
+                        <p className="text-gray-600 mb-4 text-sm md:text-base">
+                          {category.description}
+                        </p>
+                        <div className="flex items-center text-amber-600 font-medium mt-2">
+                          <span className="text-sm md:text-base">Explore Collection</span>
+                          <ChevronRight className="h-4 w-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </motion.div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* View All Button */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
-          className="text-center mt-10 md:mt-12"
+          className="text-center mt-12 md:mt-16"
         >
           <Link
             href="/collections"
-            className="inline-flex items-center bg-black text-[#fff3f3] px-5 py-2.5 md:px-6 md:py-3 rounded-sm hover:bg-gray-800 transition-colors font-medium text-sm md:text-base"
+            className="inline-flex items-center bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all duration-300 font-medium text-sm md:text-base group"
           >
-            View All Categories
-            <ChevronRight className="h-4 w-4 ml-2" />
+            <span>View All Categories</span>
+            <motion.div
+              animate={{ x: [0, 4, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
+              <ChevronRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+            </motion.div>
           </Link>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

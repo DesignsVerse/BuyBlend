@@ -13,6 +13,23 @@ const ProductShowcase: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check if window is defined (client-side)
+    if (typeof window !== 'undefined') {
+      const checkIsMobile = () => setIsMobile(window.innerWidth < 1024);
+      
+      // Initial check
+      checkIsMobile();
+      
+      // Add event listener for resize
+      window.addEventListener('resize', checkIsMobile);
+      
+      // Cleanup
+      return () => window.removeEventListener('resize', checkIsMobile);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -104,23 +121,39 @@ const ProductShowcase: React.FC = () => {
       {/* Decorative elements */}
       
       <div className="max-w-7xl mx-auto relative z-10">
+        {/* Mobile View All Button - Only visible on mobile */}
+        {isMobile && (
+          <div className="flex justify-end mb-6 lg:hidden">
+            <Link 
+              href="/products" 
+              className="text-gray-700 hover:text-gray-900 font-medium flex items-center group text-sm"
+            >
+              VIEW ALL
+              <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
           {/* Left side - Featured image */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
-            className="w-full lg:w-2/5 relative rounded-2xl overflow-hidden shadow-2xl"
+            className="w-full lg:w-2/5 relative rounded-2xl overflow-hidden shadow-2xl order-2 lg:order-1"
           >
             <div className="aspect-[3/4] w-full relative">
-              <Image
-                src="/new/8.jpg"
-                alt="Find what's meant to be yours"
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 100vw, 40vw"
-              />
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="object-cover w-full h-full"
+            >
+              <source src="/video/1.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
                 <div className="text-center w-full">
                   <motion.div 
@@ -172,20 +205,24 @@ const ProductShowcase: React.FC = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="w-full lg:w-3/5 flex flex-col justify-center"
+            className="w-full lg:w-3/5 flex flex-col justify-center order-1 lg:order-2"
           >
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h3 className="text-2xl md:text-3xl font-serif font-bold text-gray-900 mb-2">Featured Collection</h3>
                 <p className="text-gray-600 text-sm">Handpicked selections of our finest gemstones</p>
               </div>
-              <Link 
-                href="/products" 
-                className="text-gray-700 hover:text-gray-900 font-medium flex items-center group text-sm"
-              >
-                VIEW ALL
-                <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
+              
+              {/* Desktop View All Button - Hidden on mobile */}
+              {!isMobile && (
+                <Link 
+                  href="/products" 
+                  className="text-gray-700 hover:text-gray-900 font-medium flex items-center group text-sm"
+                >
+                  VIEW ALL
+                  <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+                </Link>
+              )}
             </div>
 
             <div 
@@ -199,7 +236,7 @@ const ProductShowcase: React.FC = () => {
                   <>
                     <motion.button
                       aria-label="Scroll left"
-                      className="flex items-center justify-center absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:shadow-xl border border-gray-100 backdrop-blur-sm"
+                      className="hidden lg:flex items-center justify-center absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:shadow-xl border border-gray-100 backdrop-blur-sm"
                       onClick={goPrev}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -211,7 +248,7 @@ const ProductShowcase: React.FC = () => {
                     </motion.button>
                     <motion.button
                       aria-label="Scroll right"
-                      className="flex items-center justify-center absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:shadow-xl border border-gray-100 backdrop-blur-sm"
+                      className="hidden lg:flex items-center justify-center absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white text-gray-800 p-3 rounded-full shadow-lg hover:shadow-xl border border-gray-100 backdrop-blur-sm"
                       onClick={goNext}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -225,6 +262,24 @@ const ProductShowcase: React.FC = () => {
                 )}
               </AnimatePresence>
 
+              {/* Mobile navigation buttons - Always visible on mobile */}
+              <div className="flex justify-center gap-4 mb-4 lg:hidden">
+                <button
+                  aria-label="Scroll left"
+                  className="flex items-center justify-center bg-white text-gray-800 p-2 rounded-full shadow-md border border-gray-100"
+                  onClick={goPrev}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  aria-label="Scroll right"
+                  className="flex items-center justify-center bg-white text-gray-800 p-2 rounded-full shadow-md border border-gray-100"
+                  onClick={goNext}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+
               {/* Scroller with snap */}
               <div
                 ref={scrollerRef}
@@ -236,7 +291,7 @@ const ProductShowcase: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="snap-center snap-always shrink-0 w-full basis-full sm:w-[45%] sm:basis-[45%] lg:w-[30%] lg:basis-[30%]"
+                    className="snap-center snap-always shrink-0 w-full basis-[85%] sm:basis-[45%] lg:basis-[30%]"
                   >
                     <ProductCard product={product} />
                   </motion.div>
@@ -244,7 +299,7 @@ const ProductShowcase: React.FC = () => {
               </div>
 
               {/* Dots pagination */}
-              <div className="mt-8 flex items-center justify-center gap-2">
+              {/* <div className="mt-8 flex items-center justify-center gap-2">
                 {products.map((_, i) => {
                   const isActive = i === activeIndex;
                   return (
@@ -258,7 +313,7 @@ const ProductShowcase: React.FC = () => {
                     />
                   );
                 })}
-              </div>
+              </div> */}
             </div>
           </motion.div>
         </div>

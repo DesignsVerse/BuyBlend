@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { Search, User, Heart, Menu, X, ArrowRight } from "lucide-react"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { CartButton } from "@/components/cart/cart-button"
-
+import Image from "next/image"
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -89,8 +89,22 @@ export function SiteHeader() {
           <div className="flex h-20 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 z-50">
-              <span className="text-2xl font-serif font-bold tracking-wider">BuyBlend.in</span>
-            </Link>
+      {/* Logo Icon Image */}
+      <Image 
+        src="/logo/111.png"   // yaha pe aapka icon/logo image
+        alt="BuyBlend Logo Icon" 
+        width={40} 
+        height={40} 
+      />
+
+      {/* Logo Text Image */}
+      <Image 
+        src="/logo-text.png"   // yaha pe aapka text image (BuyBlend likha hua)
+        alt="BuyBlend Logo Text" 
+        width={120} 
+        height={40} 
+      />
+    </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">

@@ -12,6 +12,7 @@ import {
   ChevronDown,
   SlidersHorizontal,
 } from "lucide-react"
+import { TopMarquee } from "@/components/products/offer-marquee"
 
 async function getRingProducts(): Promise<Product[]> {
   try {
@@ -105,6 +106,7 @@ export default function RingProductsPage() {
 
   return (
     <div className="px-4 md:px-8 lg:px-12 py-8">
+      <TopMarquee/>
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <h1 className="text-2xl font-bold">Ring Collection</h1>

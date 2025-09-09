@@ -12,6 +12,7 @@ import RecommendedProducts from "@/components/products/recommended-products"
 import ReviewSection from "@/components/products/user-review-section"
 import CustomerLove from "@/components/products/customer-images"
 import { mockProducts } from "@/lib/sanity/mock-data"
+import Breadcrumbs from "@/components/products/Breadcrumbs"
 
 interface ProductPageProps {
   params: {
@@ -95,6 +96,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   return (
     <div className="min-h-screen bg-white">
       <div className="px-4 py-8">
+        {/* Breadcrumbs Import kiya */}
+        <Breadcrumbs  product={product} />
         {/* Product Content Grid - Only this section has max-w-7xl */}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -234,6 +237,27 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     </span>
   </div>
 </div>
+{/* Special Offers */}
+<div className="pt-4 border-t border-gray-200">
+  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+    Special Offers
+  </h3>
+  <div className="flex flex-col space-y-2">
+    <div className="flex items-center text-sm text-green-600 font-medium">
+      <Check className="h-4 w-4 mr-2" />
+      50% off on all prepaid orders
+    </div>
+    <div className="flex items-center text-sm text-green-600 font-medium">
+      <Check className="h-4 w-4 mr-2" />
+      Free shipping on orders above ₹299
+    </div>
+    <div className="flex items-center text-sm text-green-600 font-medium">
+      <Check className="h-4 w-4 mr-2" />
+      Flat 15% off on first order
+    </div>
+  </div>
+</div>
+
 
  {/* Style Tips */}
  {product.styleTips && (
@@ -294,7 +318,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 <div className="flex flex-col items-center text-center p-3 bg-white border border-gray-200 rounded-lg">
                   <Truck className="h-6 w-6 text-black mb-2" />
                   <span className="text-sm font-medium text-gray-900">Free Shipping</span>
-                  <span className="text-xs text-gray-500">On orders over ₹999</span>
+                  <span className="text-xs text-gray-500">On orders over ₹299</span>
                 </div>
                 <div className="flex flex-col items-center text-center p-3 bg-white border border-gray-200 rounded-lg">
                   <RotateCw className="h-6 w-6 text-black mb-2" />

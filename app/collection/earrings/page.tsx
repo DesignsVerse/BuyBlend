@@ -110,7 +110,7 @@ export default async function EarringsPage() {
 
   return ( 
     <div className="min-h-screen bg-white">
-      <TopMarquee />
+     <TopMarquee/>
       
       {/* Category Cards Section */}
       <div className="">

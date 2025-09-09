@@ -14,7 +14,7 @@ const offers = [
 
 export function TopMarquee() {
   return (
-    <div className="w-full bg-black overflow-hidden py-2 relative">
+    <div className="w-full bg-black overflow-hidden py-1 relative">
       <div className="flex animate-marquee gap-12 min-w-max">
         {[...offers, ...offers].map((offer, idx) => (
           <div key={idx} className="flex items-center text-xs font-medium text-white tracking-wide opacity-90 hover:opacity-100 transition-opacity">

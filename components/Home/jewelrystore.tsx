@@ -25,7 +25,7 @@ const images = [
 
 export default function JewelryStore() {
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 font-sans">
+    <div className="hidden lg:block w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 font-sans mt-16"> {/* Hidden on mobile/tablet, shown on desktop, moved down with mt-16 */}
       <h2 className="text-center text-4xl md:text-5xl font-bold mb-12 text-gray-800 tracking-tight">
         THE JEWELRY STORE
       </h2>

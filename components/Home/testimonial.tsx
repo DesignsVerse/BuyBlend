@@ -241,28 +241,7 @@ const Testimonials: React.FC = () => {
           onMouseEnter={() => setIsAutoPlaying(false)}
           onMouseLeave={() => setIsAutoPlaying(true)}
         >
-          {/* Arrows */}
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <button
-              aria-label="Previous testimonials"
-              onClick={() => setIndex((i) => Math.max(0, i - 1))}
-              disabled={!canPrev}
-              className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-black shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            
-            <div className="h-1 w-12 bg-gray-300 rounded-full mx-2"></div>
-            
-            <button
-              aria-label="Next testimonials"
-              onClick={() => setIndex((i) => Math.min(maxIndex, i + 1))}
-              disabled={!canNext}
-              className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-black shadow-md hover:shadow-lg transition-all duration-200 border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
-          </div>
+         
 
           {/* Track */}
           <div className="overflow-hidden px-2">

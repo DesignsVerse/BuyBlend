@@ -116,9 +116,9 @@ export default function ProductsPageClient({
 
   return (
     <div className="min-h-screen bg-white">
-      
+    <TopMarquee/>
+
       <div className="container mx-auto py-4 md:px-8 px-2 max-w-full">
-        <TopMarquee/>
         {/* ✅ Premium Top Section with Title + Sort */}
         <div className="relative mb-8 pt-6 pb-4 border-b border-gray-100">
           {/* Background decorative element */}

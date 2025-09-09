@@ -15,16 +15,18 @@ export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSecti
   const scrollRef = useRef<HTMLDivElement>(null)
   const autoScrollRef = useRef<NodeJS.Timeout>()
   const [showScrollButtons, setShowScrollButtons] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState("earrings") // Default: Earrings
+  const [selectedCategory, setSelectedCategory] = useState("earring") // Default: Earrings
   const [newArrivals, setNewArrivals] = useState<Product[]>(initialNewArrivals)
   const [isLoading, setIsLoading] = useState(!initialNewArrivals.length)
 
-  // Categories
+  // Categories with Korean and Western as types
   const categories = [
     { label: "Earrings", value: "earring" },
     { label: "Necklace", value: "necklace" },
     { label: "Ring", value: "ring" },
     { label: "Pendant", value: "pendant" },
+    { label: "Korean", value: "korean" },
+    { label: "Western", value: "western" },
   ]
 
   // Fetch all new arrivals if not provided (e.g., recent products across categories)
@@ -65,10 +67,15 @@ export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSecti
     }
   }, [initialNewArrivals.length])
 
-  // Filtered products based on selected category (using product.category.slug.current)
-  const filteredProducts = newArrivals.filter(
-    (product) => !selectedCategory || product.category?.slug?.current === selectedCategory
-  )
+  // Filtered products: Use category for standard ones, type for Korean/Western
+  const filteredProducts = newArrivals.filter((product) => {
+    if (!selectedCategory) return true;
+    if (['korean', 'western'].includes(selectedCategory)) {
+      return product.type === selectedCategory; // Assuming type is a string field matching the value
+    } else {
+      return product.category?.slug?.current === selectedCategory;
+    }
+  })
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -138,24 +145,24 @@ export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSecti
           </p>
         </motion.div>
 
-        {/* Category Filters */}
-        <div className="flex justify-center gap-4 mb-8 flex-wrap">
+        {/* Category Filters - Responsive: 3 per row on mobile */}
+        <div className="grid grid-cols-3 gap-2 mb-8 md:flex md:justify-center md:gap-4 md:flex-wrap">
           {categories.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setSelectedCategory(cat.value)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 selectedCategory === cat.value
                   ? "bg-black text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              } md:px-4 md:py-2 md:text-sm`}
             >
               {cat.label}
             </button>
           ))}
         </div>
 
-        {/* Scrollable Products Container */}
+        {/* Scrollable Products Container - Adjusted widths for responsiveness */}
         <div 
           className="relative"
           onMouseEnter={() => setIsHovered(true)}
@@ -163,14 +170,14 @@ export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSecti
         >
           <motion.div 
             ref={scrollRef}
-            className="flex overflow-x-auto gap-6 pb-10 px-2 snap-x snap-mandatory scrollbar-hide"
+            className="flex overflow-x-auto gap-4 pb-10 px-2 snap-x snap-mandatory scrollbar-hide md:gap-6"
             style={{ scrollPadding: "0 50px" }}
           >
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
                 <motion.div
                   key={product._id}
-                  className="flex-shrink-0 snap-center w-[280px] sm:w-[300px] md:w-[320px] product-card"
+                  className="flex-shrink-0 snap-center w-[calc(100%-16px)] sm:w-[calc(50%-16px)] md:w-[320px] lg:w-[300px] product-card"
                 >
                   <ProductCard product={product} />
                 </motion.div>

@@ -102,25 +102,25 @@ export function SiteHeader() {
         {/* Top announcement bar */}
         <div className="bg-black text-[#fff3f3] text-center py-2 text-xs">
           Free shipping on all orders over $500 | Use code FIRST10 for 10% off
-          
+
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2 z-50">
-              <Image 
-                src="/logo/111.png"  
-                alt="BuyBlend Logo Icon" 
-                width={40} 
-                height={40} 
+              <Image
+                src="/logo/111.png"
+                alt="BuyBlend Logo Icon"
+                width={40}
+                height={40}
                 priority
               />
-              <Image 
-                src="/logo-text.png"  
-                alt="BuyBlend Logo Text" 
-                width={120} 
-                height={40} 
+              <Image
+                src="/logo-text.png"
+                alt="BuyBlend Logo Text"
+                width={120}
+                height={40}
                 priority
               />
             </Link>
@@ -130,13 +130,13 @@ export function SiteHeader() {
               <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors">
                 Home
               </Link>
-              
+
               {/* Products Dropdown */}
-              <div 
-                className="relative" 
+              <div
+                className="relative"
                 ref={productsDropdownRef}
               >
-                <button 
+                <button
                   className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center gap-1"
                   onMouseEnter={() => setActiveDropdown("products")}
                 >
@@ -148,7 +148,7 @@ export function SiteHeader() {
 
                 <AnimatePresence>
                   {activeDropdown === "products" && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
@@ -159,21 +159,21 @@ export function SiteHeader() {
                       <Link href="/products" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100">
                         All Products
                       </Link>
-                      <Link href="/products/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded">Pendant</Link>
-                      <Link href="/products/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded">Earrings</Link>
-                      <Link href="/products/combos" className="block py-2 px-4 hover:bg-gray-50 rounded">Combos</Link>
-                      <Link href="/products/rings" className="block py-2 px-4 hover:bg-gray-50 rounded">Rings</Link>
+                      <Link href="/collection/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded">Pendant</Link>
+                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded">Earrings</Link>
+                      <Link href="/collection/combos" className="block py-2 px-4 hover:bg-gray-50 rounded">Combos</Link>
+                      <Link href="/collection/rings" className="block py-2 px-4 hover:bg-gray-50 rounded">Rings</Link>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
               {/* Earrings Dropdown */}
-              <div 
-                className="relative" 
+              <div
+                className="relative"
                 ref={earringsDropdownRef}
               >
-                <button 
+                <button
                   className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center"
                   onMouseEnter={() => setActiveDropdown("earrings")}
                 >
@@ -184,7 +184,7 @@ export function SiteHeader() {
                 </button>
                 <AnimatePresence>
                   {activeDropdown === "earrings" && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
@@ -203,7 +203,7 @@ export function SiteHeader() {
                   )}
                 </AnimatePresence>
               </div>
-             
+
               <Link href="/about" className="text-sm font-medium hover:text-gray-600 transition-colors">
                 About
               </Link>
@@ -215,14 +215,14 @@ export function SiteHeader() {
             {/* Right side icons */}
             <div className="flex items-center space-x-4 md:space-x-5">
               <div className="hidden md:flex items-center space-x-5">
-                <button 
+                <button
                   className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                   onClick={() => setIsSearchOpen(true)}
                 >
                   <Search className="h-5 w-5" />
                 </button>
-                <Link 
-                  href="/wishlist" 
+                <Link
+                  href="/wishlist"
                   className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                 >
                   <Heart className="h-5 w-5" />
@@ -232,17 +232,17 @@ export function SiteHeader() {
                     </span>
                   )}
                 </Link>
-                <button 
+                <button
                   className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                 >
                   <User className="h-5 w-5" />
                 </button>
               </div>
-              
+
               <CartButton />
-              
+
               {/* Mobile menu button */}
-              <button 
+              <button
                 className="md:hidden p-2 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
@@ -274,10 +274,10 @@ export function SiteHeader() {
                   <Link href="/" className="text-lg font-medium py-2 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>
                     Home
                   </Link>
-                  
+
                   {/* Mobile Products Dropdown */}
                   <div>
-                    <button 
+                    <button
                       className="text-lg font-medium py-2 flex items-center justify-between w-full hover:text-gray-600"
                       onClick={() => toggleDropdown("mobile-products")}
                     >
@@ -288,7 +288,7 @@ export function SiteHeader() {
                     </button>
                     <AnimatePresence>
                       {activeDropdown === "mobile-products" && (
-                        <motion.div 
+                        <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
@@ -306,10 +306,10 @@ export function SiteHeader() {
                       )}
                     </AnimatePresence>
                   </div>
-                  
+
                   {/* Mobile Earrings Dropdown */}
                   <div>
-                    <button 
+                    <button
                       className="text-lg font-medium py-2 flex items-center justify-between w-full hover:text-gray-600"
                       onClick={() => toggleDropdown("mobile-earrings")}
                     >
@@ -320,7 +320,7 @@ export function SiteHeader() {
                     </button>
                     <AnimatePresence>
                       {activeDropdown === "mobile-earrings" && (
-                        <motion.div 
+                        <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
@@ -338,16 +338,16 @@ export function SiteHeader() {
                       )}
                     </AnimatePresence>
                   </div>
-                  
+
                   <Link href="/about" className="text-lg font-medium py-2 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>
                     About
                   </Link>
                   <Link href="/contact" className="text-lg font-medium py-2 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>
                     Contact Us
                   </Link>
-                  
+
                   <div className="border-t pt-4 mt-4 flex flex-col space-y-4">
-                    <button 
+                    <button
                       className="flex items-center space-x-2 text-lg hover:text-gray-600"
                       onClick={() => {
                         setIsMobileMenuOpen(false)
@@ -389,7 +389,7 @@ export function SiteHeader() {
         {/* Animated Search Overlay */}
         <AnimatePresence>
           {isSearchOpen && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -397,8 +397,8 @@ export function SiteHeader() {
               className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
             >
               <div className="absolute inset-0" onClick={() => setIsSearchOpen(false)} />
-              
-              <motion.div 
+
+              <motion.div
                 initial={{ y: "-100%" }}
                 animate={{ y: 0 }}
                 exit={{ y: "-100%" }}
@@ -418,14 +418,14 @@ export function SiteHeader() {
                         className="w-full pl-10 pr-4 py-3 text-lg border-0 focus:ring-0 focus:outline-none placeholder-gray-400 bg-transparent"
                       />
                     </div>
-                    
+
                     <button
                       type="submit"
                       className="ml-4 bg-black text-[#fff3f3] p-3 rounded-full hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                     >
                       <ArrowRight className="h-5 w-5" />
                     </button>
-                    
+
                     <button
                       type="button"
                       onClick={() => setIsSearchOpen(false)}

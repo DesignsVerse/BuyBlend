@@ -16,6 +16,7 @@ import {
   Search,
   SlidersHorizontal,
 } from "lucide-react"
+import { TopMarquee } from "@/components/products/offer-marquee"
 
 async function getPendantProducts(): Promise<Product[]> {
   try {
@@ -180,7 +181,11 @@ export default function PendantProductsPage() {
   ])
 
   return (
+    <>
+
+    <TopMarquee/>
     <div className="px-4 md:px-8 lg:px-12 py-8">
+      
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
         <h1 className="text-2xl font-bold">Pendant Collection</h1>
@@ -250,5 +255,6 @@ export default function PendantProductsPage() {
         </div>
       )}
     </div>
+    </>
   )
 }

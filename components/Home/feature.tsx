@@ -118,41 +118,42 @@ const ProductShowcase: React.FC = () => {
 
   return (
     <section className="py-10 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
-      {/* Decorative elements */}
-      
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Mobile View All Button - Only visible on mobile */}
-        {isMobile && (
-          <div className="flex justify-end mb-6 lg:hidden">
-            <Link 
-              href="/products" 
-              className="text-gray-700 hover:text-gray-900 font-medium flex items-center group text-sm"
-            >
-              VIEW ALL
-              <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-            </Link>
+        {/* Heading and View All - Always at top, with conditional styling */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h3 className="text-2xl md:text-3xl font-serif font-bold text-gray-900 mb-2">Featured Collection</h3>
+            <p className="text-gray-600 text-sm">Handpicked selections of our finest gemstones</p>
           </div>
-        )}
+          
+          <Link 
+            href="/products" 
+            className="text-gray-700 hover:text-gray-900 font-medium flex items-center group text-sm"
+          >
+            VIEW ALL
+            <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
 
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
-          {/* Left side - Featured image */}
+          {/* Video Section - order-1 on mobile (after heading), order-1 on lg (left) */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
-            className="w-full lg:w-2/5 relative rounded-2xl overflow-hidden shadow-2xl order-2 lg:order-1"
+            className="w-full lg:w-2/5 relative rounded-2xl overflow-hidden shadow-2xl order-1"
           >
             <div className="aspect-[3/4] w-full relative">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="object-cover w-full h-full"
-            >
-              <source src="/video/1.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="object-cover w-full h-full"
+              >
+                <source src="/video/1.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
                 <div className="text-center w-full">
@@ -200,31 +201,13 @@ const ProductShowcase: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Right side - Products - Centered with left side */}
+          {/* Products Section - order-2 on mobile (after video), order-2 on lg (right) */}
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="w-full lg:w-3/5 flex flex-col justify-center order-1 lg:order-2"
+            className="w-full lg:w-3/5 flex flex-col justify-center order-2"
           >
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h3 className="text-2xl md:text-3xl font-serif font-bold text-gray-900 mb-2">Featured Collection</h3>
-                <p className="text-gray-600 text-sm">Handpicked selections of our finest gemstones</p>
-              </div>
-              
-              {/* Desktop View All Button - Hidden on mobile */}
-              {!isMobile && (
-                <Link 
-                  href="/products" 
-                  className="text-gray-700 hover:text-gray-900 font-medium flex items-center group text-sm"
-                >
-                  VIEW ALL
-                  <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-                </Link>
-              )}
-            </div>
-
             <div 
               className="relative"
               onMouseEnter={() => setIsHovered(true)}
@@ -262,24 +245,6 @@ const ProductShowcase: React.FC = () => {
                 )}
               </AnimatePresence>
 
-              {/* Mobile navigation buttons - Always visible on mobile */}
-              <div className="flex justify-center gap-4 mb-4 lg:hidden">
-                <button
-                  aria-label="Scroll left"
-                  className="flex items-center justify-center bg-white text-gray-800 p-2 rounded-full shadow-md border border-gray-100"
-                  onClick={goPrev}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
-                  aria-label="Scroll right"
-                  className="flex items-center justify-center bg-white text-gray-800 p-2 rounded-full shadow-md border border-gray-100"
-                  onClick={goNext}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-
               {/* Scroller with snap */}
               <div
                 ref={scrollerRef}
@@ -297,23 +262,6 @@ const ProductShowcase: React.FC = () => {
                   </motion.div>
                 ))}
               </div>
-
-              {/* Dots pagination */}
-              {/* <div className="mt-8 flex items-center justify-center gap-2">
-                {products.map((_, i) => {
-                  const isActive = i === activeIndex;
-                  return (
-                    <button
-                      key={i}
-                      aria-label={`Go to slide ${i + 1}`}
-                      onClick={() => scrollToIndex(i)}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        isActive ? "w-6 bg-amber-500" : "w-2 bg-gray-300 hover:bg-gray-400"
-                      }`}
-                    />
-                  );
-                })}
-              </div> */}
             </div>
           </motion.div>
         </div>

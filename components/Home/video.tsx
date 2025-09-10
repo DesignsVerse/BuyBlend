@@ -2,9 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { X, VolumeX, Volume2, Pause, Play, ChevronLeft, ChevronRight, ShoppingBag, ChevronDown, ChevronUp } from 'lucide-react'
-import { products } from '@/data/videos/product-video'
+import { videoMap } from '@/data/videos/product-video'
+import { fetchSelectedProducts } from '@/lib/fetchProducts'
 
 export default function VideoShowcaseReels() {
+  const [products, setProducts] = useState<any[]>([])
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const [isMuted, setIsMuted] = useState(true)
@@ -18,6 +20,11 @@ export default function VideoShowcaseReels() {
   const containerRef = useRef<HTMLDivElement>(null)
   const sliderRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
+
+  // Fetch dynamic products
+  useEffect(() => {
+    fetchSelectedProducts().then(setProducts)
+  }, [])
 
   // Check if mobile view
   useEffect(() => {
@@ -60,7 +67,7 @@ export default function VideoShowcaseReels() {
     return () => {
       observerRef.current?.disconnect()
     }
-  }, [isMobileView])
+  }, [isMobileView, products]) // Added products dependency for dynamic data
 
   // Handle main video play state
   useEffect(() => {
@@ -76,7 +83,7 @@ export default function VideoShowcaseReels() {
         }
       })
     }
-  }, [activeIndex, isPlaying, isMuted, isReelMode])
+  }, [activeIndex, isPlaying, isMuted, isReelMode, products]) // Added products dependency
 
   // Handle popup video play state
   useEffect(() => {
@@ -90,7 +97,7 @@ export default function VideoShowcaseReels() {
         }
       }
     })
-  }, [activePopupIndex, isMuted])
+  }, [activePopupIndex, isMuted, products]) // Added products dependency
 
   // Scroll to center in popup
   useEffect(() => {
@@ -179,6 +186,13 @@ export default function VideoShowcaseReels() {
     if (isMobileView) {
       setIsReelMode(true)
     }
+    // Ensure video plays in popup
+    setTimeout(() => {
+      if (popupVideoRefs.current[index]) {
+        popupVideoRefs.current[index]!.muted = isMuted
+        popupVideoRefs.current[index]!.play()
+      }
+    }, 100)
   }
 
   const closePopup = () => {
@@ -197,44 +211,47 @@ export default function VideoShowcaseReels() {
           </div>
 
           <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
-            {products.map((product, index) => (
-              <div
-                key={product.id}
-                className="flex-shrink-0 w-80 bg-white  overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-100 cursor-pointer"
-                onClick={() => openPopup(index)}
-              >
-                <div className="relative h-120">
-                  <video
-                    ref={el => { videoRefs.current[index] = el }}
-                    src={product.video}
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                  />
-                </div>
+            {products.map((product, index) => {
+              const slug = product.slug?.current
+              const videoSrc = videoMap[slug] || "/fallback.mp4"
+              return (
+                <div
+                  key={product._id || index}
+                  className="flex-shrink-0 w-80 bg-white overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-100 cursor-pointer"
+                  onClick={() => openPopup(index)}
+                >
+                  <div className="relative h-120">
+                    <video
+                      ref={el => { videoRefs.current[index] = el }}
+                      src={videoSrc}
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="auto"
+                    />
+                  </div>
 
-                <div className="p-4 bg-white">
-                  <h3 className="font-medium text-sm mb-2 line-clamp-2 text-gray-900">{product.title}</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold text-gray-900">₹{product.discountPrice || product.price}</span>
-                      {product.discountPrice && (
-                        <span className="text-gray-500 line-through text-sm">₹{product.price}</span>
-                      )}
+                  <div className="p-4 bg-white">
+                    <h3 className="font-medium text-sm mb-2 line-clamp-2 text-gray-900">{product.name}</h3>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-bold text-gray-900">₹{product.price}</span>
+                        {product.originalPrice && (
+                          <span className="text-gray-500 line-through text-sm">₹{product.originalPrice}</span>
+                        )}
+                      </div>
+                      <button className="bg-gray-900 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors flex items-center gap-1">
+                        <ShoppingBag className="w-4 h-4" />
+                        Shop Now
+                      </button>
                     </div>
-                    <button className="bg-gray-900 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors flex items-center gap-1">
-                      <ShoppingBag className="w-4 h-4" />
-                      Shop Now
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
-
         </div>
       </div>
 
@@ -247,41 +264,45 @@ export default function VideoShowcaseReels() {
           </div>
 
           <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
-            {products.map((product, index) => (
-              <div
-                key={product.id}
-                className="flex-shrink-0 w-74 bg-white  overflow-hidden shadow-md border border-gray-100 cursor-pointer"
-                onClick={() => openPopup(index)}
-              >
-                <div className="relative h-120">
-                  <video
-                    ref={el => { videoRefs.current[index] = el }}
-                    src={product.video}
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                  />
-                </div>
+            {products.map((product, index) => {
+              const slug = product.slug?.current
+              const videoSrc = videoMap[slug] || "/fallback.mp4"
+              return (
+                <div
+                  key={product._id || index}
+                  className="flex-shrink-0 w-74 bg-white overflow-hidden shadow-md border border-gray-100 cursor-pointer"
+                  onClick={() => openPopup(index)}
+                >
+                  <div className="relative h-120">
+                    <video
+                      ref={el => { videoRefs.current[index] = el }}
+                      src={videoSrc}
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="auto"
+                    />
+                  </div>
 
-                <div className="p-3 bg-white">
-                  <h3 className="font-medium text-sm mb-1 line-clamp-2 text-gray-900">{product.title}</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-1">
-                      <span className="font-bold text-gray-900 text-sm">₹{product.discountPrice || product.price}</span>
-                      {product.discountPrice && (
-                        <span className="text-gray-500 line-through text-xs">₹{product.price}</span>
-                      )}
+                  <div className="p-3 bg-white">
+                    <h3 className="font-medium text-sm mb-1 line-clamp-2 text-gray-900">{product.name}</h3>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-1">
+                        <span className="font-bold text-gray-900 text-sm">₹{product.price}</span>
+                        {product.originalPrice && (
+                          <span className="text-gray-500 line-through text-xs">₹{product.originalPrice}</span>
+                        )}
+                      </div>
+                      <button className="bg-gray-900 text-white p-2 rounded text-xs font-medium hover:bg-gray-800 transition-colors">
+                        <ShoppingBag className="w-3 h-3" />
+                      </button>
                     </div>
-                    <button className="bg-gray-900 text-white p-2 rounded text-xs font-medium hover:bg-gray-800 transition-colors">
-                      <ShoppingBag className="w-3 h-3" />
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
@@ -302,62 +323,66 @@ export default function VideoShowcaseReels() {
             ref={sliderRef}
             className="w-full h-full overflow-y-scroll snap-y snap-mandatory scroll-smooth"
           >
-            {products.map((product, index) => (
-              <div
-                key={product.id}
-                className="w-full h-screen snap-start relative flex items-center justify-center"
-              >
-                <video
-                  ref={el => { popupVideoRefs.current[index] = el }}
-                  src={product.video}
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  loop
-                  muted={isMuted}
-                  playsInline
-                />
+            {products.map((product, index) => {
+              const slug = product.slug?.current
+              const videoSrc = videoMap[slug] || "/fallback.mp4"
+              return (
+                <div
+                  key={product._id || index}
+                  className="w-full h-screen snap-start relative flex items-center justify-center"
+                >
+                  <video
+                    ref={el => { popupVideoRefs.current[index] = el }}
+                    src={videoSrc}
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    playsInline
+                  />
 
-                {/* Right Side Navigation Center */}
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
-                  <button
-                    onClick={prevProduct}
-                    className="bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors"
-                  >
-                    <ChevronUp className="w-6 h-6" />
-                  </button>
-                  <button
-                    onClick={nextProduct}
-                    className="bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors"
-                  >
-                    <ChevronDown className="w-6 h-6" />
-                  </button>
-                </div>
-
-                {/* Bottom Info Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
-                  <h3 className="font-medium text-lg">{product.title}</h3>
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold">₹{product.discountPrice || product.price}</span>
-                      {product.discountPrice && (
-                        <span className="line-through text-gray-300 text-sm">₹{product.price}</span>
-                      )}
-                    </div>
-                    <button className="bg-white text-black px-3 py-2 rounded-md font-medium flex items-center gap-1">
-                      <ShoppingBag className="w-4 h-4" /> Shop Now
+                  {/* Right Side Navigation Center */}
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
+                    <button
+                      onClick={prevProduct}
+                      className="bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors"
+                    >
+                      <ChevronUp className="w-6 h-6" />
+                    </button>
+                    <button
+                      onClick={nextProduct}
+                      className="bg-white/30 text-white rounded-full p-2 hover:bg-white/50 transition-colors"
+                    >
+                      <ChevronDown className="w-6 h-6" />
                     </button>
                   </div>
-                </div>
 
-                {/* Mute Button */}
-                <button
-                  onClick={toggleMute}
-                  className="absolute bottom-20 right-4 bg-black/50 text-white rounded-full p-2"
-                >
-                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                </button>
-              </div>
-            ))}
+                  {/* Bottom Info Overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
+                    <h3 className="font-medium text-lg">{product.name}</h3>
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-bold">₹{product.price}</span>
+                        {product.originalPrice && (
+                          <span className="line-through text-gray-300 text-sm">₹{product.originalPrice}</span>
+                        )}
+                      </div>
+                      <button className="bg-white text-black px-3 py-2 rounded-md font-medium flex items-center gap-1">
+                        <ShoppingBag className="w-4 h-4" /> Shop Now
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Mute Button */}
+                  <button
+                    onClick={toggleMute}
+                    className="absolute bottom-20 right-4 bg-black/50 text-white rounded-full p-2"
+                  >
+                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  </button>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
@@ -377,15 +402,17 @@ export default function VideoShowcaseReels() {
             <div className="flex h-[80vh]">
               {/* Video Section */}
               <div className="flex-1 relative bg-black">
-                <video
-                  ref={el => { popupVideoRefs.current[activePopupIndex] = el }}
-                  src={products[activePopupIndex].video}
-                  className="w-full h-full object-contain"
-                  autoPlay
-                  loop
-                  muted={isMuted}
-                  playsInline
-                />
+                {products[activePopupIndex] && (
+                  <video
+                    ref={el => { popupVideoRefs.current[activePopupIndex] = el }}
+                    src={videoMap[products[activePopupIndex].slug?.current] || "/fallback.mp4"}
+                    className="w-full h-full object-contain"
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    playsInline
+                  />
+                )}
 
                 {/* Navigation Arrows */}
                 {products.length > 1 && (
@@ -416,16 +443,16 @@ export default function VideoShowcaseReels() {
 
               {/* Product Info Section */}
               <div className="w-96 p-6 bg-white overflow-y-auto">
-                <h2 className="text-2xl font-bold mb-4">{products[activePopupIndex].title}</h2>
-                <p className="text-gray-600 mb-6">{products[activePopupIndex].description}</p>
+                <h2 className="text-2xl font-bold mb-4">{products[activePopupIndex]?.name}</h2>
+                <p className="text-gray-600 mb-6">{products[activePopupIndex]?.description}</p>
                 
                 <div className="flex items-center mb-6">
                   <span className="text-2xl font-bold text-gray-900">
-                    ₹{products[activePopupIndex].discountPrice || products[activePopupIndex].price}
+                    ₹{products[activePopupIndex]?.price}
                   </span>
-                  {products[activePopupIndex].discountPrice && (
+                  {products[activePopupIndex]?.originalPrice && (
                     <span className="text-lg line-through text-gray-500 ml-2">
-                      ₹{products[activePopupIndex].price}
+                      ₹{products[activePopupIndex]?.originalPrice}
                     </span>
                   )}
                 </div>
@@ -441,14 +468,14 @@ export default function VideoShowcaseReels() {
                     <div className="grid grid-cols-3 gap-2">
                       {products.map((product, index) => (
                         <button
-                          key={product.id}
+                          key={product._id || index}
                           onClick={() => setActivePopupIndex(index)}
                           className={`relative aspect-video overflow-hidden rounded-lg border-2 transition-all ${
                             index === activePopupIndex ? 'border-gray-900' : 'border-transparent'
                           }`}
                         >
                           <video
-                            src={product.video}
+                            src={videoMap[product.slug?.current] || "/fallback.mp4"}
                             className="w-full h-full object-cover"
                             muted
                             loop

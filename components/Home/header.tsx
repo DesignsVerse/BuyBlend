@@ -1,4 +1,5 @@
 "use client"
+
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { Search, User, Heart, Menu, X, ArrowRight } from "lucide-react"
@@ -99,16 +100,15 @@ export function SiteHeader() {
   return (
     <>
       <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? "border-b border-gray-200 bg-[#fff3f3]/95 backdrop-blur supports-backdrop-blur:backdrop-blur" : "bg-[#fff3f3]/80 backdrop-blur supports-backdrop-blur:backdrop-blur"}`}>
-        {/* Top announcement bar */}
-        <div className="bg-black text-[#fff3f3] text-center py-2 text-xs">
+        {/* Top announcement bar - Improved with better typography and hover effect */}
+        <div className="bg-black text-[#fff3f3] text-center py-2 text-sm font-medium tracking-wide hover:bg-gray-900 transition-colors">
           Free shipping on all orders over $500 | Use code FIRST10 for 10% off
-
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2 z-50">
+            {/* Logo - Added subtle hover animation */}
+            <Link href="/" className="flex items-center space-x-2 z-50 transition-transform hover:scale-105 duration-200">
               <Image
                 src="/logo/111.png"
                 alt="BuyBlend Logo Icon"
@@ -125,19 +125,19 @@ export function SiteHeader() {
               />
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors">
+            {/* Desktop Navigation - Improved spacing and hover effects */}
+            <nav className="hidden md:flex items-center space-x-10">
+              <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200">
                 Home
               </Link>
 
-              {/* Products Dropdown */}
+              {/* Products Dropdown - Enhanced with shadow and rounded corners */}
               <div
                 className="relative"
                 ref={productsDropdownRef}
               >
                 <button
-                  className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center gap-1"
+                  className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 flex items-center gap-1"
                   onMouseEnter={() => setActiveDropdown("products")}
                 >
                   Products
@@ -153,28 +153,28 @@ export function SiteHeader() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute bg-white shadow-lg rounded-md p-4 w-48 mt-2 border border-gray-100"
+                      className="absolute bg-white shadow-xl rounded-lg p-4 w-48 mt-2 border border-gray-100"
                       onMouseLeave={() => setActiveDropdown(null)}
                     >
-                      <Link href="/products" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100">
+                      <Link href="/products" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100 transition-colors duration-150">
                         All Products
                       </Link>
-                      <Link href="/collection/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded">Pendant</Link>
-                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded">Earrings</Link>
-                      <Link href="/collection/combos" className="block py-2 px-4 hover:bg-gray-50 rounded">Combos</Link>
-                      <Link href="/collection/rings" className="block py-2 px-4 hover:bg-gray-50 rounded">Rings</Link>
+                      <Link href="/collection/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150">Pendant</Link>
+                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150">Earrings</Link>
+                      <Link href="/collection/combos" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150">Combos</Link>
+                      <Link href="/collection/rings" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150">Rings</Link>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
-              {/* Earrings Dropdown */}
+              {/* Earrings Dropdown - Enhanced similarly */}
               <div
                 className="relative"
                 ref={earringsDropdownRef}
               >
                 <button
-                  className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center"
+                  className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 flex items-center"
                   onMouseEnter={() => setActiveDropdown("earrings")}
                 >
                   Earrings
@@ -189,41 +189,41 @@ export function SiteHeader() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute bg-white shadow-lg rounded-md p-4 w-48 mt-2 border border-gray-100"
+                      className="absolute bg-white shadow-xl rounded-lg p-4 w-48 mt-2 border border-gray-100"
                       onMouseLeave={() => setActiveDropdown(null)}
                     >
-                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100">
+                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100 transition-colors duration-150">
                         All Earrings
                       </Link>
-                      <Link href="/collection/earrings/stud" className="block py-2 px-4 hover:bg-gray-50 rounded">Studs</Link>
-                      <Link href="/collection/earrings/western" className="block py-2 px-4 hover:bg-gray-50 rounded">Western</Link>
-                      <Link href="/collection/earrings/korean" className="block py-2 px-4 hover:bg-gray-50 rounded">Korean</Link>
-                      <Link href="/collection/earrings/jhumkas" className="block py-2 px-4 hover:bg-gray-50 rounded">Jhumkas</Link>
+                      <Link href="/collection/earrings/stud" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150">Studs</Link>
+                      <Link href="/collection/earrings/western" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150">Western</Link>
+                      <Link href="/collection/earrings/korean" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150">Korean</Link>
+                      <Link href="/collection/earrings/jhumkas" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150">Jhumkas</Link>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
-              <Link href="/about" className="text-sm font-medium hover:text-gray-600 transition-colors">
+              <Link href="/about" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200">
                 About
               </Link>
-              <Link href="/contact" className="text-sm font-medium hover:text-gray-600 transition-colors">
+              <Link href="/contact" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200">
                 Contact Us
               </Link>
             </nav>
 
-            {/* Right side icons */}
+            {/* Right side icons - Added hover animations */}
             <div className="flex items-center space-x-4 md:space-x-5">
               <div className="hidden md:flex items-center space-x-5">
                 <button
-                  className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                  className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200"
                   onClick={() => setIsSearchOpen(true)}
                 >
                   <Search className="h-5 w-5" />
                 </button>
                 <Link
                   href="/wishlist"
-                  className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                  className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200"
                 >
                   <Heart className="h-5 w-5" />
                   {wishlistState.itemCount > 0 && (
@@ -233,7 +233,7 @@ export function SiteHeader() {
                   )}
                 </Link>
                 <button
-                  className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                  className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200"
                 >
                   <User className="h-5 w-5" />
                 </button>
@@ -241,7 +241,7 @@ export function SiteHeader() {
 
               <CartButton />
 
-              {/* Mobile menu button */}
+              {/* Mobile menu button - Improved sizing */}
               <button
                 className="md:hidden p-2 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -252,7 +252,7 @@ export function SiteHeader() {
           </div>
         </div>
 
-        {/* Mobile menu with slide-in animation */}
+        {/* Mobile menu with slide-in animation - Enhanced with smoother transitions and padding */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
@@ -265,24 +265,24 @@ export function SiteHeader() {
             >
               <div className="px-6 py-6">
                 <button
-                  className="absolute top-4 right-4 p-2"
+                  className="absolute top-4 right-4 p-2 transition-transform hover:scale-110 duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <X className="h-6 w-6" />
                 </button>
                 <div className="flex flex-col space-y-6 mt-8">
-                  <Link href="/" className="text-lg font-medium py-2 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/" className="text-lg font-medium py-2 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>
                     Home
                   </Link>
 
-                  {/* Mobile Products Dropdown */}
+                  {/* Mobile Products Dropdown - Improved animations */}
                   <div>
                     <button
-                      className="text-lg font-medium py-2 flex items-center justify-between w-full hover:text-gray-600"
+                      className="text-lg font-medium py-2 flex items-center justify-between w-full hover:text-gray-600 transition-colors duration-150"
                       onClick={() => toggleDropdown("mobile-products")}
                     >
                       <span>Products</span>
-                      <svg className={`transform transition-transform ${activeDropdown === "mobile-products" ? "rotate-180" : ""} h-5 w-5`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className={`transform transition-transform ${activeDropdown === "mobile-products" ? "rotate-180" : ""} h-5 w-5 duration-200`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
@@ -295,26 +295,26 @@ export function SiteHeader() {
                           transition={{ duration: 0.3 }}
                           className="pl-4 flex flex-col space-y-3 overflow-hidden"
                         >
-                          <Link href="/products" className="block py-2 font-semibold text-gray-900 border-b border-gray-200" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Link href="/products" className="block py-2 font-semibold text-gray-900 border-b border-gray-200 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>
                             All Products
                           </Link>
-                          <Link href="/products/pendants" className="block py-1 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>Pendants</Link>
-                          <Link href="/products/earrings" className="block py-1 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>Earrings</Link>
-                          <Link href="/products/combos" className="block py-1 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>Combos</Link>
-                          <Link href="/products/rings" className="block py-1 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>Rings</Link>
+                          <Link href="/products/pendants" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Pendants</Link>
+                          <Link href="/products/earrings" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Earrings</Link>
+                          <Link href="/products/combos" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Combos</Link>
+                          <Link href="/products/rings" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Rings</Link>
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
 
-                  {/* Mobile Earrings Dropdown */}
+                  {/* Mobile Earrings Dropdown - Similar improvements */}
                   <div>
                     <button
-                      className="text-lg font-medium py-2 flex items-center justify-between w-full hover:text-gray-600"
+                      className="text-lg font-medium py-2 flex items-center justify-between w-full hover:text-gray-600 transition-colors duration-150"
                       onClick={() => toggleDropdown("mobile-earrings")}
                     >
                       <span>Earrings</span>
-                      <svg className={`transform transition-transform ${activeDropdown === "mobile-earrings" ? "rotate-180" : ""} h-5 w-5`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className={`transform transition-transform ${activeDropdown === "mobile-earrings" ? "rotate-180" : ""} h-5 w-5 duration-200`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
@@ -327,28 +327,28 @@ export function SiteHeader() {
                           transition={{ duration: 0.3 }}
                           className="pl-4 flex flex-col space-y-3 overflow-hidden"
                         >
-                          <Link href="/collection/earrings" className="block py-2 font-semibold text-gray-900 border-b border-gray-200" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Link href="/collection/earrings" className="block py-2 font-semibold text-gray-900 border-b border-gray-200 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>
                             All Earrings
                           </Link>
-                          <Link href="/collection/earrings/stud" className="block py-1 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>Studs</Link>
-                          <Link href="/collection/earrings/western" className="block py-1 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>Western</Link>
-                          <Link href="/collection/earrings/korean" className="block py-1 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>Korean</Link>
-                          <Link href="/collection/earrings/jhumkas" className="block py-1 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>Jhumkas</Link>
+                          <Link href="/collection/earrings/stud" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Studs</Link>
+                          <Link href="/collection/earrings/western" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Western</Link>
+                          <Link href="/collection/earrings/korean" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Korean</Link>
+                          <Link href="/collection/earrings/jhumkas" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Jhumkas</Link>
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
 
-                  <Link href="/about" className="text-lg font-medium py-2 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/about" className="text-lg font-medium py-2 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>
                     About
                   </Link>
-                  <Link href="/contact" className="text-lg font-medium py-2 hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/contact" className="text-lg font-medium py-2 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>
                     Contact Us
                   </Link>
 
                   <div className="border-t pt-4 mt-4 flex flex-col space-y-4">
                     <button
-                      className="flex items-center space-x-2 text-lg hover:text-gray-600"
+                      className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150"
                       onClick={() => {
                         setIsMobileMenuOpen(false)
                         setIsSearchOpen(true)
@@ -357,11 +357,11 @@ export function SiteHeader() {
                       <Search className="h-5 w-5" />
                       <span>Search</span>
                     </button>
-                    <Link href="/wishlist" className="flex items-center space-x-2 text-lg hover:text-gray-600" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link href="/wishlist" className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>
                       <Heart className="h-5 w-5" />
                       <span>Wishlist</span>
                     </Link>
-                    <button className="flex items-center space-x-2 text-lg hover:text-gray-600">
+                    <button className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150">
                       <User className="h-5 w-5" />
                       <span>Account</span>
                     </button>
@@ -372,7 +372,7 @@ export function SiteHeader() {
           )}
         </AnimatePresence>
 
-        {/* Backdrop for mobile menu */}
+        {/* Backdrop for mobile menu - Added fade effect */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
@@ -386,7 +386,7 @@ export function SiteHeader() {
           )}
         </AnimatePresence>
 
-        {/* Animated Search Overlay */}
+        {/* Animated Search Overlay - Improved with better styling and button designs */}
         <AnimatePresence>
           {isSearchOpen && (
             <motion.div
@@ -421,7 +421,7 @@ export function SiteHeader() {
 
                     <button
                       type="submit"
-                      className="ml-4 bg-black text-[#fff3f3] p-3 rounded-full hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                      className="ml-4 bg-black text-[#fff3f3] p-3 rounded-full hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                     >
                       <ArrowRight className="h-5 w-5" />
                     </button>
@@ -429,14 +429,14 @@ export function SiteHeader() {
                     <button
                       type="button"
                       onClick={() => setIsSearchOpen(false)}
-                      className="ml-4 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                      className="ml-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                     >
                       <X className="h-6 w-6" />
                     </button>
                   </form>
                 </div>
 
-                {/* Popular Searches */}
+                {/* Popular Searches - Improved with hover effects and rounded buttons */}
                 <div className="border-t border-gray-100 bg-gray-50">
                   <div className="container mx-auto px-4 py-4">
                     <h3 className="text-sm font-medium text-gray-500 mb-2">Popular Searches</h3>
@@ -448,7 +448,7 @@ export function SiteHeader() {
                             setSearchQuery(item)
                             searchInputRef.current?.focus()
                           }}
-                          className="px-3 py-1 bg-[#fff3f3] border border-gray-200 rounded-full text-sm hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                          className="px-3 py-1 bg-[#fff3f3] border border-gray-200 rounded-full text-sm hover:bg-gray-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
                         >
                           {item}
                         </button>

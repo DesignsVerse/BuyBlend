@@ -298,10 +298,10 @@ export function SiteHeader() {
                           <Link href="/products" className="block py-2 font-semibold text-gray-900 border-b border-gray-200 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>
                             All Products
                           </Link>
-                          <Link href="/products/pendants" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Pendants</Link>
-                          <Link href="/products/earrings" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Earrings</Link>
-                          <Link href="/products/combos" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Combos</Link>
-                          <Link href="/products/rings" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Rings</Link>
+                          <Link href="/collection/pendants" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Pendants</Link>
+                          <Link href="/collection/earrings" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Earrings</Link>
+                          <Link href="/collection/combos" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Combos</Link>
+                          <Link href="/collection/rings" className="block py-1 hover:text-gray-600 transition-colors duration-150" onClick={() => setIsMobileMenuOpen(false)}>Rings</Link>
                         </motion.div>
                       )}
                     </AnimatePresence>

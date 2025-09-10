@@ -11,6 +11,7 @@ import CategoriesSection from "@/components/Home/category"
 import JewelryStore from "@/components/Home/jewelrystore"
 import VideoProductShowcase from "@/components/Home/video"
 import { NewArrivalsSection } from "@/components/Home/newarrival"
+import AdvancedCTABanner from "@/components/Home/CTABanner"
 
 async function getProducts(): Promise<Product[]> {
   try {
@@ -44,6 +45,7 @@ export default async function HomePage() {
       <FeaturedProductsSection featuredProducts={featuredProducts} />
       <CustomProductCard />
       <JewelryStore/>
+      <AdvancedCTABanner/>
       {/* <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">All Products</h2>

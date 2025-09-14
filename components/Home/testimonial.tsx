@@ -18,14 +18,14 @@ const testimonials: Testimonial[] = [
     name: 'Priya Sharma',
     role: 'Jewelry Enthusiast',
     text: 'This jewelry collection is stunning! The designs are elegant and the quality is top-notch. Highly recommend for anyone looking for timeless pieces.',
-    image: 'https://via.placeholder.com/100?text=Priya', // Replace with real image URL
+    image: '/images/1.jpg', // Replace with real image URL
   },
   {
     id: 2,
     name: 'Rahul Verma',
     role: 'Satisfied Customer',
     text: 'Amazing service and beautiful products. The necklace I bought was perfect for my wife birthday. Fast delivery and great value for money!',
-    image: 'https://via.placeholder.com/100?text=Rahul', // Replace with real image URL
+    image: '/images/1.jpg', // Replace with real image URL
   },
 ];
 

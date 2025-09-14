@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation"
-import Image from "next/image"
 import { client, queries, urlFor } from "@/lib/sanity/client"
 import type { Product } from "@/lib/sanity/types"
 import { AddToCartButton } from "@/components/cart/add-to-cart-button"
@@ -8,7 +7,6 @@ import { ProductMediaSlider } from "@/components/products/product-media-slider"
 import { TestimonialSection } from "@/components/products/TestimonialSection"
 import { FeaturedProductsSection } from "@/components/Home/bestseller"
 import CustomProductCard from "@/components/Home/feature"
-import ReviewSection from "@/components/products/user-review-section"
 import CustomerLove from "@/components/products/customer-images"
 import { mockProducts } from "@/lib/sanity/mock-data"
 import Breadcrumbs from "@/components/products/Breadcrumbs"
@@ -109,7 +107,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {/* Product Details Section */}
             <div className="flex flex-col space-y-3">
               {/* Category & Tags */}
-              <div className="flex items-center gap-2 flex-wrap">
+              {/* <div className="flex items-center gap-2 flex-wrap">
                 {product.category && product.category.name && (
                   <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">
                     {product.category.name}
@@ -125,7 +123,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     #{tag}
                   </span>
                 ))}
-              </div>
+              </div> */}
 
               {/* Product Name */}
               

@@ -15,34 +15,30 @@ interface BreadcrumbsProps {
 
 export default function Breadcrumbs({ product }: BreadcrumbsProps) {
   return (
-    <nav className="text-sm text-gray-600 mb-6">
-<ol className="flex flex-wrap items-center space-x-2 justify-start ml-22">
-{/* Home */}
+    <nav className="text-gray-600 mb-6" aria-label="Breadcrumb">
+      <ol className="flex flex-wrap items-end gap-2 text-sm md:text-base justify-end">
+        {/* Home */}
         <li>
-          <Link href="/" className="hover:underline text-gray-500">
+          <Link
+            href="/"
+            className="hover:underline text-gray-500 transition-colors"
+          >
             Home
           </Link>
         </li>
-        <li>/</li>
 
-        {/* Products */}
-        <li>
-          <Link href="/products" className="hover:underline text-gray-500">
-            Products
-          </Link>
-        </li>
 
         {/* Category */}
         {product?.category?.name && (
           <>
-            <li>/</li>
+            <li className="text-gray-400">/</li>
             <li>
               <Link
                 href={`/collection/${
                   product.category.slug?.current ||
                   product.category.name.toLowerCase()
                 }`}
-                className="hover:underline text-gray-500 capitalize"
+                className="hover:underline text-gray-500 capitalize transition-colors"
               >
                 {product.category.name}
               </Link>
@@ -53,11 +49,11 @@ export default function Breadcrumbs({ product }: BreadcrumbsProps) {
         {/* Type */}
         {product?.type && (
           <>
-            <li>/</li>
+            <li className="text-gray-400">/</li>
             <li>
               <Link
-                href={`/collection/earrings/${product.type.toLowerCase()}`}
-                className="hover:underline text-gray-500 capitalize"
+                href={`/collection/${product.type.toLowerCase()}`}
+                className="hover:underline text-gray-500 capitalize transition-colors"
               >
                 {product.type}
               </Link>
@@ -66,8 +62,10 @@ export default function Breadcrumbs({ product }: BreadcrumbsProps) {
         )}
 
         {/* Product Name */}
-        <li>/</li>
-        <li className="text-gray-900 font-semibold">{product?.name}</li>
+        <li className="text-gray-400">/</li>
+        <li className="text-gray-900 font-semibold truncate max-w-[200px] sm:max-w-xs md:max-w-md lg:max-w-lg">
+          {product?.name}
+        </li>
       </ol>
     </nav>
   )

@@ -168,7 +168,7 @@ export function SiteHeader() {
                       className="absolute bg-white shadow-xl rounded-lg p-4 w-48 mt-2 border border-gray-100"
                       onMouseLeave={() => setActiveDropdown(null)}
                     >
-                      <Link href="/products" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+                      <Link href="/collection" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
                         All Products
                       </Link>
                       <Link href="/collection/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Pendant</Link>

@@ -126,7 +126,7 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
 
         {/* Content */}
         <div className="p-4 flex flex-col gap-1 flex-grow">
-          <Link href={`/products/${productSlug}`}>
+          <Link href={`/collection/product/${productSlug}`}>
             <h3 className="text-sm font-semibold line-clamp-2">{product.name}</h3>
             {product.description && (
               <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 line-clamp-1">

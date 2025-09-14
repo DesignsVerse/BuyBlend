@@ -1,7 +1,7 @@
 import { client, queries } from "@/lib/sanity/client"
 import type { Product, Category } from "@/lib/sanity/types"
-import ProductsPageClient from "../products/products-client"
-import { TopMarquee } from "@/components/products/offer-marquee"
+import ProductsPageClient from "./products-client"
+
 async function getProducts(): Promise<Product[]> {
   try {
     const products = await client.fetch(
@@ -34,11 +34,8 @@ export default async function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-                  <TopMarquee/>
-
-          {/* Client Component */}
-          <ProductsPageClient allProducts={allProducts} categories={categories} />
-      
+      {/* Client Component */}
+      <ProductsPageClient allProducts={allProducts} categories={categories} />
     </div>
   )
 }

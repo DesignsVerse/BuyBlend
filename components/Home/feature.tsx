@@ -119,24 +119,14 @@ const ProductShowcase: React.FC = () => {
   return (
     <section className="py-10 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Heading and View All - Always at top, with conditional styling */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="text-2xl md:text-3xl font-serif font-bold text-gray-900 mb-2">Featured Collection</h3>
-            <p className="text-gray-600 text-sm">Handpicked selections of our finest gemstones</p>
-          </div>
-          
-          <Link 
-            href="/products" 
-            className="text-gray-700 hover:text-gray-900 font-medium flex items-center group text-sm"
-          >
-            VIEW ALL
-            <ArrowRight className="ml-1 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-          </Link>
+        {/* Centered heading for the product cards section */}
+        <div className="text-center mb-10">
+          <h3 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-3">Featured Collection</h3>
+          <p className="text-gray-600 max-w-3xl mx-auto">Handpicked selections of our finest gemstones, meticulously crafted to bring out their natural beauty</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
-          {/* Video Section - order-1 on mobile (after heading), order-1 on lg (left) */}
+          {/* Video Section */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -201,7 +191,7 @@ const ProductShowcase: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Products Section - order-2 on mobile (after video), order-2 on lg (right) */}
+          {/* Products Section */}
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}

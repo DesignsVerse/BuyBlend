@@ -11,10 +11,11 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 
 export default function CustomerLove() {
   return (
-    <div className="max-w-6xl mx-auto py- px-4">
-      <div className="flex justify-between items-center mb-8">
+    <div className="w-full py-8 relative">
+      {/* Section Header */}
+      <div className="flex justify-between items-center px-4 md:px-8 mb-8 max-w-[1600px] mx-auto">
         <h2 className="text-2xl font-bold text-gray-800">Customer Love</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <button className="custom-prev bg-white border rounded-full p-2 shadow">
             <ArrowLeft size={20} />
           </button>
@@ -24,10 +25,11 @@ export default function CustomerLove() {
         </div>
       </div>
 
+      {/* Swiper */}
       <Swiper
         modules={[Navigation, Pagination]}
         spaceBetween={20}
-        slidesPerView={3}
+        slidesPerView={1}
         loop={true}
         navigation={{
           prevEl: ".custom-prev",
@@ -35,10 +37,12 @@ export default function CustomerLove() {
         }}
         pagination={{ clickable: true, el: ".custom-pagination", type: "bullets" }}
         breakpoints={{
-          320: { slidesPerView: 1 },
           640: { slidesPerView: 2 },
           1024: { slidesPerView: 3 },
+          1280: { slidesPerView: 4 }, // Large screens
+          1600: { slidesPerView: 5 }, // Extra large screens
         }}
+        className="px-4 md:px-8"
       >
         {customerImages.map((img) => (
           <SwiperSlide key={img.id}>
@@ -46,14 +50,15 @@ export default function CustomerLove() {
               <Image
                 src={img.src}
                 alt={img.alt}
-                width={300}
-                height={400}
+                fill
                 className="object-cover w-full h-full"
               />
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
+
+      {/* Pagination */}
       <div className="custom-pagination mt-4 flex justify-center space-x-2"></div>
     </div>
   )

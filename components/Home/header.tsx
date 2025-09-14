@@ -7,6 +7,7 @@ import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { CartButton } from "@/components/cart/cart-button"
 import Image from "next/image"
 import { AnimatePresence, motion } from "framer-motion"
+import "/styles/globals.css"
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -100,29 +101,40 @@ export function SiteHeader() {
   return (
     <>
       <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? "border-b border-gray-200 bg-[#fff3f3]/95 backdrop-blur supports-backdrop-blur:backdrop-blur" : "bg-[#fff3f3]/80 backdrop-blur supports-backdrop-blur:backdrop-blur"}`}>
-        {/* Top announcement bar - Updated with premium hover and gradient */}
-        <div className="bg-gradient-to-r from-black to-gray-900 text-[#fff3f3] text-center py-3 text-sm font-medium tracking-wider hover:opacity-90 transition-opacity cursor-pointer">
-          Free shipping on all orders over $500 | Use code FIRST10 for 10% off
-        </div>
-
+        {/* Top announcement bar with infinite marquee scrolling */}
+        <div className="marquee-wrapper">
+  <div className="marquee-content">
+    <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span>
+    <span>💎 Diamond Rings Sale – 15% OFF | Limited Time</span>
+    <span>🎁 Buy 2 Get 1 Free on Earrings Collection</span>
+    <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span> 
+  </div>
+</div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">
-            {/* Logo - Enhanced hover with shadow */}
-            <Link href="/" className="flex items-center space-x-2 z-50 transition-all hover:scale-105 hover:shadow-md duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+            {/* Logo with text and tagline */}
+            <Link
+              href="/"
+              className="flex items-center space-x-1.5 z-50 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+            >
+              {/* Left side logo icon */}
               <Image
-                src="/logo/111.png"
+                src="/logo/logo.png"
                 alt="BuyBlend Logo Icon"
-                width={40}
-                height={40}
+                width={60}
+                height={60}
                 priority
               />
-              <Image
-                src="/logo-text.png"
-                alt="BuyBlend Logo Text"
-                width={120}
-                height={40}
-                priority
-              />
+
+              {/* Right side text */}
+              <div className="flex flex-col leading-tight">
+                <span className="text-3xl font-serif tracking-wide text-black">
+                  BLEND
+                </span>
+                <span className="text-[10px] font-serif text-black uppercase tracking-normal">
+                  Pure Blend, Pure You
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Navigation - Enhanced with cursor pointer and focus rings */}
@@ -232,11 +244,11 @@ export function SiteHeader() {
                     </span>
                   )}
                 </Link>
-                <button
-                  className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200 cursor-pointer"
+                <Link
+                  href="/login" className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200 cursor-pointer"
                 >
                   <User className="h-5 w-5" />
-                </button>
+                </Link>
               </div>
 
               <CartButton />
@@ -256,12 +268,12 @@ export function SiteHeader() {
       {/* Mobile menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
+            <motion.div
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="md:hidden fixed top-0 right-0 w-80 max-w-[80vw] h-screen bg-[#fff3f3] shadow-2xl z-40 overflow-y-auto"
+            className="md:hidden fixed top-0 right-0 w-80 max-w-[80vw] h-screen bg-[#fff3f3] shadow-2xl z-[60] overflow-y-auto"
             ref={mobileMenuRef}
           >
             <div className="px-6 py-6">
@@ -375,15 +387,15 @@ export function SiteHeader() {
 
       {/* Backdrop for mobile menu */}
       <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden fixed inset-0 bg-black/30 z-30"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
+      {isMobileMenuOpen && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="md:hidden fixed inset-0 bg-black/30 z-[55]"
+      onClick={() => setIsMobileMenuOpen(false)}
+    />
         )}
       </AnimatePresence>
 

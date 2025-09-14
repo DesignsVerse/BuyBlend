@@ -137,10 +137,10 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
 
           {/* Price */}
           <div className="flex items-center gap-1.5">
-            <span className="text-m font-bold">₹{(product.price ?? 0).toLocaleString("en-IN")}</span>
+            <span className="text-m font-bold">₹{(product.originalPrice ?? 0).toLocaleString("en-IN")}</span>
             {hasDiscount && (
               <span className="text-xs line-through text-gray-500">
-                ₹{(product.originalPrice ?? 0).toLocaleString("en-IN")}
+                ₹{(product.price ?? 0).toLocaleString("en-IN")}
               </span>
             )}
             {hasDiscount && (

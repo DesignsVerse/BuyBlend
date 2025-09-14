@@ -8,11 +8,11 @@ import { ProductMediaSlider } from "@/components/products/product-media-slider"
 import { TestimonialSection } from "@/components/products/TestimonialSection"
 import { FeaturedProductsSection } from "@/components/Home/bestseller"
 import CustomProductCard from "@/components/Home/feature"
-import RecommendedProducts from "@/components/products/recommended-products"
 import ReviewSection from "@/components/products/user-review-section"
 import CustomerLove from "@/components/products/customer-images"
 import { mockProducts } from "@/lib/sanity/mock-data"
 import Breadcrumbs from "@/components/products/Breadcrumbs"
+import { RecommendedProductsSection } from "@/components/products/recommended-products"
 
 interface ProductPageProps {
   params: {
@@ -342,18 +342,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <CustomerLove />
         </div>
         
-        {/* Recommended Products - Full width */}
-        <div className="mt-16">
-          <RecommendedProducts
-            type={product.type ?? ""}
-            currentSlug={product.slug?.current ?? ""}
-          />
-        </div>
+       
+                {/* Recommended Products - Full width */}
 
-        {/* Reviews Section - Full width */}
-        <div className="mt-16">
-          <ReviewSection productName={slug.replace(/-/g, " ")} />
-        </div>
+        <RecommendedProductsSection recommendedProducts={featuredProducts}/>
 
         {/* Featured Products - Full width */}
         <div className="mt-16">

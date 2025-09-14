@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import type { Product, Category } from "@/lib/sanity/types"
 import { ProductCard } from "@/components/Home/product-card"
 import { Filter, Search, ChevronDown, X, SlidersHorizontal, Sparkles } from "lucide-react"
-import { TopMarquee } from "@/components/products/offer-marquee"
+// import { TopMarquee } from "@/components/products/offer-marquee"
 
 export default function ProductsPageClient({
   allProducts,
@@ -116,7 +116,7 @@ export default function ProductsPageClient({
 
   return (
     <div className="min-h-screen bg-white">
-    <TopMarquee/>
+    {/* <TopMarquee/> */}
 
       <div className="container mx-auto py-4 md:px-8 px-2 max-w-full">
         {/* ✅ Premium Top Section with Title + Sort */}

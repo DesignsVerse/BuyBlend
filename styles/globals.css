@@ -121,3 +121,52 @@
     @apply bg-background text-foreground;
   }
 }
+/* Marquee keyframes for smooth infinite scroll */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Wrapper to hide overflow */
+.marquee-wrapper {
+  overflow: hidden;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #000, #111); /* subtle gradient for professional look */
+  padding: 0.5rem 0; /* top-bottom padding */
+  position: relative;
+  font-size: 0.875rem; /* text size */
+  font-weight: 500;
+  color: #fff3f3;
+}
+
+/* Content wrapper for scrolling text */
+.marquee-content {
+  display: inline-block;
+  animation: marquee 25s linear infinite; /* slower for smoother effect */
+}
+
+/* Each repeated text block */
+.marquee-content span {
+  display: inline-block;
+  margin-right: 5rem; /* space between repeated offers */
+}
+
+/* Hover to pause scroll */
+.marquee-content:hover {
+  animation-play-state: paused;
+}
+
+/* Optional: make it responsive */
+@media (max-width: 768px) {
+  .marquee-wrapper {
+    font-size: 0.75rem;
+    padding: 0.5rem 0;
+  }
+  .marquee-content span {
+    margin-right: 3rem;
+  }
+}

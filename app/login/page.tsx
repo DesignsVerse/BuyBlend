@@ -3,14 +3,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, User, Phone, ShoppingBag } from 'lucide-react';
+import { Eye, EyeOff, User, Phone, Mail, Lock, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
     rememberMe: false
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -20,14 +25,36 @@ export default function LoginPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
+    if (!isLogin) {
+      // Registration-specific validations
+      if (!formData.name) {
+        newErrors.name = 'Full name is required';
+      }
+      
+      if (!formData.email) {
+        newErrors.email = 'Email is required';
+      } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = 'Email is invalid';
+      }
+      
+      if (!formData.password) {
+        newErrors.password = 'Password is required';
+      } else if (formData.password.length < 6) {
+        newErrors.password = 'Password must be at least 6 characters';
+      }
+      
+      if (!formData.confirmPassword) {
+        newErrors.confirmPassword = 'Confirm password is required';
+      } else if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
+    }
+    
+    // Common validations for both login and registration
     if (!formData.mobile) {
       newErrors.mobile = 'Mobile number is required';
     } else if (!/^[6-9]\d{9}$/.test(formData.mobile)) {
       newErrors.mobile = 'Please enter a valid 10-digit Indian mobile number';
-    }
-    
-    if (!formData.name) {
-      newErrors.name = 'Full name is required';
     }
     
     setErrors(newErrors);
@@ -41,14 +68,9 @@ export default function LoginPage() {
     
     setIsLoading(true);
     
-    // Simulate API call (e.g., send OTP or direct login with name and mobile)
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // In a real app, you would handle authentication here (e.g., verify OTP)
       console.log(isLogin ? 'Login data:' : 'Register data:', formData);
-      
-      // Redirect to products page after successful login
       router.push('/products');
     } catch (error) {
       console.error('Authentication error:', error);
@@ -65,7 +87,6 @@ export default function LoginPage() {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -78,40 +99,49 @@ export default function LoginPage() {
   const toggleFormMode = () => {
     setIsLogin(!isLogin);
     setErrors({});
+    setFormData({
+      name: '',
+      mobile: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      rememberMe: false
+    });
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="sm:mx-auto sm:w-full sm:max-w-md"
+        className="w-full max-w-md space-y-8"
       >
-        <div className="flex justify-center items-center mb-6">
-          <h1 className="text-4xl font-serif font-bold text-black tracking-wide">Blend</h1>
+        <div className="text-center">
+          <div className="relative flex justify-center items-center">
+            <ShoppingBag className="h-16 w-16 text-black" />
+          </div>
+          <h1 className="mt-6 text-4xl font-serif font-bold text-black tracking-tight">Blend</h1>
+          <h2 className="mt-2 text-2xl font-serif font-light text-gray-800">
+            {isLogin ? 'Sign in to your account' : 'Create a new account'}
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Or{' '}
+            <button
+              onClick={toggleFormMode}
+              className="font-medium text-black hover:text-gray-700 transition-colors duration-200"
+            >
+              {isLogin ? 'create a new account' : 'sign in to your existing account'}
+            </button>
+          </p>
         </div>
-        <h2 className="text-center text-3xl font-serif font-light text-gray-900 mb-2">
-          {isLogin ? 'Sign in to your account' : 'Create a new account'}
-        </h2>
-        <p className="text-center text-sm text-gray-600">
-          Or{' '}
-          <button
-            onClick={toggleFormMode}
-            className="font-medium text-black hover:text-gray-700 focus:outline-none transition ease-in-out duration-150"
-          >
-            {isLogin ? 'create a new account' : 'sign in to your existing account'}
-          </button>
-        </p>
-      </motion.div>
 
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
-      >
-        <div className="bg-white py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-gray-100">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200"
+        >
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -119,7 +149,7 @@ export default function LoginPage() {
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <User className="h-5 w-5 text-gray-500" />
                 </div>
                 <input
                   id="name"
@@ -128,7 +158,7 @@ export default function LoginPage() {
                   autoComplete="name"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className={`appearance-none block w-full pl-10 pr-3 py-3 border ${errors.name ? 'border-red-300' : 'border-gray-200'} rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200 bg-white`}
+                  className={`block w-full pl-10 pr-3 py-3 border ${errors.name ? 'border-red-500' : 'border-gray-300'} bg-white text-black rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
                   placeholder="Enter your full name"
                 />
               </div>
@@ -143,7 +173,7 @@ export default function LoginPage() {
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-5 w-5 text-gray-400" />
+                  <Phone className="h-5 w-5 text-gray-500" />
                 </div>
                 <input
                   id="mobile"
@@ -152,7 +182,7 @@ export default function LoginPage() {
                   autoComplete="tel"
                   value={formData.mobile}
                   onChange={handleInputChange}
-                  className={`appearance-none block w-full pl-10 pr-3 py-3 border ${errors.mobile ? 'border-red-300' : 'border-gray-200'} rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200 bg-white`}
+                  className={`block w-full pl-10 pr-3 py-3 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} bg-white text-black rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
                   placeholder="Enter your mobile number (e.g., 9876543210)"
                 />
               </div>
@@ -160,6 +190,100 @@ export default function LoginPage() {
                 <p className="mt-2 text-sm text-red-600">{errors.mobile}</p>
               )}
             </div>
+
+            {!isLogin && (
+              <>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Email Address
+                  </label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className={`block w-full pl-10 pr-3 py-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'} bg-white text-black rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                  {errors.email && (
+                    <p className="mt-2 text-sm text-red-600">{errors.email}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className={`block w-full pl-10 pr-10 py-3 border ${errors.password ? 'border-red-500' : 'border-gray-300'} bg-white text-black rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
+                      placeholder="Enter your password"
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                      <button
+                        type="button"
+                        className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                  </div>
+                  {errors.password && (
+                    <p className="mt-2 text-sm text-red-600">{errors.password}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                    Confirm Password
+                  </label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      className={`block w-full pl-10 pr-10 py-3 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} bg-white text-black rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-black sm:text-sm transition-all duration-200`}
+                      placeholder="Confirm your password"
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                      <button
+                        type="button"
+                        className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                  </div>
+                  {errors.confirmPassword && (
+                    <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>
+                  )}
+                </div>
+              </>
+            )}
 
             {isLogin && (
               <div className="flex items-center justify-between">
@@ -180,18 +304,14 @@ export default function LoginPage() {
             )}
 
             {errors.submit && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      {errors.submit}
-                    </h3>
-                  </div>
+              <div className="rounded-lg bg-red-50 p-4 border border-red-200">
+                <div className="flex items-center">
+                  <svg className="h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <h3 className="ml-3 text-sm font-medium text-red-800">
+                    {errors.submit}
+                  </h3>
                 </div>
               </div>
             )}
@@ -200,14 +320,14 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-75 transition-all duration-300"
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 transition-all duration-200"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 ) : isLogin ? (
-                  'Sign in'
+                  'Sign In'
                 ) : (
-                  'Create account'
+                  'Create Account'
                 )}
               </button>
             </div>
@@ -216,7 +336,7 @@ export default function LoginPage() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+                <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-gray-500">
@@ -229,7 +349,7 @@ export default function LoginPage() {
               <div>
                 <a
                   href="#"
-                  className="w-full inline-flex justify-center py-3 px-4 border border-gray-200 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                  className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-100 transition-all duration-200"
                 >
                   <span className="sr-only">Sign in with Facebook</span>
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -241,7 +361,7 @@ export default function LoginPage() {
               <div>
                 <a
                   href="#"
-                  className="w-full inline-flex justify-center py-3 px-4 border border-gray-200 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                  className="w-full inline-flex justify-center py-2.5 px-4 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-100 transition-all duration-200"
                 >
                   <span className="sr-only">Sign in with Google</span>
                   <svg className="w-5 h-5" viewBox="0 0 24 24" width="24" height="24">
@@ -254,11 +374,11 @@ export default function LoginPage() {
               </div>
             </div>
           </div>
-        </div>
-        
+        </motion.div>
+
         <div className="mt-6 text-center">
-          <Link href="/products" className="font-medium text-black hover:text-gray-700 transition-all duration-200">
-            Continue as guest
+          <Link href="/products" className="font-medium text-black hover:text-gray-700 transition-colors duration-200">
+            Continue as Guest
           </Link>
         </div>
       </motion.div>

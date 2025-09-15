@@ -1,12 +1,42 @@
+// app/login/page.js (updated)
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, FormEvent, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState('');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+          router.push('/profile');
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    // Check if register mode is set in URL
+    const registerParam = searchParams.get('register');
+    if (registerParam === 'true') {
+      setIsRegister(true);
+    }
+    
+    checkAuth();
+  }, [router, searchParams]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,10 +67,21 @@ export default function LoginPage() {
         setIsRegister(false);
       } else {
         router.push('/profile');
+        router.refresh(); // Refresh to update the header
       }
     } catch {
       setError('Something went wrong.');
     }
+  }
+
+  if (loading || user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

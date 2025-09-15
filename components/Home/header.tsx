@@ -2,12 +2,19 @@
 
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
-import { Search, User, Heart, Menu, X, ArrowRight } from "lucide-react"
+import { Search, User, Heart, Menu, X, ArrowRight, LogOut } from "lucide-react"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { CartButton } from "@/components/cart/cart-button"
 import Image from "next/image"
 import { AnimatePresence, motion } from "framer-motion"
 import "/styles/globals.css"
+
+type AuthUser = {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+};
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -15,6 +22,8 @@ export function SiteHeader() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const { state: wishlistState } = useWishlist()
   const mobileMenuRef = useRef<HTMLDivElement>(null)
@@ -22,6 +31,7 @@ export function SiteHeader() {
   // Separate refs for each desktop dropdown
   const productsDropdownRef = useRef<HTMLDivElement>(null)
   const earringsDropdownRef = useRef<HTMLDivElement>(null)
+  const accountDropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,10 +47,28 @@ export function SiteHeader() {
     }
   }, [isSearchOpen])
 
+  // Fetch user authentication status
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch('/api/auth/me')
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data.user)
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error)
+      } finally {
+        setAuthLoading(false)
+      }
+    }
+    fetchUser()
+  }, [])
+
   // Close desktop dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const refs = [productsDropdownRef, earringsDropdownRef]
+      const refs = [productsDropdownRef, earringsDropdownRef, accountDropdownRef]
       if (!refs.some(ref => ref.current?.contains(event.target as Node))) {
         setActiveDropdown(null)
       }
@@ -98,18 +126,30 @@ export function SiteHeader() {
     return () => document.removeEventListener("keydown", handleEscape)
   }, [])
 
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      setUser(null)
+      setIsMobileMenuOpen(false)
+      window.location.href = '/'
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
+
   return (
     <>
       <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${isScrolled ? "border-b border-gray-200 bg-[#fff3f3]/95 backdrop-blur supports-backdrop-blur:backdrop-blur" : "bg-[#fff3f3]/80 backdrop-blur supports-backdrop-blur:backdrop-blur"}`}>
         {/* Top announcement bar with infinite marquee scrolling */}
         <div className="marquee-wrapper">
-  <div className="marquee-content">
-    <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span>
-    <span>💎 Diamond Rings Sale – 15% OFF | Limited Time</span>
-    <span>🎁 Buy 2 Get 1 Free on Earrings Collection</span>
-    <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span> 
-  </div>
-</div>
+          <div className="marquee-content">
+            <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span>
+            <span>💎 Diamond Rings Sale – 15% OFF | Limited Time</span>
+            <span>🎁 Buy 2 Get 1 Free on Earrings Collection</span>
+            <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span> 
+          </div>
+        </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-20 items-center justify-between">
             {/* Logo with text and tagline */}
@@ -244,11 +284,62 @@ export function SiteHeader() {
                     </span>
                   )}
                 </Link>
-                <Link
-                  href="/login" className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200 cursor-pointer"
+                
+                {/* Account Dropdown */}
+                <div
+                  className="relative"
+                  ref={accountDropdownRef}
                 >
-                  <User className="h-5 w-5" />
-                </Link>
+                  {authLoading ? (
+                    <div className="h-5 w-5 rounded-full bg-gray-200 animate-pulse"></div>
+                  ) : user ? (
+                    <>
+                      <button
+                        className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200 cursor-pointer"
+                        onMouseEnter={() => setActiveDropdown("account")}
+                      >
+                        <User className="h-5 w-5" />
+                      </button>
+                      <AnimatePresence>
+                        {activeDropdown === "account" && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute right-0 bg-white shadow-xl rounded-lg p-4 w-48 mt-2 border border-gray-100"
+                            onMouseLeave={() => setActiveDropdown(null)}
+                          >
+                            <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
+                              Hello, {user.name}
+                            </div>
+                            <Link 
+                              href="/profile" 
+                              className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                              onClick={() => setActiveDropdown(null)}
+                            >
+                              Profile
+                            </Link>
+                            <button
+                              onClick={handleLogout}
+                              className="w-full text-left py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 flex items-center"
+                            >
+                              <LogOut className="h-4 w-4 mr-2" />
+                              Logout
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200 cursor-pointer"
+                    >
+                      <User className="h-5 w-5" />
+                    </Link>
+                  )}
+                </div>
               </div>
 
               <CartButton />
@@ -374,10 +465,40 @@ export function SiteHeader() {
                     <Heart className="h-5 w-5" />
                     <span>Wishlist</span>
                   </Link>
-                  <Link href='/login' className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
-                    <User className="h-5 w-5" />
-                    <span>Account</span>
-                  </Link>
+                  
+                  {authLoading ? (
+                    <div className="h-6 w-6 rounded-full bg-gray-200 animate-pulse"></div>
+                  ) : user ? (
+                    <>
+                      <div className="px-2 py-2 text-sm text-gray-700 border-b border-gray-200">
+                        Hello, {user.name}
+                      </div>
+                      <Link 
+                        href="/profile" 
+                        className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <User className="h-5 w-5" />
+                        <span>Profile</span>
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 w-full text-left"
+                      >
+                        <LogOut className="h-5 w-5" />
+                        <span>Logout</span>
+                      </button>
+                    </>
+                  ) : (
+                    <Link 
+                      href="/login" 
+                      className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <User className="h-5 w-5" />
+                      <span>Login / Register</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

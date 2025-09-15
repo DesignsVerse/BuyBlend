@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react"
 import { ProductCard } from "@/components/Home/product-card"
 import type { Product } from "@/lib/sanity/types"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
+import { Sparkles, ArrowRight } from "lucide-react"
 
 interface FeaturedProductsSectionProps {
   featuredProducts: Product[]
@@ -22,8 +22,8 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
       }
     }
     checkOverflow()
-    window.addEventListener('resize', checkOverflow)
-    return () => window.removeEventListener('resize', checkOverflow)
+    window.addEventListener("resize", checkOverflow)
+    return () => window.removeEventListener("resize", checkOverflow)
   }, [featuredProducts])
 
   useEffect(() => {
@@ -39,33 +39,29 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
 
   const scrollLeft = () => {
     if (scrollRef.current) {
-      const cardWidth = scrollRef.current.querySelector('.product-card')?.clientWidth || 320
+      const cardWidth = scrollRef.current.querySelector(".product-card")?.clientWidth || 320
       scrollRef.current.scrollBy({ left: -cardWidth - 24, behavior: "smooth" })
     }
   }
 
   const scrollRight = () => {
     if (scrollRef.current) {
-      const cardWidth = scrollRef.current.querySelector('.product-card')?.clientWidth || 320
+      const cardWidth = scrollRef.current.querySelector(".product-card")?.clientWidth || 320
       scrollRef.current.scrollBy({ left: cardWidth + 24, behavior: "smooth" })
     }
   }
 
   return (
-    <section className="py-16 bg-white relative overflow-hidden scrollbar-hide">
-      {/* Decorative elements */}
-      {/* <div className="absolute top-10 left-0 w-48 h-48 bg-gray-100 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
-      <div className="absolute bottom-10 right-0 w-64 h-64 bg-gray-100 rounded-full translate-x-1/3 translate-y-1/3 opacity-50"></div> */}
-      
-      <div className="container mx-auto px-4 relative z-10">
+    <section className="py-12 bg-white relative overflow-hidden scrollbar-hide">
+      <div className="w-full md:px-4 relative z-10">
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-6"
+          className="text-center mb-6 px-4"
         >
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
@@ -76,31 +72,30 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
               Featured Collection
             </span>
           </motion.div>
-          
+
           <h2 className="text-3xl md:text-4xl font-serif font-normal text-gray-900 mb-4">
             Best Seller
           </h2>
-          
+
           <p className="text-gray-600 max-w-3xl mx-auto text-sm md:text-base">
             Discover our handpicked luxury items showcasing exceptional craftsmanship
           </p>
         </motion.div>
 
         {/* Scrollable Products Container */}
-        <div 
-          className="relative"
+        <div
+          className="relative w-full"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <motion.div 
+          <motion.div
             ref={scrollRef}
-            className="flex overflow-x-auto gap-6 pb-10 px-2 snap-x snap-mandatory scrollbar-hide"
-            style={{ scrollPadding: "0 50px" }} // margin left/right to prevent cut-off
+            className="flex overflow-x-auto gap-4 pb-10 snap-x snap-mandatory scrollbar-hide w-full"
           >
-            {featuredProducts.map((product, index) => (
+            {featuredProducts.map((product) => (
               <motion.div
                 key={product._id}
-                className="flex-shrink-0 snap-center w-[280px] sm:w-[300px] md:w-[320px] product-card"
+                className="flex-shrink-0 snap-center w-1/2 sm:w-1/3 md:w-[320px] lg:w-[300px] product-card"
               >
                 <ProductCard product={product} />
               </motion.div>
@@ -108,10 +103,10 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
           </motion.div>
 
           {/* Scroll Buttons */}
-          <AnimatePresence>
+          {/* <AnimatePresence>
             {showScrollButtons && (
               <>
-                <motion.button 
+                <motion.button
                   onClick={scrollLeft}
                   className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-r-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
                   initial={{ opacity: 0, x: -10 }}
@@ -123,7 +118,7 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
                 >
                   <ChevronLeft className="h-5 w-5 text-gray-700" />
                 </motion.button>
-                <motion.button 
+                <motion.button
                   onClick={scrollRight}
                   className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-l-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
                   initial={{ opacity: 0, x: 10 }}
@@ -137,17 +132,17 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
                 </motion.button>
               </>
             )}
-          </AnimatePresence>
+          </AnimatePresence> */}
         </div>
 
         {/* View All Button */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}
           className="text-center"
         >
-          <motion.button 
+          <motion.button
             className="inline-flex items-center justify-center bg-black text-white px-8 py-3 rounded-sm hover:bg-gray-800 transition-all duration-300 group text-sm font-medium border border-black mt-4"
             whileHover={{ y: -2 }}
             whileTap={{ y: 0 }}

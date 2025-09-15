@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react"
 import { ProductCard } from "@/components/Home/product-card"
 import type { Product } from "@/lib/sanity/types"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { client } from "@/lib/sanity/client" // Import your Sanity client
 
 interface NewArrivalsSectionProps {
@@ -13,7 +13,7 @@ interface NewArrivalsSectionProps {
 export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSectionProps) {
   const [isHovered, setIsHovered] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const autoScrollRef = useRef<NodeJS.Timeout>()
+  const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
   const [showScrollButtons, setShowScrollButtons] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState("earring") // Default: Earrings
   const [newArrivals, setNewArrivals] = useState<Product[]>(initialNewArrivals)
@@ -115,130 +115,118 @@ export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSecti
   }
 
   return (
-    <section className="py-16 bg-white relative overflow-hidden scrollbar-hide">
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Section Header */}
+    <section className="md: py-6 bg-white relative overflow-hidden scrollbar-hide">
+    {/* ✅ Full width instead of container with px-4 */}
+    <div className="w-full md:px-4 relative z-10">
+      {/* Section Header */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-6 px-4" // sirf header ko thoda padding diya
+      >
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-6"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+          className="inline-flex items-center justify-center mb-4 bg-black rounded-full px-4 py-1.5"
         >
-          <motion.div 
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-            className="inline-flex items-center justify-center mb-4 bg-black rounded-full px-4 py-1.5"
-          >
-            <Sparkles className="h-3 w-3 text-white mr-2" />
-            <span className="text-xs font-medium text-white uppercase tracking-wider">
-              New Arrivals
-            </span>
-          </motion.div>
-          
-          <h2 className="text-3xl md:text-4xl font-serif font-normal text-gray-900 mb-4">
-            Fresh Arrivals
-          </h2>
-          
-          <p className="text-gray-600 max-w-3xl mx-auto text-sm md:text-base">
-            Explore our latest additions in premium jewelry
-          </p>
+          <Sparkles className="h-3 w-3 text-white mr-2" />
+          <span className="text-xs font-medium text-white uppercase tracking-wider">
+            New Arrivals
+          </span>
         </motion.div>
-
-        {/* Category Filters - Responsive: 3 per row on mobile */}
-        <div className="grid grid-cols-3 gap-2 mb-8 md:flex md:justify-center md:gap-4 md:flex-wrap">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setSelectedCategory(cat.value)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                selectedCategory === cat.value
-                  ? "bg-black text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              } md:px-4 md:py-2 md:text-sm`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Scrollable Products Container - Adjusted widths for responsiveness */}
-        <div 
-          className="relative"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <motion.div 
-            ref={scrollRef}
-            className="flex overflow-x-auto gap-4 pb-10 px-2 snap-x snap-mandatory scrollbar-hide md:gap-6"
-            style={{ scrollPadding: "0 50px" }}
+        
+        <h2 className="text-3xl md:text-4xl font-serif font-normal text-gray-900 mb-4">
+          Fresh Arrivals
+        </h2>
+        
+        <p className="text-gray-600 max-w-3xl mx-auto text-sm md:text-base">
+          Explore our latest additions in premium jewelry
+        </p>
+      </motion.div>
+  
+      {/* Category Filters */}
+      <div className="grid grid-cols-3 gap-2 mb-8 md:flex md:justify-center md:gap-4 md:flex-wrap px-4">
+        {categories.map((cat) => (
+          <button
+            key={cat.value}
+            onClick={() => setSelectedCategory(cat.value)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+              selectedCategory === cat.value
+                ? "bg-black text-white"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            } md:px-4 md:py-2 md:text-sm`}
           >
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
-                <motion.div
-                  key={product._id}
-                  className="flex-shrink-0 snap-center w-[calc(100%-16px)] sm:w-[calc(50%-16px)] md:w-[320px] lg:w-[300px] product-card"
-                >
-                  <ProductCard product={product} />
-                </motion.div>
-              ))
-            ) : (
-              <div className="flex items-center justify-center w-full text-gray-600 py-8">
-                No new arrivals in this category yet.
-              </div>
-            )}
-          </motion.div>
-
-          {/* Scroll Buttons */}
-          <AnimatePresence>
-            {showScrollButtons && (
-              <>
-                <motion.button 
-                  onClick={scrollLeft}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-r-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Scroll left"
-                >
-                  <ChevronLeft className="h-5 w-5 text-gray-700" />
-                </motion.button>
-                <motion.button 
-                  onClick={scrollRight}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-l-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Scroll right"
-                >
-                  <ChevronRight className="h-5 w-5 text-gray-700" />
-                </motion.button>
-              </>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* View All Button */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="text-center"
-        >
-          <motion.button 
-            className="inline-flex items-center justify-center bg-black text-white px-8 py-3 rounded-sm hover:bg-gray-800 transition-all duration-300 group text-sm font-medium border border-black mt-4"
-            whileHover={{ y: -2 }}
-            whileTap={{ y: 0 }}
-          >
-            View All Products
-            <ArrowRight className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
-          </motion.button>
-        </motion.div>
+            {cat.label}
+          </button>
+        ))}
       </div>
-    </section>
+  
+      {/* ✅ Full width scrollable container */}
+      <div 
+        className="relative w-full"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <motion.div 
+          ref={scrollRef}
+          className="flex overflow-x-auto gap-3 pt-4 pb-10 snap-x snap-mandatory scrollbar-hide w-full"
+        >
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => (
+              <motion.div
+                key={product._id}
+                className="
+                flex-shrink-0 snap-center
+                w-1/2 sm:w-1/3 md:w-[320px] lg:w-[300px] product-card
+              "
+              
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))
+          ) : (
+            <div className="flex items-center justify-center w-full text-gray-600 py-8">
+              No new arrivals in this category yet.
+            </div>
+          )}
+        </motion.div>
+  
+        {/* Scroll Buttons */}
+        {/* <AnimatePresence>
+          {showScrollButtons && (
+            <>
+              <motion.button 
+                onClick={scrollLeft}
+                className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-r-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-700" />
+              </motion.button>
+              <motion.button 
+                onClick={scrollRight}
+                className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-l-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="h-5 w-5 text-gray-700" />
+              </motion.button>
+            </>
+          )}
+        </AnimatePresence> */}
+      </div>
+    </div>
+  </section>
+  
   )
 }

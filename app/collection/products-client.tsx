@@ -123,7 +123,7 @@ export default function ProductsPageClient({
         <div className="relative mb-8 pt-6 pb-4 border-b border-gray-100">
           {/* Background decorative element */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-gradient-to-r from-amber-50 to-rose-50 rounded-full opacity-70 blur-3xl"></div>
+            <div className="absolute -right-20 -top-20 w-64 h-64  rounded-full opacity-70 blur-3xl"></div>
           </div>
           
           <div className="relative flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6">

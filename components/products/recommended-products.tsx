@@ -12,7 +12,7 @@ interface RecommendedProductsSectionProps {
 export function RecommendedProductsSection({ recommendedProducts }: RecommendedProductsSectionProps) {
   const [isHovered, setIsHovered] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const autoScrollRef = useRef<NodeJS.Timeout>()
+  const autoScrollRef = useRef<NodeJS.Timeout | null>(null)
   const [showScrollButtons, setShowScrollButtons] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 

@@ -32,7 +32,7 @@ async function getEarringsProducts(): Promise<Product[]> {
       
 }`,
       {},
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     )
   } catch (error) {
     console.error("Error fetching earrings products:", error)

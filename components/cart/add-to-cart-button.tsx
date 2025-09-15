@@ -13,13 +13,15 @@ interface AddToCartButtonProps {
   product: Product
   disabled?: boolean
   className?: string
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void // ✅ added support
 }
 
-export function AddToCartButton({ product, disabled, className }: AddToCartButtonProps) {
+export function AddToCartButton({ product, disabled, className, onClick }: AddToCartButtonProps) {
   const [status, setStatus] = useState<"idle" | "adding" | "added">("idle")
   const { addItem, trackActivity, state } = useCart()
   const { toast } = useToast()
 
+  // ✅ Product ka image URL nikalna
   const getImageUrl = useCallback(() => {
     const firstMedia = product.media?.[0]
     if (!firstMedia) return "/fallback-product.png"
@@ -40,62 +42,75 @@ export function AddToCartButton({ product, disabled, className }: AddToCartButto
     }
   }, [product.media])
 
-  const handleAddToCart = useCallback(async () => {
-    if (disabled || status !== "idle") return
+  // ✅ Add to cart handler
+  const handleAddToCart = useCallback(
+    async (e?: React.MouseEvent<HTMLButtonElement>) => {
+      if (onClick) onClick(e as React.MouseEvent<HTMLButtonElement>) // custom click bhi chalega
+      if (disabled || status !== "idle") return
 
-    setStatus("adding")
-
-    try {
-      const imageUrl = getImageUrl()
-
-      addItem({
-        id: product._id,
-        name: product.name || "Unnamed Product",
-        price: product.price || 0,
-        slug: product.slug?.current || product.name?.toLowerCase().replace(/\s+/g, '-') || product._id,
-        image: imageUrl,
-      })
-
-      trackActivity()
-
-      setStatus("added")
-      toast({
-        title: "Added to Cart",
-        description: `${product.name || "Item"} has been added to your cart.`,
-        className: "bg-gray-50 border-gray-200 text-black",
-        duration: 3000,
-      })
+      setStatus("adding")
 
       try {
-        await fetch("/api/analytics/add-to-cart", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sessionId: state.sessionId,
-            userId: state.userId,
-            productId: product._id,
-            productName: product.name || "Unnamed Product",
-            price: product.price || 0,
-            timestamp: new Date().toISOString(),
-          }),
+        const imageUrl = getImageUrl()
+
+        // add item to cart
+        addItem({
+          id: product._id,
+          name: product.name || "Unnamed Product",
+          price: product.price || 0,
+          slug:
+            product.slug?.current ||
+            product.name?.toLowerCase().replace(/\s+/g, "-") ||
+            product._id,
+          image: imageUrl,
         })
+
+        // track activity
+        trackActivity()
+
+        setStatus("added")
+        toast({
+          title: "Added to Cart",
+          description: `${product.name || "Item"} has been added to your cart.`,
+          className: "bg-gray-50 border-gray-200 text-black",
+          duration: 3000,
+        })
+
+        // send analytics
+        try {
+          await fetch("/api/analytics/add-to-cart", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              sessionId: state.sessionId,
+              userId: state.userId,
+              productId: product._id,
+              productName: product.name || "Unnamed Product",
+              price: product.price || 0,
+              timestamp: new Date().toISOString(),
+            }),
+          })
+        } catch (error) {
+          console.error("Analytics error:", error)
+        }
+
+        // reset after delay
+        setTimeout(() => setStatus("idle"), 2000)
       } catch (error) {
-        console.error("Analytics error:", error)
+        console.error("Error adding to cart:", error)
+        toast({
+          title: "Error",
+          description: "Failed to add item to cart. Please try again.",
+          className: "bg-red-50 border-red-200 text-red-900",
+          duration: 3000,
+        })
+        setStatus("idle")
       }
+    },
+    [disabled, status, addItem, trackActivity, state, product, toast, getImageUrl, onClick]
+  )
 
-      setTimeout(() => setStatus("idle"), 2000)
-    } catch (error) {
-      console.error("Error adding to cart:", error)
-      toast({
-        title: "Error",
-        description: "Failed to add item to cart. Please try again.",
-        className: "bg-red-50 border-red-200 text-red-900",
-        duration: 3000,
-      })
-      setStatus("idle")
-    }
-  }, [disabled, status, addItem, trackActivity, state, product, toast, getImageUrl])
-
+  // ✅ Button UI states
   const buttonContent = {
     idle: {
       icon: <ShoppingBag className="h-4 w-4 mr-2" />,

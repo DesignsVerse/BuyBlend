@@ -1,58 +1,30 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import Link from "next/link";
-import Image from "next/image";
 import { ProductCard } from "@/components/Home/product-card";
 import type { Product } from "@/lib/sanity/types";
-import { client, queries } from "@/lib/sanity/client";
-import { mockProducts } from "@/lib/sanity/mock-data";
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const ProductShowcase: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+interface ProductShowcaseProps {
+  products: Product[] | undefined | null;
+}
+
+const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    // Check if window is defined (client-side)
-    if (typeof window !== 'undefined') {
-      const checkIsMobile = () => setIsMobile(window.innerWidth < 1024);
-      
-      // Initial check
-      checkIsMobile();
-      
-      // Add event listener for resize
-      window.addEventListener('resize', checkIsMobile);
-      
-      // Cleanup
-      return () => window.removeEventListener('resize', checkIsMobile);
-    }
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-    (async () => {
-      try {
-        const featured = await client.fetch<Product[]>(queries.featuredProducts);
-        if (isMounted) {
-          setProducts(
-            featured && featured.length > 0 ? featured : mockProducts.slice(0, 6)
-          );
-        }
-      } catch {
-        if (isMounted) setProducts(mockProducts.slice(0, 6));
-      }
-    })();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-  // Scroll to a specific card index, accounting for gap
+  // ✅ Mobile detection
+  useEffect(() => {
+    const checkIsMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
+  // ✅ Scroll to a specific card index
   const scrollToIndex = useCallback((index: number) => {
     const el = scrollerRef.current;
     if (!el) return;
@@ -65,19 +37,23 @@ const ProductShowcase: React.FC = () => {
     });
   }, []);
 
-  // Prev/next controls
+  // ✅ Prev/next buttons
   const goPrev = () => {
+    if (!products || products.length === 0) return;
     const next = Math.max(0, activeIndex - 1);
     scrollToIndex(next);
   };
   const goNext = () => {
+    if (!products || products.length === 0) return;
     const last = Math.max(0, products.length - 1);
     const next = Math.min(last, activeIndex + 1);
     scrollToIndex(next);
   };
 
-  // Track which card is centered/most visible
+  // ✅ Track which card is most visible
   useEffect(() => {
+    if (!products || products.length === 0) return;
+
     const el = scrollerRef.current;
     if (!el) return;
 
@@ -86,7 +62,6 @@ const ProductShowcase: React.FC = () => {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Find the entry with highest intersection ratio
         let best: { i: number; r: number } = { i: 0, r: 0 };
         for (const entry of entries) {
           const i = items.indexOf(entry.target as HTMLElement);
@@ -96,38 +71,44 @@ const ProductShowcase: React.FC = () => {
       },
       {
         root: el,
-        threshold: Array.from({ length: 11 }, (_, i) => i / 10), // 0..1
+        threshold: Array.from({ length: 11 }, (_, i) => i / 10),
       }
     );
 
     items.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [products.length]);
+  }, [products]);
 
-  // Auto-scroll functionality
+  // ✅ Auto-scroll
   useEffect(() => {
-    if (!isHovered && products.length > 0) {
+    if (!products || products.length === 0) return;
+    if (!isHovered) {
       const interval = setInterval(() => {
         const nextIndex = (activeIndex + 1) % products.length;
         scrollToIndex(nextIndex);
       }, 4000);
-      
       return () => clearInterval(interval);
     }
-  }, [activeIndex, isHovered, products.length, scrollToIndex]);
+  }, [activeIndex, isHovered, products, scrollToIndex]);
+
+  if (!products || products.length === 0) return null;
 
   return (
     <section className="py-10 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Centered heading for the product cards section */}
+        {/* Section Heading */}
         <div className="text-center mb-10">
-          <h3 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-3">Featured Collection</h3>
-          <p className="text-gray-600 max-w-3xl mx-auto">Handpicked selections of our finest gemstones, meticulously crafted to bring out their natural beauty</p>
+          <h3 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-3">
+            Featured Collection
+          </h3>
+          <p className="text-gray-600 max-w-3xl mx-auto">
+            Handpicked selections of our finest gemstones, meticulously crafted to bring out their natural beauty
+          </p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
           {/* Video Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
@@ -147,7 +128,7 @@ const ProductShowcase: React.FC = () => {
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-8">
                 <div className="text-center w-full">
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
@@ -158,8 +139,8 @@ const ProductShowcase: React.FC = () => {
                       Exclusive Collection
                     </span>
                   </motion.div>
-                  
-                  <motion.h2 
+
+                  <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
@@ -167,8 +148,8 @@ const ProductShowcase: React.FC = () => {
                   >
                     Discover Your Perfect Gemstone
                   </motion.h2>
-                  
-                  <motion.p 
+
+                  <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7 }}
@@ -176,7 +157,7 @@ const ProductShowcase: React.FC = () => {
                   >
                     Each piece is meticulously crafted to bring out the natural beauty and energy of these precious stones.
                   </motion.p>
-                  
+
                   <motion.button
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -192,13 +173,13 @@ const ProductShowcase: React.FC = () => {
           </motion.div>
 
           {/* Products Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="w-full lg:w-3/5 flex flex-col justify-center order-2"
           >
-            <div 
+            <div
               className="relative"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
@@ -235,7 +216,7 @@ const ProductShowcase: React.FC = () => {
                 )}
               </AnimatePresence>
 
-              {/* Scroller with snap */}
+              {/* Scroller */}
               <div
                 ref={scrollerRef}
                 className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 hide-scrollbar pb-4 px-1"
@@ -259,8 +240,13 @@ const ProductShowcase: React.FC = () => {
 
       {/* hide native scrollbar */}
       <style jsx global>{`
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
       `}</style>
     </section>
   );

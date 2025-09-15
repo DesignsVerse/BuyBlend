@@ -141,7 +141,7 @@ export default function CategoriesSection() {
                 className="group relative"
               >
                 <Link
-                  href={`/category/${category.slug}`}
+                  href={`/collection/${category.slug}`}
                   className="block overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
                 >
                   <div className="relative aspect-square overflow-hidden">
@@ -172,7 +172,7 @@ export default function CategoriesSection() {
                   className="group relative"
                 >
                   <Link
-                    href={`/category/${category.slug}`}
+                    href={`/collection/${category.slug}`}
                     className="block  overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-500 border border-gray-100"
                   >
                     <div className="relative aspect-square overflow-hidden">

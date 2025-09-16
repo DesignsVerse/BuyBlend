@@ -35,14 +35,14 @@ export function CartButton() {
         side="right" 
         className="w-full sm:max-w-md bg-white p-0 overflow-hidden"
       >
-        <SheetHeader className="px-6 py-4 border-b border-gray-100">
+        {/* <SheetHeader className="px-6 py-4 border-b border-gray-100">
           <SheetTitle className="text-xl font-serif">Your Shopping Cart</SheetTitle>
           <SheetDescription className="text-sm">
             {state.itemCount === 0
               ? "Your cart is empty"
               : `${state.itemCount} premium item${state.itemCount > 1 ? "s" : ""} awaiting checkout`}
           </SheetDescription>
-        </SheetHeader>
+        </SheetHeader> */}
         
         <CartSidebar />
       </SheetContent>

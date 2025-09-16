@@ -78,14 +78,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const [featuredProducts, allProducts] = await Promise.all([getFeaturedProducts(), getProducts()])
 
   // Handle pricing: prefer compareAtPrice over originalPrice for discounts
-  const effectiveOriginalPrice = product.compareAtPrice || product.originalPrice
-  const hasDiscount = effectiveOriginalPrice && effectiveOriginalPrice !== product.price
-  const discountPercent =
-    effectiveOriginalPrice && product.price
-      ? Math.round(
-        ((effectiveOriginalPrice - product.price) /  product.price) * 100
-      )
-      : 0
+  const mrpPrice = product.price
+const sellingPrice = product.originalPrice || product.price
+
+const hasDiscount = sellingPrice < mrpPrice
+const discountPercent = hasDiscount
+  ? Math.round(((mrpPrice - sellingPrice) / mrpPrice) * 100)
+  : 0
+
 
   // Check stock status
   const isOutOfStock = !product.inStock || product.inventory <= 0
@@ -158,30 +158,28 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </div>
 
               {/* Price Section */}
-              <div className="flex items-center gap-4">
-  {hasDiscount ? (
-    <>
-      {/* Current Price */}
-      <span className="text-3xl font-bold text-gray-900">
-        ₹{product.price.toLocaleString("en-IN")}
-      </span>
+<div className="flex items-center gap-1.5">
+  {/* Selling Price (Discounted) */}
+  <span className="text-2xl font-bold">
+    ₹{sellingPrice.toLocaleString("en-IN")}
+  </span>
 
-      {/* Original Price (Strikethrough) */}
-      <span className="text-xl line-through text-gray-500">
-        ₹{effectiveOriginalPrice?.toLocaleString("en-IN")}
-      </span>
+  {/* MRP with strikethrough */}
+  {hasDiscount && (
+    <span className="text-md line-through text-gray-500">
+      ₹{mrpPrice.toLocaleString("en-IN")}
+    </span>
+  )}
 
-      {/* Discount Badge */}
-      <span className="text-sm font-semibold bg-green-600 text-white px-2 py-1 rounded">
-        {Math.abs(discountPercent)}% OFF
-      </span>
-    </>
-  ) : (
-    <span className="text-3xl font-bold text-gray-900">
-      ₹{product.price.toLocaleString("en-IN")}
+  {/* Discount Badge */}
+  {hasDiscount && (
+    <span className="text-sm text-[#FF905A]">
+      ({discountPercent}% OFF)
     </span>
   )}
 </div>
+
+
 
               {/* Stock Status */}
               <div className="py-2">
@@ -347,7 +345,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         {/* Featured Products - Full width */}
         <div className="mt-16">
-          <CustomProductCard />
+          {/* <CustomProductCard /> */}
         </div>
 
         {/* Testimonials - Full width */}

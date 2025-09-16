@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
-import { Search, User, Heart, Menu, X, ArrowRight, LogOut } from "lucide-react"
+import { Search, User, Heart, Menu, X, ArrowRight, LogOut,Settings ,Bell} from "lucide-react"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { CartButton } from "@/components/cart/cart-button"
 import Image from "next/image"
@@ -286,60 +286,96 @@ export function SiteHeader() {
                 </Link>
                 
                 {/* Account Dropdown */}
-                <div
-                  className="relative"
-                  ref={accountDropdownRef}
-                >
-                  {authLoading ? (
-                    <div className="h-5 w-5 rounded-full bg-gray-200 animate-pulse"></div>
-                  ) : user ? (
-                    <>
-                      <button
-                        className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200 cursor-pointer"
-                        onMouseEnter={() => setActiveDropdown("account")}
-                      >
-                        <User className="h-5 w-5" />
-                      </button>
-                      <AnimatePresence>
-                        {activeDropdown === "account" && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute right-0 bg-white shadow-xl rounded-lg p-4 w-48 mt-2 border border-gray-100"
-                            onMouseLeave={() => setActiveDropdown(null)}
-                          >
-                            <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
-                              Hello, {user.name}
-                            </div>
-                            <Link 
-                              href="/profile" 
-                              className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                              onClick={() => setActiveDropdown(null)}
-                            >
-                              Profile
-                            </Link>
-                            <button
-                              onClick={handleLogout}
-                              className="w-full text-left py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 flex items-center"
-                            >
-                              <LogOut className="h-4 w-4 mr-2" />
-                              Logout
-                            </button>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </>
-                  ) : (
-                    <Link
-                      href="/login"
-                      className="relative p-1 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 duration-200 cursor-pointer"
-                    >
-                      <User className="h-5 w-5" />
-                    </Link>
-                  )}
-                </div>
+                <div className="relative" ref={accountDropdownRef}>
+  {authLoading ? (
+    <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+  ) : user ? (
+    <>
+      <button
+        className="relative flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-gray-700 to-black transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
+        onMouseEnter={() => setActiveDropdown("account")}
+        onClick={() => setActiveDropdown(activeDropdown === "account" ? null : "account")}
+        aria-label="Account menu"
+        aria-expanded={activeDropdown === "account"}
+      >
+        {/* User avatar with initial */}
+        <span className="text-xs font-medium text-white">
+          {user.name ? user.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
+        </span>
+        
+        {/* Online status indicator */}
+        <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></span>
+      </button>
+      
+      <AnimatePresence>
+        {activeDropdown === "account" && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            className="absolute right-0 bg-white shadow-xl rounded-xl py-2 w-64 mt-2 border border-gray-200 z-50"
+            onMouseLeave={() => setActiveDropdown(null)}
+          >
+            {/* User info header */}
+            <div className="px-4 py-3 border-b border-gray-100">
+              <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+              <p className="text-xs text-gray-500 truncate mt-1">{user.email}</p>
+            </div>
+            
+            <div className="py-2">
+              <Link 
+                href="/profile" 
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+                onClick={() => setActiveDropdown(null)}
+              >
+                <User className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
+                Your Profile
+              </Link>
+              
+              <Link 
+                href="/settings" 
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+                onClick={() => setActiveDropdown(null)}
+              >
+                <Settings className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
+                Settings
+              </Link>
+              
+              <Link 
+                href="/notifications" 
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+                onClick={() => setActiveDropdown(null)}
+              >
+                <Bell className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
+                Notifications
+                <span className="ml-auto bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">3</span>
+              </Link>
+            </div>
+            
+            <div className="py-2 border-t border-gray-100">
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+              >
+                <LogOut className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
+                Sign out
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  ) : (
+    <Link
+      href="/login"
+      className="relative flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 transition-all duration-300 hover:scale-110 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
+      aria-label="Login"
+    >
+      <User className="h-4 w-4 text-gray-600" />
+    </Link>
+  )}
+</div>
               </div>
 
               <CartButton />

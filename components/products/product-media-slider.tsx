@@ -4,13 +4,13 @@ import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { urlFor, fileUrl } from "@/lib/sanity/client"
 import { PlayCircle, ChevronLeft, ChevronRight, Pause } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 
 export function ProductMediaSlider({ mediaItems, product }: { mediaItems: any[], product: any }) {
   const [activeIndex, setActiveIndex] = useState(0)
-  const [direction, setDirection] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
+  const mobileContainerRef = useRef<HTMLDivElement | null>(null)
 
   const activeMedia = mediaItems[activeIndex]
 
@@ -30,13 +30,11 @@ export function ProductMediaSlider({ mediaItems, product }: { mediaItems: any[],
   }
 
   const handlePrev = () => {
-    setDirection(-1)
     setIsPlaying(true)
     setActiveIndex((prev) => (prev === 0 ? mediaItems.length - 1 : prev - 1))
   }
 
   const handleNext = () => {
-    setDirection(1)
     setIsPlaying(true)
     setActiveIndex((prev) => (prev === mediaItems.length - 1 ? 0 : prev + 1))
   }
@@ -53,16 +51,40 @@ export function ProductMediaSlider({ mediaItems, product }: { mediaItems: any[],
   }
 
   useEffect(() => {
-    videoRefs.current.forEach(video => {
-      if (video) video.pause()
-    })
-    if (activeMedia?._type === "file" && isPlaying) {
-      const playPromise = videoRefs.current[activeIndex]?.play()
-      if (playPromise !== undefined) {
-        playPromise.catch(() => setIsPlaying(false))
+    // Pause all videos first
+    videoRefs.current.forEach((video, index) => {
+      if (video) {
+        if (index === activeIndex && activeMedia?._type === "file" && isPlaying) {
+          const playPromise = video.play()
+          if (playPromise !== undefined) {
+            playPromise.catch(() => setIsPlaying(false))
+          }
+        } else {
+          video.pause()
+        }
       }
-    }
+    })
   }, [activeIndex, activeMedia?._type, isPlaying])
+
+  // Sync active index with mobile horizontal scroll
+  const handleMobileScroll = () => {
+    const container = mobileContainerRef.current
+    if (!container) return
+    const width = container.clientWidth || 1
+    const index = Math.round(container.scrollLeft / width)
+    if (index !== activeIndex) {
+      setActiveIndex(index)
+    }
+  }
+
+  const scrollMobileTo = (index: number) => {
+    const container = mobileContainerRef.current
+    if (!container) return
+    const width = container.clientWidth
+    container.scrollTo({ left: index * width, behavior: "smooth" })
+    setActiveIndex(index)
+    setIsPlaying(true)
+  }
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto p-">
@@ -72,7 +94,6 @@ export function ProductMediaSlider({ mediaItems, product }: { mediaItems: any[],
           <button
             key={item._key || index}
             onClick={() => {
-              setDirection(index > activeIndex ? 1 : -1)
               setActiveIndex(index)
               setIsPlaying(true)
             }}
@@ -103,57 +124,65 @@ export function ProductMediaSlider({ mediaItems, product }: { mediaItems: any[],
       {/* Main media container */}
       <div className="relative flex-1">
         <div className="relative h-[530px] w-full overflow-hidden rounded-lg bg-black hidden lg:block">
-          {/* Desktop animation + arrows */}
-          <AnimatePresence mode="wait" custom={direction}>
+          {/* Desktop sliding container */}
+          <div className="flex h-full w-full">
             <motion.div
-              key={activeIndex}
-              custom={direction}
-              initial={{ x: direction > 0 ? 300 : -300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: direction > 0 ? -300 : 300, opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              className="absolute inset-0"
+              className="flex h-full w-full"
+              animate={{ x: `-${activeIndex * 100}%` }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 300, 
+                damping: 30,
+                duration: 0.6
+              }}
             >
-              {activeMedia?._type === "image" ? (
-                <Image
-                  src={getMediaUrl(activeMedia)}
-                  alt={activeMedia.alt || product.name}
-                  fill
-                  className="object-contain"
-                />
-              ) : activeMedia?._type === "file" ? (
-                <div className="relative w-full h-full">
-                  <video
-                    ref={el => { if (el) videoRefs.current[activeIndex] = el }}
-                    src={getMediaUrl(activeMedia)}
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-contain"
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    autoPlay
-                  />
-                  {!isPlaying && (
-                    <button
-                      onClick={togglePlay}
-                      className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40"
-                    >
-                      <PlayCircle className="w-16 h-16 text-white/90 drop-shadow-lg" />
-                    </button>
-                  )}
-                  {isPlaying && (
-                    <button
-                      onClick={togglePlay}
-                      className="absolute bottom-4 right-4 bg-black/60 rounded-full p-2 text-white"
-                    >
-                      <Pause className="w-6 h-6" />
-                    </button>
-                  )}
+              {mediaItems.map((item, index) => (
+                <div
+                  key={item._key || index}
+                  className="relative w-full h-full flex-shrink-0"
+                >
+                  {item._type === "image" ? (
+                    <Image
+                      src={getMediaUrl(item)}
+                      alt={item.alt || `${product.name} ${index + 1}`}
+                      fill
+                      className="object-contain"
+                    />
+                  ) : item._type === "file" ? (
+                    <div className="relative w-full h-full">
+                      <video
+                        ref={el => { if (el) videoRefs.current[index] = el }}
+                        src={getMediaUrl(item)}
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-contain"
+                        onPlay={() => setIsPlaying(true)}
+                        onPause={() => setIsPlaying(false)}
+                        autoPlay={index === activeIndex}
+                      />
+                      {index === activeIndex && !isPlaying && (
+                        <button
+                          onClick={togglePlay}
+                          className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/40"
+                        >
+                          <PlayCircle className="w-16 h-16 text-white/90 drop-shadow-lg" />
+                        </button>
+                      )}
+                      {index === activeIndex && isPlaying && (
+                        <button
+                          onClick={togglePlay}
+                          className="absolute bottom-4 right-4 bg-black/60 rounded-full p-2 text-white"
+                        >
+                          <Pause className="w-6 h-6" />
+                        </button>
+                      )}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
+              ))}
             </motion.div>
-          </AnimatePresence>
+          </div>
 
           {/* Desktop arrows */}
           {mediaItems.length > 1 && (
@@ -174,9 +203,13 @@ export function ProductMediaSlider({ mediaItems, product }: { mediaItems: any[],
           )}
         </div>
 
-        {/* Mobile slider (no extra thumbnails) */}
+        {/* Mobile slider with thumbnails below */}
         <div className="lg:hidden relative w-full h-[400px] overflow-hidden rounded-lg bg-black">
-          <div className="flex w-[400px] h-full snap-x snap-mandatory overflow-x-auto scrollbar-hide">
+          <div
+            ref={mobileContainerRef}
+            onScroll={handleMobileScroll}
+            className="flex w-[400px] h-full snap-x snap-mandatory overflow-x-auto scrollbar-hide"
+          >
             {mediaItems.map((item, index) => (
               <div
                 key={item._key || index}
@@ -215,6 +248,39 @@ export function ProductMediaSlider({ mediaItems, product }: { mediaItems: any[],
             </div>
           )}
         </div>
+
+        {/* Mobile thumbnail strip */}
+        {mediaItems.length > 1 && (
+          <div className="lg:hidden mt-3 flex items-center gap-2 overflow-x-auto">
+            {mediaItems.map((item, index) => (
+              <button
+                key={item._key || index}
+                onClick={() => scrollMobileTo(index)}
+                className={`relative w-16 h-16 flex-shrink-0 overflow-hidden rounded-md border-2 transition-all ${
+                  activeIndex === index ? "border-black" : "border-gray-200 hover:border-gray-400"
+                }`}
+              >
+                {item._type === "image" ? (
+                  <Image
+                    src={getMediaUrl(item)}
+                    alt={item.alt || `${product.name} ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <video
+                    src={getMediaUrl(item)}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

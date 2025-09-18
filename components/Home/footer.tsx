@@ -53,11 +53,13 @@ export function SiteFooter() {
           <div>
             <h3 className="font-serif text-lg font-medium mb-6">Collections</h3>
             <ul className="space-y-3">
-              <li><Link href="/collections/rings" className="text-gray-400 hover:text-white transition-colors">Rings</Link></li>
-              <li><Link href="/collections/necklaces" className="text-gray-400 hover:text-white transition-colors">Necklaces</Link></li>
-              <li><Link href="/collections/earrings" className="text-gray-400 hover:text-white transition-colors">Earrings</Link></li>
-              <li><Link href="/collections/bracelets" className="text-gray-400 hover:text-white transition-colors">Bracelets</Link></li>
-              <li><Link href="/collections/new-arrivals" className="text-gray-400 hover:text-white transition-colors">New Arrivals</Link></li>
+              <li><Link href="/collection/earrings" className="text-gray-400 hover:text-white transition-colors">Earrings</Link></li>
+              <li><Link href="/collection/earrings/korean" className="text-gray-400 hover:text-white transition-colors">Korean Earrings</Link></li>
+              <li><Link href="/collection/earrings/western" className="text-gray-400 hover:text-white transition-colors">Western Earrings</Link></li>
+              <li><Link href="/collection/earrings/stud" className="text-gray-400 hover:text-white transition-colors">Stud Earrings</Link></li>
+              <li><Link href="/collection/pendants" className="text-gray-400 hover:text-white transition-colors">Pendants</Link></li>
+              <li><Link href="/collection/ring" className="text-gray-400 hover:text-white transition-colors">Rings</Link></li>
+              <li><Link href="/collection/combos" className="text-gray-400 hover:text-white transition-colors">Combos</Link></li>
             </ul>
           </div>
 
@@ -67,9 +69,9 @@ export function SiteFooter() {
             <ul className="space-y-3">
               <li><Link href="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
-              <li><Link href="/blog" className="text-gray-400 hover:text-white transition-colors">Blog</Link></li>
-              <li><Link href="/careers" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
-              <li><Link href="/press" className="text-gray-400 hover:text-white transition-colors">Press</Link></li>
+              <li><Link href="/products" className="text-gray-400 hover:text-white transition-colors">All Products</Link></li>
+              <li><Link href="/wishlist" className="text-gray-400 hover:text-white transition-colors">Wishlist</Link></li>
+              <li><Link href="/profile" className="text-gray-400 hover:text-white transition-colors">My Account</Link></li>
             </ul>
           </div>
 
@@ -101,15 +103,15 @@ export function SiteFooter() {
             <div className="space-y-3">
               <div className="flex items-center text-gray-400">
                 <Phone className="h-4 w-4 mr-3" />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 98765 43210</span>
               </div>
               <div className="flex items-center text-gray-400">
                 <Mail className="h-4 w-4 mr-3" />
-                <span>contact@luxejewels.com</span>
+                <span>contact@buyblend.in</span>
               </div>
               <div className="flex items-start text-gray-400">
                 <MapPin className="h-4 w-4 mr-3 mt-1 flex-shrink-0" />
-                <span>123 Luxury Avenue, Jewelry District, NY 10001</span>
+                <span>Mumbai, Maharashtra, India</span>
               </div>
             </div>
           </div>
@@ -121,7 +123,7 @@ export function SiteFooter() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} Luxe Jewels. All rights reserved.
+              © {new Date().getFullYear()} BuyBlend.in. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-500 hover:text-white text-sm transition-colors">

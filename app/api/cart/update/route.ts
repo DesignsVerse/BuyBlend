@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { cartId, variantId, quantity, userId, sessionId } = body || {};
+    const { cartId, variantId, quantity, userId, sessionId, unitPrice, currency } = body || {};
 
     // Coerce quantity to number
     const qty = typeof quantity === "string" ? Number(quantity) : quantity;
@@ -36,10 +36,30 @@ export async function POST(req: Request) {
         where: { cartId_variantId: { cartId: resolvedCartId, variantId } },
       }).catch(() => {});
     } else {
-      await prisma.cartItem.update({
+      // Update if exists else create with provided pricing
+      const existing = await prisma.cartItem.findUnique({
         where: { cartId_variantId: { cartId: resolvedCartId, variantId } },
-        data: { quantity: qty },
       });
+      if (existing) {
+        await prisma.cartItem.update({
+          where: { cartId_variantId: { cartId: resolvedCartId, variantId } },
+          data: { quantity: qty },
+        });
+      } else {
+        if (typeof unitPrice !== "number" || Number.isNaN(unitPrice)) {
+          return NextResponse.json({ error: "Missing unitPrice for new item" }, { status: 400 });
+        }
+        await prisma.cartItem.create({
+          data: {
+            cartId: resolvedCartId,
+            productId: variantId,
+            variantId,
+            quantity: qty,
+            unitPrice,
+            currency: currency || "INR",
+          },
+        });
+      }
     }
 
     const updatedCart = await prisma.cart.findUnique({

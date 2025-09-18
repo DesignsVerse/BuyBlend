@@ -15,42 +15,46 @@ type Category = {
 
 const categories: Category[] = [
   { 
-    slug: "necklaces", 
-    title: "Necklaces", 
-    image: "/new/8.jpg", 
-    description: "Elegant neckpieces for every occasion",
-    featured: true
-  },
-  { 
     slug: "earrings", 
     title: "Earrings", 
     image: "/new/2.jpg", 
     description: "Sparkling ear adornments"
   },
   { 
-    slug: "rings", 
+    slug: "pendants", 
+    title: "Pendants", 
+    image: "/new/8.jpg", 
+    description: "Elegant neckpieces for every occasion"
+  },
+  { 
+    slug: "ring", 
     title: "Rings", 
     image: "/new/6.jpg", 
-    description: "Symbols of love and commitment",
+    description: "Symbols of love"
+  },
+  { 
+    slug: "combos", 
+    title: "Combos", 
+    image: "/new/3.jpg", 
+    description: "Perfect matching sets"
+  },
+];
+
+// Featured cards for bottom section
+const featuredCategories: Category[] = [
+  { 
+    slug: "earrings/korean", 
+    title: "Korean Earrings", 
+    image: "/new/4.jpg", 
+    description: "Trendy Korean style earrings",
     featured: true
   },
   { 
-    slug: "bangles", 
-    title: "Bangles", 
-    image: "/new/3.jpg", 
-    description: "Traditional and contemporary designs"
-  },
-  { 
-    slug: "bracelets", 
-    title: "Bracelets", 
+    slug: "earrings/western", 
+    title: "Western Earrings", 
     image: "/new/5.jpg", 
-    description: "Delicate wrist accessories"
-  },
-  { 
-    slug: "brooches", 
-    title: "Brooches", 
-    image: "/new/4.jpg", 
-    description: "Statement pieces for any outfit"
+    description: "Classic western designs",
+    featured: true
   },
 ];
 
@@ -133,8 +137,9 @@ export default function CategoriesSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
         >
-          {/* ✅ Mobile Layout: sab ek sath 2x2 grid */}
+          {/* ✅ Mobile Layout: All categories in same grid */}
           <div className="grid grid-cols-2 gap-4 w-full max-w-6xl md:hidden">
+            {/* Main categories */}
             {categories.map((category) => (
               <motion.div
                 key={category.slug}
@@ -160,13 +165,45 @@ export default function CategoriesSection() {
                 </Link>
               </motion.div>
             ))}
+            
+            {/* Featured categories - same size as main categories */}
+            {featuredCategories.map((category) => (
+              <motion.div
+                key={category.slug}
+                className="group relative"
+              >
+                <Link
+                  href={`/collection/${category.slug}`}
+                  className="block overflow-hidden bg-gradient-to-br from-amber-50 to-rose-50 shadow-md hover:shadow-xl transition-all duration-500 border border-amber-100"
+                >
+                  <div className="relative aspect-square overflow-hidden">
+                    <Image
+                      src={category.image}
+                      alt={category.title}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute top-2 left-2 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">
+                      Trending
+                    </div>
+                  </div>
+                  <div className="p-3 text-center">
+                    <h3 className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-amber-600 transition-colors">
+                      {category.title}
+                    </h3>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
           </div>
+
+         
 
           {/* ✅ Desktop Layout */}
           <div className="hidden md:flex flex-col items-center w-full">
-            {/* Regular (upar) */}
+            {/* Main Categories (upar) */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-4 w-full max-w-6xl mb-4 mx-auto">
-              {categories.filter(cat => !cat.featured).map((category) => (
+              {categories.map((category) => (
                 <motion.div
                   key={category.slug}
                   className="group relative"
@@ -204,16 +241,56 @@ export default function CategoriesSection() {
               ))}
             </div>
 
-            {/* Featured (neeche) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-6xl mx-auto">
-              {categories.filter(cat => cat.featured).map((category) => (
+            {/* Earring Sub-categories */}
+            {/* <div className="grid grid-cols-3 gap-4 w-full max-w-4xl mb-6 mx-auto">
+              {earringSubCategories.map((category) => (
                 <motion.div
                   key={category.slug}
                   className="group relative"
                 >
                   <Link
-                    href={`/category/${category.slug}`}
-                    className="block  overflow-hidden bg-gradient-to-br from-amber-50 to-rose-50 shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 relative"
+                    href={`/collection/${category.slug}`}
+                    className="block overflow-hidden bg-gradient-to-br from-amber-50 to-rose-50 shadow-md hover:shadow-xl transition-all duration-500 border border-amber-100"
+                  >
+                    <div className="relative aspect-square overflow-hidden">
+                      <motion.div
+                        variants={imageHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        className="h-full w-full"
+                      >
+                        <Image
+                          src={category.image}
+                          alt={category.title}
+                          fill
+                          className="object-cover"
+                        />
+                      </motion.div>
+                    </div>
+                    <div className="p-3 text-center">
+                      <h3 className="font-semibold text-gray-900 text-sm mb-1 group-hover:text-amber-600 transition-colors">
+                        {category.title}
+                      </h3>
+                      <div className="flex items-center justify-center text-xs text-amber-600 font-medium">
+                        <span>Shop Now</span>
+                        <ChevronRight className="h-3 w-3 ml-1 transform group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div> */}
+
+            {/* Featured Cards (neeche 2 bade cards) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-6xl mx-auto">
+              {featuredCategories.map((category) => (
+                <motion.div
+                  key={category.slug}
+                  className="group relative"
+                >
+                  <Link
+                    href={`/collection/${category.slug}`}
+                    className="block overflow-hidden bg-gradient-to-br from-amber-50 to-rose-50 shadow-lg hover:shadow-2xl transition-all duration-500 border border-amber-100 relative"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"></div>
                     
@@ -236,7 +313,7 @@ export default function CategoriesSection() {
                         </motion.div>
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500" />
                         <div className="absolute top-4 left-4 bg-amber-500 text-white text-xs font-medium px-2 py-1 rounded">
-                          Featured
+                          Trending
                         </div>
                       </div>
                       {/* Content */}
@@ -262,6 +339,7 @@ export default function CategoriesSection() {
                 </motion.div>
               ))}
             </div>
+
           </div>
         </motion.div>
 

@@ -354,7 +354,7 @@ export default function ProductsPageClient({
 
           {/* Mobile Filters */}
           {showMobileFilters && (
-            <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+            <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50 ">
               <div className="bg-white w-full max-w-md h-full p-6 overflow-y-auto animate-slide-up">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold flex items-center text-gray-900">

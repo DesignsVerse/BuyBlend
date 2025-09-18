@@ -3,7 +3,7 @@
 import { customerImages } from "@/data/products/customerImages"
 import Image from "next/image"
 import { Swiper, SwiperSlide } from "swiper/react"
-import { Navigation, Pagination } from "swiper/modules"
+import { Navigation, Pagination, Autoplay } from "swiper/modules"
 import "swiper/css"
 import "swiper/css/navigation"
 import "swiper/css/pagination"
@@ -27,10 +27,15 @@ export default function CustomerLove() {
 
       {/* Swiper */}
       <Swiper
-        modules={[Navigation, Pagination]}
+        modules={[Navigation, Pagination, Autoplay]}
         spaceBetween={20}
         slidesPerView={1}
         loop={true}
+        autoplay={{
+          delay: 3000, // 3 seconds delay between slides
+          disableOnInteraction: false, // Continue autoplay even after user interaction
+          pauseOnMouseEnter: true, // Pause when user hovers over the slider
+        }}
         navigation={{
           prevEl: ".custom-prev",
           nextEl: ".custom-next",

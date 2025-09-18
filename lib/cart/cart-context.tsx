@@ -7,7 +7,7 @@ import React, { createContext, useContext, useReducer, useEffect, useRef, useCal
 export interface CartItem {
   id: string;
   name: string;
-  price: number;
+  originalPrice: number;
   quantity: number;
   image?: string;
   slug: string;
@@ -63,13 +63,13 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       const updatedItems = existingItem
         ? state.items.map((item) => (item.id === action.payload.id ? { ...item, quantity: item.quantity + 1 } : item))
         : [...state.items, { ...action.payload, quantity: 1 }];
-      const total = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const total = updatedItems.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
       const itemCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
       return { ...state, items: updatedItems, total, itemCount, lastActivity: new Date(), isAbandoned: false };
     }
     case "REMOVE_ITEM": {
       const updatedItems = state.items.filter((item) => item.id !== action.payload);
-      const total = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const total = updatedItems.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
       const itemCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
       return { ...state, items: updatedItems, total, itemCount, lastActivity: new Date() };
     }
@@ -78,7 +78,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         return cartReducer(state, { type: "REMOVE_ITEM", payload: action.payload.id });
       }
       const updatedItems = state.items.map((item) => (item.id === action.payload.id ? { ...item, quantity: action.payload.quantity } : item));
-      const total = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const total = updatedItems.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
       const itemCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
       return { ...state, items: updatedItems, total, itemCount, lastActivity: new Date() };
     }
@@ -175,13 +175,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return {
           id: it.variantId,
           name: (it.name ?? local?.name ?? ""),
-          price: it.unitPrice,
+          originalPrice: it.unitPrice,
           quantity: it.quantity,
           image: (it.image ?? local?.image ?? ""),
           slug: (it.slug ?? local?.slug ?? ""),
         };
       });
-      const total = items.reduce((s, it) => s + it.price * it.quantity, 0);
+      const total = items.reduce((s, it) => s + it.originalPrice * it.quantity, 0);
       const itemCount = items.reduce((s, it) => s + it.quantity, 0);
       dispatch({ type: "RESTORE_CART", payload: { ...state, items, total, itemCount, lastActivity: new Date() } });
     } catch { }
@@ -198,7 +198,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       productId: item.id,
       variantId: item.id,
       quantity: 1,
-      unitPrice: item.price,
+      unitPrice: item.originalPrice,
       currency: "INR",
     };
     await fetch("/api/cart/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(async (r) => {
@@ -215,10 +215,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 
   const updateCall = async (id: string, quantity: number) => {
+    const item = state.items.find((it) => it.id === id);
     const body =
       cartIdRef.current
-        ? { cartId: cartIdRef.current, variantId: id, quantity }
-        : { ...getIdentity(), variantId: id, quantity }; // server should accept userId/sessionId when no cartId
+        ? { cartId: cartIdRef.current, variantId: id, quantity, unitPrice: item?.originalPrice, currency: "INR" }
+        : { ...getIdentity(), variantId: id, quantity, unitPrice: item?.originalPrice, currency: "INR" }; // server should accept userId/sessionId when no cartId
     await fetch("/api/cart/update", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   };
 

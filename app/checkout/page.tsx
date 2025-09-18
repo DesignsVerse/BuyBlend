@@ -157,7 +157,7 @@ export default function CheckoutPage() {
                         <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">Rs. {(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="font-medium">Rs. {(item.originalPrice * item.quantity).toFixed(2)}</p>
                       </div>
                     </div>
                   ))}
@@ -477,7 +477,7 @@ export default function CheckoutPage() {
                         <p className="text-sm font-medium truncate">{item.name}</p>
                         <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-medium">Rs. {(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm font-medium">Rs. {(item.originalPrice * item.quantity).toFixed(2)}</p>
                     </div>
                   ))}
                   

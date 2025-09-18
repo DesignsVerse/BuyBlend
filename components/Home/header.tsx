@@ -22,6 +22,9 @@ export function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<Array<{ _id: string; name: string; slug: { current: string }; price?: number; originalPrice?: number; description?: string; image?: string; category?: { name?: string } }>>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [user, setUser] = useState<AuthUser | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
@@ -48,6 +51,42 @@ export function SiteHeader() {
       searchInputRef.current.focus()
     }
   }, [isSearchOpen])
+
+  // Debounced live search
+  useEffect(() => {
+    if (!isSearchOpen) return
+    const query = searchQuery.trim()
+    if (query.length < 2) {
+      setSearchResults([])
+      setIsSearching(false)
+      setSearchError(null)
+      return
+    }
+
+    setIsSearching(true)
+    setSearchError(null)
+    const controller = new AbortController()
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal: controller.signal })
+        if (!res.ok) throw new Error("Failed")
+        const data = await res.json()
+        setSearchResults(Array.isArray(data.products) ? data.products : [])
+      } catch (err: any) {
+        if (err?.name !== "AbortError") {
+          setSearchError("Search failed. Please try again.")
+          setSearchResults([])
+        }
+      } finally {
+        setIsSearching(false)
+      }
+    }, 300)
+
+    return () => {
+      controller.abort()
+      clearTimeout(timer)
+    }
+  }, [searchQuery, isSearchOpen])
 
   // Fetch user authentication status
   useEffect(() => {
@@ -226,10 +265,10 @@ export function SiteHeader() {
                       <Link href="/collection" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
                         All Products
                       </Link>
-                      <Link href="/collection/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Pendant</Link>
+                      <Link href="/collection/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Pendants</Link>
                       <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Earrings</Link>
+                      <Link href="/collection/ring" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Rings</Link>
                       <Link href="/collection/combos" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Combos</Link>
-                      <Link href="/collection/rings" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Rings</Link>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -265,7 +304,7 @@ export function SiteHeader() {
                       <Link href="/collection/earrings/stud" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Studs</Link>
                       <Link href="/collection/earrings/western" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Western</Link>
                       <Link href="/collection/earrings/korean" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Korean</Link>
-                      <Link href="/collection/earrings/jhumkas" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Jhumkas</Link>
+                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Jhumkas</Link>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -415,17 +454,34 @@ export function SiteHeader() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="md:hidden fixed top-0 right-0 w-80 max-w-[80vw] h-screen bg-[#fff3f3] shadow-2xl z-[60] overflow-y-auto"
+            className="md:hidden fixed top-0 right-0 w-full max-w-sm h-screen bg-[#fff3f3] shadow-2xl z-[60] overflow-y-auto"
             ref={mobileMenuRef}
           >
-            <div className="px-6 py-6">
-              <button
-                className="absolute top-4 right-4 p-2 transition-transform hover:scale-110 duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <X className="h-6 w-6" />
-              </button>
-              <div className="flex flex-col space-y-6 mt-8">
+            <div className="px-4 py-4">
+              {/* Mobile Header */}
+              <div className="flex items-center justify-between mb-6">
+                <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Image
+                    src="/logo/logo.png"
+                    alt="BuyBlend Logo"
+                    width={40}
+                    height={40}
+                    priority
+                  />
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-xl font-serif tracking-wide text-black">BLEND</span>
+                    <span className="text-[8px] font-serif text-black uppercase tracking-normal">Pure Blend, Pure You</span>
+                  </div>
+                </Link>
+                <button
+                  className="p-2 transition-transform hover:scale-110 duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              
+              <div className="flex flex-col space-y-4">
                 <Link href="/" className="text-lg font-medium py-2 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>
                   Home
                 </Link>
@@ -450,13 +506,13 @@ export function SiteHeader() {
                         transition={{ duration: 0.3 }}
                         className="pl-4 flex flex-col space-y-3 overflow-hidden"
                       >
-                        <Link href="/products" className="block py-2 font-semibold text-gray-900 border-b border-gray-200 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Link href="/collection" className="block py-2 font-semibold text-gray-900 border-b border-gray-200 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>
                           All Products
                         </Link>
                         <Link href="/collection/pendants" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Pendants</Link>
                         <Link href="/collection/earrings" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Earrings</Link>
+                        <Link href="/collection/ring" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Rings</Link>
                         <Link href="/collection/combos" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Combos</Link>
-                        <Link href="/collection/rings" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Rings</Link>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -488,7 +544,7 @@ export function SiteHeader() {
                         <Link href="/collection/earrings/stud" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Studs</Link>
                         <Link href="/collection/earrings/western" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Western</Link>
                         <Link href="/collection/earrings/korean" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Korean</Link>
-                        <Link href="/collection/earrings/jhumkas" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Jhumkas</Link>
+                        <Link href="/collection/earrings" className="block py-1 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>Jhumkas</Link>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -501,49 +557,60 @@ export function SiteHeader() {
                   Contact Us
                 </Link>
 
-                <div className="border-t pt-4 mt-4 flex flex-col space-y-4">
+                {/* Mobile Action Buttons */}
+                <div className="border-t pt-4 mt-4 flex flex-col space-y-3">
                   <button
-                    className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                    className="flex items-center space-x-3 text-base hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 py-2"
                     onClick={() => {
                       setIsMobileMenuOpen(false)
                       setIsSearchOpen(true)
                     }}
                   >
                     <Search className="h-5 w-5" />
-                    <span>Search</span>
+                    <span>Search Products</span>
                   </button>
-                  <Link href="/wishlist" className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/wishlist" className="flex items-center space-x-3 text-base hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 py-2" onClick={() => setIsMobileMenuOpen(false)}>
                     <Heart className="h-5 w-5" />
-                    <span>Wishlist</span>
+                    <span>My Wishlist</span>
+                    {wishlistState.itemCount > 0 && (
+                      <span className="ml-auto bg-black text-white text-xs px-2 py-1 rounded-full">
+                        {wishlistState.itemCount}
+                      </span>
+                    )}
                   </Link>
                   
+                  {/* User Section */}
                   {authLoading ? (
-                    <div className="h-6 w-6 rounded-full bg-gray-200 animate-pulse"></div>
+                    <div className="flex items-center space-x-3 py-2">
+                      <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+                      <div className="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                    </div>
                   ) : user ? (
                     <>
-                      <div className="px-2 py-2 text-sm text-gray-700 border-b border-gray-200">
-                        Hello, {user.name}
+                      <div className="px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg mb-2">
+                        <div className="font-medium">Hello, {user.name}</div>
+                        <div className="text-xs text-gray-500">{user.email}</div>
                       </div>
                       <Link 
                         href="/profile" 
-                        className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                        className="flex items-center space-x-3 text-base hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 py-2"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <User className="h-5 w-5" />
-                        <span>Profile</span>
+                        <span>My Profile</span>
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 w-full text-left"
+                        className="flex items-center space-x-3 text-base hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 w-full text-left py-2"
                       >
                         <LogOut className="h-5 w-5" />
-                        <span>Logout</span>
+                        <span>Sign Out</span>
                       </button>
                     </>
                   ) : (
                     <Link 
                       href="/login" 
-                      className="flex items-center space-x-2 text-lg hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+                      className="flex items-center space-x-3 text-base hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 py-2"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <User className="h-5 w-5" />
@@ -588,7 +655,7 @@ export function SiteHeader() {
               animate={{ y: 0 }}
               exit={{ y: "-100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative z-10 bg-[#fff3f3] shadow-2xl"
+              className="relative z-10 bg-[#fff3f3] shadow-2xl max-h-[80vh] overflow-y-auto"
             >
               <div className="container mx-auto px-4 py-4">
                 <form onSubmit={handleSearchSubmit} className="flex items-center">
@@ -619,6 +686,49 @@ export function SiteHeader() {
                     <X className="h-6 w-6" />
                   </button>
                 </form>
+              </div>
+
+              {/* Live results */}
+              <div className="border-t border-gray-100">
+                <div className="container mx-auto px-4 py-4">
+                  {isSearching && (
+                    <div className="text-sm text-gray-500">Searching…</div>
+                  )}
+
+                  {!isSearching && searchError && (
+                    <div className="text-sm text-red-500">{searchError}</div>
+                  )}
+
+                  {!isSearching && !searchError && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
+                    <div className="text-sm text-gray-500">No products found.</div>
+                  )}
+
+                  {!isSearching && !searchError && searchResults.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                      {searchResults.map((p) => (
+                        <Link key={p._id} href={`/collection/product/${p.slug?.current ?? ""}`}
+                          className="group rounded-md border border-gray-200 bg-white p-2 hover:shadow-sm transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+                          <div className="aspect-square w-full overflow-hidden rounded-sm bg-gray-100">
+                            {p.image ? (
+                              <Image src={p.image} alt={p.name} width={100} height={100} className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" />
+                            ) : (
+                              <div className="h-full w-full flex items-center justify-center text-gray-400">No image</div>
+                            )}
+                          </div>
+                          <div className="mt-2">
+                            <div className="text-xs font-medium text-gray-900 line-clamp-1">{p.name}</div>
+                            {typeof p.price === 'number' && (
+                              <div className="text-xs text-gray-700">₹{p.price}</div>
+                            )}
+                            {p.category?.name && (
+                              <div className="text-[10px] text-gray-500 mt-0.5">{p.category.name}</div>
+                            )}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Popular Searches */}

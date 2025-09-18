@@ -5,8 +5,8 @@ import type { Product } from "@/lib/sanity/types"
 import { urlFor } from "@/lib/sanity/client"
 import { AddToCartButton } from "@/components/cart/add-to-cart-button"
 import { Heart } from "lucide-react"
-import { useState, useMemo } from "react"
-import { motion, useMotionValue, useSpring } from "framer-motion"
+import { useState, useMemo, useRef, useEffect } from "react"
+import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 
 interface ProductCardProps {
@@ -17,6 +17,10 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCardProps) {
   const [isMediaLoaded, setIsMediaLoaded] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0)
+  const [previousImageIndex, setPreviousImageIndex] = useState(0)
+  const [direction, setDirection] = useState(0) // 0: right, 1: left
   const { toggleItem, isInWishlist } = useWishlist()
   const isWishlisted = isInWishlist(product._id)
   const shadow = useMotionValue("0 4px 8px rgba(0, 0, 0, 0.05)")
@@ -30,20 +34,33 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
     [product.slug, product.name]
   )
 
-  const firstMedia = useMemo(() => product.media?.[0], [product.media])
-  const mediaUrl = useMemo(() => {
-    if (!firstMedia) return "/fallback-product.png"
+  // Media processing - Only Images
+  const imageArray = useMemo(() => 
+    (product.media || []).filter(media => media._type === "image"), 
+    [product.media]
+  )
+  const hasMultipleImages = imageArray.length > 1
+  
+  const currentImage = useMemo(() => imageArray[currentMediaIndex], [imageArray, currentMediaIndex])
+  const previousImage = useMemo(() => imageArray[previousImageIndex], [imageArray, previousImageIndex])
+  
+  const currentImageUrl = useMemo(() => {
+    if (!currentImage) return "/fallback-product.png"
     try {
-      if (firstMedia._type === "image") {
-        return urlFor(firstMedia.asset)?.width(400)?.height(400)?.url() ?? "/fallback-product.png"
-      }
-      if (firstMedia._type === "file") {
-        return urlFor(firstMedia.asset)?.url() ?? "/fallback-product.png"
-      }
+      return urlFor(currentImage.asset)?.width(400)?.height(400)?.url() ?? "/fallback-product.png"
     } catch {
       return "/fallback-product.png"
     }
-  }, [firstMedia])
+  }, [currentImage])
+
+  const previousImageUrl = useMemo(() => {
+    if (!previousImage) return "/fallback-product.png"
+    try {
+      return urlFor(previousImage.asset)?.width(400)?.height(400)?.url() ?? "/fallback-product.png"
+    } catch {
+      return "/fallback-product.png"
+    }
+  }, [previousImage])
 
   const hasDiscount = useMemo(
     () => product.originalPrice && product.originalPrice !== product.price,
@@ -61,6 +78,45 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
     [hasDiscount, product.originalPrice, product.price]
   )
 
+  // Auto-slide effect on hover - Only Images
+  useEffect(() => {
+    if (!isHovered || !hasMultipleImages) return
+
+    const interval = setInterval(() => {
+      setPreviousImageIndex(currentMediaIndex)
+      setDirection(0) // Always slide in the same direction for consistency
+      setCurrentMediaIndex((prev) => (prev + 1) % imageArray.length)
+    }, 3000) // Change slide every 3 seconds for a more relaxed pace
+
+    return () => clearInterval(interval)
+  }, [isHovered, hasMultipleImages, imageArray.length, currentMediaIndex])
+
+  // Reset to first image when not hovered
+  useEffect(() => {
+    if (!isHovered) {
+      setCurrentMediaIndex(0)
+    }
+  }, [isHovered])
+
+  // Variants for image animation
+  const imageVariants = {
+    enter: (direction: number) => ({
+      x: direction === 0 ? 300 : -300,
+      opacity: 0,
+      scale: 1.05
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      scale: 1
+    },
+    exit: (direction: number) => ({
+      x: direction === 0 ? -300 : 300,
+      opacity: 0,
+      scale: 0.95
+    })
+  }
+
   return (
     <motion.div
       className="group relative h-full"
@@ -68,36 +124,70 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       whileHover={{
-        scale: 1.05,
-        y: -10,
+        scale: 1.02,
+        y: -5,
         transition: { type: "spring", stiffness: 300, damping: 20 },
       }}
-      onHoverStart={() => shadow.set("0 8px 16px rgba(0, 0, 0, 0.1)")}
-      onHoverEnd={() => shadow.set("0 4px 8px rgba(0, 0, 0, 0.05)")}
+      onHoverStart={() => {
+        shadow.set("0 8px 16px rgba(0, 0, 0, 0.1)")
+        setIsHovered(true)
+      }}
+      onHoverEnd={() => {
+        shadow.set("0 4px 8px rgba(0, 0, 0, 0.05)")
+        setIsHovered(false)
+      }}
       style={{ boxShadow: springShadow }}
     >
       <Link
         href={`/collection/product/${productSlug}`}
         className="relative bg-white dark:bg-black shadow-md overflow-hidden border flex flex-col h-full"
       >
-        {/* Media */}
+        {/* Image Slider - Only Photos */}
         <div className="relative aspect-square overflow-hidden">
-          {firstMedia?._type === "image" ? (
-            <Image
-              src={mediaUrl ?? "/fallback-product.png"}
-              alt={product.name}
-              fill
-              className={`object-cover transition-transform ${isMediaLoaded ? "opacity-100" : "opacity-0"}`}
-              onLoad={() => setIsMediaLoaded(true)}
-              priority={product.featured}
-            />
-          ) : (
-            <Image src="/fallback-product.png" alt={product.name} fill className="object-cover" />
-          )}
+          <div className="relative w-full h-full">
+            <AnimatePresence initial={false} custom={direction}>
+              <motion.div
+                key={currentMediaIndex}
+                custom={direction}
+                variants={imageVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{
+                  x: { type: "spring", stiffness: 300, damping: 30 },
+                  opacity: { duration: 0.4 },
+                  scale: { duration: 0.4 }
+                }}
+                className="absolute inset-0 w-full h-full"
+              >
+                {currentImage ? (
+                  <Image
+                    src={currentImageUrl}
+                    alt={currentImage.alt || product.name}
+                    fill
+                    className={`object-cover ${
+                      isMediaLoaded ? "opacity-100" : "opacity-0"
+                    }`}
+                    onLoad={() => setIsMediaLoaded(true)}
+                    priority={product.featured && currentMediaIndex === 0}
+                  />
+                ) : (
+                  <Image 
+                    src="/fallback-product.png" 
+                    alt={product.name} 
+                    fill 
+                    className="object-cover" 
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {!isMediaLoaded && (
             <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 animate-pulse" />
           )}
+
+        
 
           {/* ❤️ Wishlist (inside card, but no link trigger) */}
           <button
@@ -109,12 +199,15 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
                 name: product.name,
                 price: product.price,
                 slug: productSlug,
-                image: mediaUrl,
+                image: currentImageUrl,
               })
             }}
-            className={`absolute top-2 right-2 h-8 w-8 rounded-full flex items-center justify-center shadow-md ${
-              isWishlisted ? "bg-red-500 text-white" : "bg-white/80 text-gray-700"
+            className={`absolute top-2 right-2 h-8 w-8 rounded-full flex items-center justify-center shadow-md z-20 transition-all duration-300 ${
+              isWishlisted 
+                ? "bg-red-500 text-white" 
+                : "bg-white/80 text-gray-700 hover:bg-white hover:scale-110"
             }`}
+            style={{ zIndex: 20 }}
           >
             <Heart className={`w-4 h-4 ${isWishlisted ? "fill-current" : ""}`} />
           </button>
@@ -135,7 +228,9 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
 
         {/* Content */}
         <div className="p-4 flex flex-col gap-1 flex-grow">
-          <h3 className="text-sm font-semibold line-clamp-2">{product.name}</h3>
+          <h3 className="text-sm font-semibold line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+            {product.name}
+          </h3>
           {product.description && (
             <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
               {product.description}
@@ -143,16 +238,20 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
           )}
 
           {/* Price */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 mt-2">
             <span className="text-m font-bold">
-              ₹{(product.originalPrice ?? 0).toLocaleString("en-IN")}
+              ₹{(product.price ?? 0).toLocaleString("en-IN")}
             </span>
             {hasDiscount && (
               <span className="text-xs line-through text-gray-500">
-                ₹{(product.price ?? 0).toLocaleString("en-IN")}
+                ₹{(product.originalPrice ?? 0).toLocaleString("en-IN")}
               </span>
             )}
-            {hasDiscount && <span className="text-xs text-[#FF905A]">({discountPercent}% OFF)</span>}
+            {hasDiscount && (
+              <span className="text-xs text-[#FF905A] font-medium bg-orange-50 px-1.5 py-0.5 rounded">
+                {discountPercent}% OFF
+              </span>
+            )}
           </div>
         </div>
 
@@ -165,8 +264,10 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
                 e.stopPropagation()
                 onSelectForCombo(product)
               }}
-              className={`w-full py-2 rounded-md text-sm font-medium transition ${
-                isSelected ? "bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300"
+              className={`w-full py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+                isSelected 
+                  ? "bg-green-500 text-white" 
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-800"
               }`}
             >
               {isSelected ? "✅ Added to Combo" : "Add to Combo"}
@@ -174,7 +275,7 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
           ) : (
             <AddToCartButton
               product={product}
-              className="w-full py-2 bg-black text-white hover:bg-gray-800 rounded-md text-sm font-medium"
+              className="w-full py-2 bg-black text-white hover:bg-gray-800 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-[1.02]"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()

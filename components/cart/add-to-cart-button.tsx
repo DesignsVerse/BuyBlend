@@ -46,7 +46,7 @@ export function AddToCartButton({ product, disabled, className, onClick }: AddTo
         addItem({
           id: product._id,
           name: product.name || "Unnamed Product",
-          price: product.price || 0,
+          originalPrice: product.originalPrice || 0,
           slug: product.slug?.current || product.name?.toLowerCase().replace(/\s+/g, "-") || product._id,
           image: imageUrl,
         })

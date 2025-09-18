@@ -35,7 +35,7 @@ html {
         `}</style>
       </head>
       <body className="antialiased" cz-shortcut-listen="true">
-        <CartProvider>
+        <CartProvider >
           <WishlistProvider>
             <SiteHeader/>
             {children}

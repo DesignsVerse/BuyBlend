@@ -3,10 +3,11 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Clear all items in a cart by cartId or by userId/sessionId
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { cartId, variantId, userId, sessionId } = body || {};
+    const { cartId, userId, sessionId } = body || {};
 
     // Resolve cartId if not provided
     let resolvedCartId = cartId as string | undefined;
@@ -18,29 +19,24 @@ export async function POST(req: Request) {
         ? await prisma.cart.findUnique({ where: { userId } })
         : await prisma.cart.findUnique({ where: { sessionId } });
       if (!cart) {
-        return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+        return NextResponse.json({ message: "Cart already empty" });
       }
       resolvedCartId = cart.id;
     }
 
-    if (!resolvedCartId || !variantId) {
-      return NextResponse.json({ error: "Missing cartId or variantId" }, { status: 400 });
-    }
+    // Delete all items for this cart
+    await prisma.cartItem.deleteMany({ where: { cartId: resolvedCartId } });
 
-    await prisma.cartItem.delete({
-      where: {
-        cartId_variantId: { cartId: resolvedCartId, variantId },
-      },
-    }).catch(() => {});
-
-    const updatedCart = await prisma.cart.findUnique({
+    const cleared = await prisma.cart.findUnique({
       where: { id: resolvedCartId },
       include: { items: true },
     });
 
-    return NextResponse.json(updatedCart);
+    return NextResponse.json(cleared);
   } catch (error: any) {
     console.error(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+

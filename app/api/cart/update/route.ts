@@ -1,36 +1,51 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 export async function POST(req: Request) {
-    const prisma = new PrismaClient();
-
   try {
-    const { cartId, variantId, quantity } = await req.json();
+    const body = await req.json();
+    const { cartId, variantId, quantity, userId, sessionId } = body || {};
 
-    if (!cartId || !variantId || typeof quantity !== "number") {
+    // Coerce quantity to number
+    const qty = typeof quantity === "string" ? Number(quantity) : quantity;
+
+    // Resolve cartId if not provided
+    let resolvedCartId = cartId as string | undefined;
+    if (!resolvedCartId) {
+      if (!userId && !sessionId) {
+        return NextResponse.json({ error: "Missing cartId or userId/sessionId" }, { status: 400 });
+      }
+      const cart =
+        userId
+          ? await prisma.cart.findUnique({ where: { userId } })
+          : await prisma.cart.findUnique({ where: { sessionId } });
+      if (!cart) {
+        return NextResponse.json({ error: "Cart not found" }, { status: 404 });
+      }
+      resolvedCartId = cart.id;
+    }
+
+    if (!resolvedCartId || !variantId || typeof qty !== "number" || Number.isNaN(qty)) {
       return NextResponse.json({ error: "Missing or invalid fields" }, { status: 400 });
     }
 
-    if (quantity <= 0) {
-      // Remove if quantity <= 0
+    if (qty <= 0) {
       await prisma.cartItem.delete({
-        where: {
-          cartId_variantId: { cartId, variantId },
-        },
-      });
+        where: { cartId_variantId: { cartId: resolvedCartId, variantId } },
+      }).catch(() => {});
     } else {
       await prisma.cartItem.update({
-        where: {
-          cartId_variantId: { cartId, variantId },
-        },
-        data: { quantity },
+        where: { cartId_variantId: { cartId: resolvedCartId, variantId } },
+        data: { quantity: qty },
       });
     }
 
     const updatedCart = await prisma.cart.findUnique({
-      where: { id: cartId },
+      where: { id: resolvedCartId },
       include: { items: true },
     });
-
     return NextResponse.json(updatedCart);
   } catch (error: any) {
     console.error(error);

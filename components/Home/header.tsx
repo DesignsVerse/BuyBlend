@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
+import { useCart } from "@/lib/cart/cart-context"
 import { Search, User, Heart, Menu, X, ArrowRight, LogOut,Settings ,Bell} from "lucide-react"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { CartButton } from "@/components/cart/cart-button"
@@ -27,6 +28,7 @@ export function SiteHeader() {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const { state: wishlistState } = useWishlist()
   const mobileMenuRef = useRef<HTMLDivElement>(null)
+  const { setUserId, clearIdentityAndCart, state } = useCart()
 
   // Separate refs for each desktop dropdown
   const productsDropdownRef = useRef<HTMLDivElement>(null)
@@ -55,6 +57,8 @@ export function SiteHeader() {
         if (res.ok) {
           const data = await res.json()
           setUser(data.user)
+          // Inform cart context about authenticated user so server cart is loaded
+          setUserId(data.user.id)
         }
       } catch (error) {
         console.error('Error fetching user:', error)
@@ -129,8 +133,19 @@ export function SiteHeader() {
   // Handle logout
   const handleLogout = async () => {
     try {
+      // Clear server cart first (by userId if available, else sessionId)
+      try {
+        await fetch('/api/cart/clear', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: state.userId, sessionId: state.sessionId }),
+        })
+      } catch {}
+
       await fetch('/api/auth/logout', { method: 'POST' })
       setUser(null)
+      // Clear cart and identity locally for a fresh guest session
+      clearIdentityAndCart()
       setIsMobileMenuOpen(false)
       window.location.href = '/'
     } catch (error) {

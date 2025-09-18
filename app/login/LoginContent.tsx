@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, FormEvent, useEffect } from 'react';
+import { useCart } from '@/lib/cart/cart-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setUserId } = useCart();
   const [isRegister, setIsRegister] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
@@ -19,6 +21,8 @@ export default function LoginPage() {
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
+          // Set cart userId to load server cart
+          setUserId(data.user.id);
           router.push('/profile');
         }
       } catch (error) {
@@ -65,6 +69,14 @@ export default function LoginPage() {
         alert('Registration successful. Please login.');
         setIsRegister(false);
       } else {
+        // After login, fetch /api/auth/me to get user and set cart userId
+        try {
+          const me = await fetch('/api/auth/me');
+          if (me.ok) {
+            const dataMe = await me.json();
+            setUserId(dataMe.user.id);
+          }
+        } catch {}
         router.push('/profile');
         router.refresh();
       }

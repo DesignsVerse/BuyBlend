@@ -1,6 +1,8 @@
 import Link from "next/link"
-import { Home, Search, ArrowLeft, Heart } from "lucide-react"
+import { Home, Search, Heart } from "lucide-react"
 import Image from "next/image"
+import { Suspense } from "react"
+import { BackButton } from "@/components/ui/back-button"
 
 export default function NotFound() {
   return (
@@ -134,13 +136,9 @@ export default function NotFound() {
 
         {/* Back to Previous Page */}
         <div className="mt-8">
-          <button
-            onClick={() => window.history.back()}
-            className="group flex items-center gap-2 text-gray-600 hover:text-[#ff4d8d] transition-colors mx-auto"
-          >
-            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Go back to previous page</span>
-          </button>
+          <Suspense fallback={<div className="h-8"></div>}>
+            <BackButton />
+          </Suspense>
         </div>
       </div>
     </div>

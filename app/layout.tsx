@@ -11,7 +11,7 @@ import Head from "next/head"
 import { SiteFooter } from "@/components/Home/footer"
 import { SiteHeader } from "@/components/Home/header"
 import { WishlistProvider } from "@/lib/wishlist/wishlist-context"
-import GlobalLoadingOverlay from "@/components/ui/global-loading"
+// import GlobalLoadingOverlay from "@/components/ui/global-loading"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
@@ -40,7 +40,7 @@ html {
         <CartProvider >
           <WishlistProvider>
             <Suspense fallback={null}>
-              <GlobalLoadingOverlay />
+              {/* <GlobalLoadingOverlay /> */}
             </Suspense>
             <SiteHeader/>
             {children}

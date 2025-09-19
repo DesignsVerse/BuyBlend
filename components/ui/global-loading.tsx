@@ -13,6 +13,7 @@ export default function GlobalLoadingOverlay() {
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const timeoutRef = useRef<number | null>(null)
+  const hideTimeoutRef = useRef<number | null>(null)
 
   // Start loading on internal link clicks
   useEffect(() => {
@@ -34,10 +35,10 @@ export default function GlobalLoadingOverlay() {
 
       if (!isSameOrigin || isHashOnly) return
 
-      // Next.js intercepts internal links; show loading after a brief delay
-      // This prevents flashing for very fast transitions
+      // Show loading immediately for better UX
       window.clearTimeout(timeoutRef.current ?? undefined)
-      timeoutRef.current = window.setTimeout(() => setIsLoading(true), 200)
+      window.clearTimeout(hideTimeoutRef.current ?? undefined)
+      setIsLoading(true)
     }
 
     document.addEventListener('click', handleClick, true)
@@ -47,9 +48,11 @@ export default function GlobalLoadingOverlay() {
   // Stop loading when route actually changes
   useEffect(() => {
     if (isLoading) {
-      // Grace period to ensure smooth transition
-      window.clearTimeout(timeoutRef.current ?? undefined)
-      timeoutRef.current = window.setTimeout(() => setIsLoading(false), 300)
+      // Hide loading immediately when route changes
+      window.clearTimeout(hideTimeoutRef.current ?? undefined)
+      hideTimeoutRef.current = window.setTimeout(() => {
+        setIsLoading(false)
+      }, 100) // Much faster hide time
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, searchParams])
@@ -57,9 +60,27 @@ export default function GlobalLoadingOverlay() {
   // Also ensure we hide spinner on hard navigations/unloads
   useEffect(() => {
     const handleBeforeUnload = () => setIsLoading(false)
+    const handlePageShow = () => setIsLoading(false)
+    
     window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('pageshow', handlePageShow)
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('pageshow', handlePageShow)
+    }
   }, [])
+
+  // Auto-hide after maximum time to prevent stuck loading
+  useEffect(() => {
+    if (isLoading) {
+      const maxTimeout = window.setTimeout(() => {
+        setIsLoading(false)
+      }, 3000) // Maximum 3 seconds
+
+      return () => clearTimeout(maxTimeout)
+    }
+  }, [isLoading])
 
   return (
     <AnimatePresence>
@@ -68,38 +89,30 @@ export default function GlobalLoadingOverlay() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[1000] bg-[#fff3f3]/40  flex items-center justify-center"
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-[1000] bg-white/80 backdrop-blur-sm flex items-center justify-center"
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="bg-white rounded-2xl shadow-2xl p-6 flex flex-col items-center space-y-4 border border-gray-100"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="bg-white rounded-xl shadow-lg p-4 flex items-center space-x-3 border border-gray-100"
           >
+            {/* Professional Spinner */}
             <div className="relative">
-              <div className="h-12 w-12 rounded-full border-3 border-gray-200 border-t-black animate-spin" />
-              <div className="absolute inset-0 rounded-full border-3 border-transparent border-t-black/20 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+              <div className="h-6 w-6 rounded-full border-2 border-gray-200 border-t-[#ff4d8d] animate-spin" />
             </div>
-            <div className="text-center">
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="text-sm font-medium text-gray-700"
-              >
-                Loading...
-              </motion.p>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-xs text-gray-500 mt-1"
-              >
-                Please wait a moment
-              </motion.p>
-            </div>
+            
+            {/* Loading Text */}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="text-sm font-medium text-gray-700"
+            >
+              Loading...
+            </motion.span>
           </motion.div>
         </motion.div>
       )}

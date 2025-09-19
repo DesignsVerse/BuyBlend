@@ -3,9 +3,10 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { useCart } from "@/lib/cart/cart-context"
-import { Search, User, Heart, Menu, X, ArrowRight, LogOut,Settings ,Bell} from "lucide-react"
+import { Search, User, Heart, Menu, X, LogOut, Settings, Bell } from "lucide-react"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { CartButton } from "@/components/cart/cart-button"
+import { SearchOverlay } from "@/components/Home/search-overlay"
 import Image from "next/image"
 import { AnimatePresence, motion } from "framer-motion"
 import "/styles/globals.css"
@@ -21,14 +22,9 @@ export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<Array<{ _id: string; name: string; slug: { current: string }; price?: number; originalPrice?: number; description?: string; image?: string; category?: { name?: string } }>>([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [searchError, setSearchError] = useState<string | null>(null)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [user, setUser] = useState<AuthUser | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
-  const searchInputRef = useRef<HTMLInputElement>(null)
   const { state: wishlistState } = useWishlist()
   const mobileMenuRef = useRef<HTMLDivElement>(null)
   const { setUserId, clearIdentityAndCart, state } = useCart()
@@ -46,47 +42,6 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  useEffect(() => {
-    if (isSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus()
-    }
-  }, [isSearchOpen])
-
-  // Debounced live search
-  useEffect(() => {
-    if (!isSearchOpen) return
-    const query = searchQuery.trim()
-    if (query.length < 2) {
-      setSearchResults([])
-      setIsSearching(false)
-      setSearchError(null)
-      return
-    }
-
-    setIsSearching(true)
-    setSearchError(null)
-    const controller = new AbortController()
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal: controller.signal })
-        if (!res.ok) throw new Error("Failed")
-        const data = await res.json()
-        setSearchResults(Array.isArray(data.products) ? data.products : [])
-      } catch (err: any) {
-        if (err?.name !== "AbortError") {
-          setSearchError("Search failed. Please try again.")
-          setSearchResults([])
-        }
-      } finally {
-        setIsSearching(false)
-      }
-    }, 300)
-
-    return () => {
-      controller.abort()
-      clearTimeout(timer)
-    }
-  }, [searchQuery, isSearchOpen])
 
   // Fetch user authentication status
   useEffect(() => {
@@ -120,12 +75,6 @@ export function SiteHeader() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`
-    }
-  }
 
   // Toggle dropdown for mobile
   const toggleDropdown = (dropdownName: string) => {
@@ -172,15 +121,6 @@ export function SiteHeader() {
   // Handle logout
   const handleLogout = async () => {
     try {
-      // Clear server cart first (by userId if available, else sessionId)
-      try {
-        await fetch('/api/cart/clear', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: state.userId, sessionId: state.sessionId }),
-        })
-      } catch {}
-
       await fetch('/api/auth/logout', { method: 'POST' })
       setUser(null)
       // Clear cart and identity locally for a fresh guest session
@@ -201,7 +141,7 @@ export function SiteHeader() {
             <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span>
             <span>💎 Diamond Rings Sale – 15% OFF | Limited Time</span>
             <span>🎁 Buy 2 Get 1 Free on Earrings Collection</span>
-            <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span> 
+            <span>🚚 Free shipping on all orders over $500 | Use code FIRST10 for 10% off</span>
           </div>
         </div>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -231,92 +171,215 @@ export function SiteHeader() {
               </div>
             </Link>
 
-            {/* Desktop Navigation - Enhanced with cursor pointer and focus rings */}
-            <nav className="hidden md:flex items-center space-x-10">
-              <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
-                Home
-              </Link>
+           {/* Desktop Navigation - Enhanced with cursor pointer and focus rings */}
+<nav className="hidden md:flex items-center space-x-10">
+  <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+    Home
+  </Link>
 
-              {/* Products Dropdown */}
-              <div
-                className="relative"
-                ref={productsDropdownRef}
-              >
-                <button
-                  className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 flex items-center gap-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                  onMouseEnter={() => setActiveDropdown("products")}
-                >
-                  Products
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+  {/* Products Dropdown */}
+  <div
+    className="relative"
+    ref={productsDropdownRef}
+  >
+    <button
+      className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 flex items-center gap-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+      onMouseEnter={() => setActiveDropdown("products")}
+    >
+      Products
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
 
-                <AnimatePresence>
-                  {activeDropdown === "products" && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute bg-white shadow-xl rounded-lg p-4 w-48 mt-2 border border-gray-100"
-                      onMouseLeave={() => setActiveDropdown(null)}
-                    >
-                      <Link href="/collection" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
-                        All Products
-                      </Link>
-                      <Link href="/collection/pendants" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Pendants</Link>
-                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Earrings</Link>
-                      <Link href="/collection/ring" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Rings</Link>
-                      <Link href="/collection/combos" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Combos</Link>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+    <AnimatePresence>
+      {activeDropdown === "products" && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+           className="absolute bg-white shadow-xl rounded-lg p-4 w-96 left-1/2 transform -translate-x-1/2 mt-2 border border-gray-100 z-50"
+          onMouseLeave={() => setActiveDropdown(null)}
+        >
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Shop by Category</h3>
+           <div className="grid grid-cols-4 gap-2">
+             <Link href="/collection/pendants" className="group block">
+               <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
+                 <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
+                   <Image 
+                     src="/new/1.jpg" 
+                     alt="Pendants" 
+                     width={60}  
+                     height={60} 
+                     className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" 
+                   />
+                 </div>
+                 <p className="text-xs font-medium text-gray-900 text-center">Pendants</p>
+               </div>
+             </Link>
+            
+            <Link href="/collection/earrings" className="group block">
+              <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
+                <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
+                  <Image 
+                    src="/new/2.jpg" 
+                    alt="Earrings" 
+                    width={60} 
+                    height={60} 
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" 
+                  />
+                </div>
+                <p className="text-xs font-medium text-gray-900 text-center">Earrings</p>
               </div>
-
-              {/* Earrings Dropdown */}
-              <div
-                className="relative"
-                ref={earringsDropdownRef}
-              >
-                <button
-                  className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 flex items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-                  onMouseEnter={() => setActiveDropdown("earrings")}
-                >
-                  Earrings
-                  <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <AnimatePresence>
-                  {activeDropdown === "earrings" && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute bg-white shadow-xl rounded-lg p-4 w-48 mt-2 border border-gray-100"
-                      onMouseLeave={() => setActiveDropdown(null)}
-                    >
-                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded font-semibold text-gray-900 border-b border-gray-100 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
-                        All Earrings
-                      </Link>
-                      <Link href="/collection/earrings/stud" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Studs</Link>
-                      <Link href="/collection/earrings/western" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Western</Link>
-                      <Link href="/collection/earrings/korean" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Korean</Link>
-                      <Link href="/collection/earrings" className="block py-2 px-4 hover:bg-gray-50 rounded transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Jhumkas</Link>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+            </Link>
+            
+            <Link href="/collection/ring" className="group block">
+              <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
+                <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
+                  <Image 
+                    src="/new/3.jpg" 
+                    alt="Rings" 
+                    width={60} 
+                    height={60} 
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" 
+                  />
+                </div>
+                <p className="text-xs font-medium text-gray-900 text-center">Rings</p>
               </div>
+            </Link>
+            
+            <Link href="/collection/combos" className="group block">
+              <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
+                <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
+                  <Image 
+                    src="/new/4.jpg" 
+                    alt="Combos" 
+                    width={60} 
+                    height={60} 
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" 
+                  />
+                </div>
+                <p className="text-xs font-medium text-gray-900 text-center">Combos</p>
+              </div>
+            </Link>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <Link href="/collection" className="block text-center py-2 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium">
+              View All Products
+            </Link>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
 
-              <Link href="/about" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
-                About
-              </Link>
-              <Link href="/contact" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
-                Contact Us
-              </Link>
-            </nav>
+  {/* Earrings Dropdown */}
+  <div
+    className="relative"
+    ref={earringsDropdownRef}
+  >
+    <button
+      className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 flex items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+      onMouseEnter={() => setActiveDropdown("earrings")}
+    >
+      Earrings
+      <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    <AnimatePresence>
+      {activeDropdown === "earrings" && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+           className="absolute bg-white shadow-xl rounded-lg p-4 w-96 left-1/2 transform -translate-x-1/2 mt-2 border border-gray-100 z-50"
+          onMouseLeave={() => setActiveDropdown(null)}
+        >
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Earring Styles</h3>
+           <div className="grid grid-cols-4 gap-2">
+             <Link href="/collection/earrings/stud" className="group block">
+               <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
+                 <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
+                   <Image 
+                     src="/new/5.jpg" 
+                     alt="Stud Earrings" 
+                     width={60} 
+                     height={60} 
+                     className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" 
+                   />
+                 </div>
+                 <p className="text-xs font-medium text-gray-900 text-center">Studs</p>
+               </div>
+             </Link>
+             
+             <Link href="/collection/earrings/western" className="group block">
+               <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
+                 <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
+                   <Image 
+                     src="/new/6.jpg" 
+                     alt="Western Earrings" 
+                     width={60} 
+                     height={60} 
+                     className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" 
+                   />
+                 </div>
+                 <p className="text-xs font-medium text-gray-900 text-center">Western</p>
+               </div>
+             </Link>
+             
+             <Link href="/collection/earrings/korean" className="group block">
+               <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
+                 <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
+                   <Image 
+                     src="/new/7.jpg" 
+                     alt="Korean Earrings" 
+                     width={60} 
+                     height={60} 
+                     className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" 
+                   />
+                 </div>
+                 <p className="text-xs font-medium text-gray-900 text-center">Korean</p>
+               </div>
+             </Link>
+             
+             <Link href="/collection/earrings" className="group block">
+               <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
+                 <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
+                   <Image 
+                     src="/new/8.jpg" 
+                     alt="Jhumkas" 
+                     width={60} 
+                     height={60} 
+                     className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" 
+                   />
+                 </div>
+                 <p className="text-xs font-medium text-gray-900 text-center">Jhumkas</p>
+               </div>
+             </Link>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <Link href="/collection/earrings" className="block text-center py-2 px-4 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium">
+              View All Earrings
+            </Link>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+
+  <Link href="/about" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+    About
+  </Link>
+  <Link href="/contact" className="text-sm font-medium hover:text-gray-600 transition-colors duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+    Contact Us
+  </Link>
+</nav>
+
 
             {/* Right side icons - Enhanced with cursor and focus */}
             <div className="flex items-center space-x-4 md:space-x-5">
@@ -338,98 +401,98 @@ export function SiteHeader() {
                     </span>
                   )}
                 </Link>
-                
+
                 {/* Account Dropdown */}
                 <div className="relative" ref={accountDropdownRef}>
-  {authLoading ? (
-    <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
-  ) : user ? (
-    <>
-      <button
-        className="relative flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-gray-700 to-black transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
-        onMouseEnter={() => setActiveDropdown("account")}
-        onClick={() => setActiveDropdown(activeDropdown === "account" ? null : "account")}
-        aria-label="Account menu"
-        aria-expanded={activeDropdown === "account"}
-      >
-        {/* User avatar with initial */}
-        <span className="text-xs font-medium text-white">
-          {user.name ? user.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
-        </span>
-        
-        {/* Online status indicator */}
-        <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></span>
-      </button>
-      
-      <AnimatePresence>
-        {activeDropdown === "account" && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className="absolute right-0 bg-white shadow-xl rounded-xl py-2 w-64 mt-2 border border-gray-200 z-50"
-            onMouseLeave={() => setActiveDropdown(null)}
-          >
-            {/* User info header */}
-            <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-              <p className="text-xs text-gray-500 truncate mt-1">{user.email}</p>
-            </div>
-            
-            <div className="py-2">
-              <Link 
-                href="/profile" 
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
-                onClick={() => setActiveDropdown(null)}
-              >
-                <User className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
-                Your Profile
-              </Link>
-              
-              <Link 
-                href="/settings" 
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
-                onClick={() => setActiveDropdown(null)}
-              >
-                <Settings className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
-                Settings
-              </Link>
-              
-              <Link 
-                href="/notifications" 
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
-                onClick={() => setActiveDropdown(null)}
-              >
-                <Bell className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
-                Notifications
-                <span className="ml-auto bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">3</span>
-              </Link>
-            </div>
-            
-            <div className="py-2 border-t border-gray-100">
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
-              >
-                <LogOut className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
-                Sign out
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  ) : (
-    <Link
-      href="/login"
-      className="relative flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 transition-all duration-300 hover:scale-110 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
-      aria-label="Login"
-    >
-      <User className="h-4 w-4 text-gray-600" />
-    </Link>
-  )}
-</div>
+                  {authLoading ? (
+                    <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+                  ) : user ? (
+                    <>
+                      <button
+                        className="relative flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-gray-700 to-black transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
+                        onMouseEnter={() => setActiveDropdown("account")}
+                        onClick={() => setActiveDropdown(activeDropdown === "account" ? null : "account")}
+                        aria-label="Account menu"
+                        aria-expanded={activeDropdown === "account"}
+                      >
+                        {/* User avatar with initial */}
+                        <span className="text-xs font-medium text-white">
+                          {user.name ? user.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
+                        </span>
+
+                        {/* Online status indicator */}
+                        <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></span>
+                      </button>
+
+                      <AnimatePresence>
+                        {activeDropdown === "account" && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                            className="absolute right-0 bg-white shadow-xl rounded-xl py-2 w-64 mt-2 border border-gray-200 z-50"
+                            onMouseLeave={() => setActiveDropdown(null)}
+                          >
+                            {/* User info header */}
+                            <div className="px-4 py-3 border-b border-gray-100">
+                              <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+                              <p className="text-xs text-gray-500 truncate mt-1">{user.email}</p>
+                            </div>
+
+                            <div className="py-2">
+                              <Link
+                                href="/profile"
+                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+                                onClick={() => setActiveDropdown(null)}
+                              >
+                                <User className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
+                                Your Profile
+                              </Link>
+
+                              <Link
+                                href="/settings"
+                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+                                onClick={() => setActiveDropdown(null)}
+                              >
+                                <Settings className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
+                                Settings
+                              </Link>
+
+                              <Link
+                                href="/notifications"
+                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+                                onClick={() => setActiveDropdown(null)}
+                              >
+                                <Bell className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
+                                Notifications
+                                <span className="ml-auto bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full">3</span>
+                              </Link>
+                            </div>
+
+                            <div className="py-2 border-t border-gray-100">
+                              <button
+                                onClick={handleLogout}
+                                className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer group"
+                              >
+                                <LogOut className="h-4 w-4 mr-3 text-gray-400 group-hover:text-gray-600" />
+                                Sign out
+                              </button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="relative flex items-center justify-center h-8 w-8 rounded-full bg-gray-100 transition-all duration-300 hover:scale-110 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
+                      aria-label="Login"
+                    >
+                      <User className="h-4 w-4 text-gray-600" />
+                    </Link>
+                  )}
+                </div>
               </div>
 
               <CartButton />
@@ -449,7 +512,7 @@ export function SiteHeader() {
       {/* Mobile menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-            <motion.div
+          <motion.div
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
@@ -480,7 +543,7 @@ export function SiteHeader() {
                   <X className="h-6 w-6" />
                 </button>
               </div>
-              
+
               <div className="flex flex-col space-y-4">
                 <Link href="/" className="text-lg font-medium py-2 hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2" onClick={() => setIsMobileMenuOpen(false)}>
                   Home
@@ -578,7 +641,7 @@ export function SiteHeader() {
                       </span>
                     )}
                   </Link>
-                  
+
                   {/* User Section */}
                   {authLoading ? (
                     <div className="flex items-center space-x-3 py-2">
@@ -591,8 +654,8 @@ export function SiteHeader() {
                         <div className="font-medium">Hello, {user.name}</div>
                         <div className="text-xs text-gray-500">{user.email}</div>
                       </div>
-                      <Link 
-                        href="/profile" 
+                      <Link
+                        href="/profile"
                         className="flex items-center space-x-3 text-base hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 py-2"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
@@ -608,8 +671,8 @@ export function SiteHeader() {
                       </button>
                     </>
                   ) : (
-                    <Link 
-                      href="/login" 
+                    <Link
+                      href="/login"
                       className="flex items-center space-x-3 text-base hover:text-gray-600 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 py-2"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -626,135 +689,20 @@ export function SiteHeader() {
 
       {/* Backdrop for mobile menu */}
       <AnimatePresence>
-      {isMobileMenuOpen && (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      className="md:hidden fixed inset-0 bg-black/30 z-[55]"
-      onClick={() => setIsMobileMenuOpen(false)}
-    />
-        )}
-      </AnimatePresence>
-
-      {/* Animated Search Overlay */}
-      <AnimatePresence>
-        {isSearchOpen && (
+        {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
-          >
-            <div className="absolute inset-0" onClick={() => setIsSearchOpen(false)} />
-
-            <motion.div
-              initial={{ y: "-100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "-100%" }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative z-10 bg-[#fff3f3] shadow-2xl max-h-[80vh] overflow-y-auto"
-            >
-              <div className="container mx-auto px-4 py-4">
-                <form onSubmit={handleSearchSubmit} className="flex items-center">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      placeholder="Search for exquisite jewelry..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 text-lg border-0 focus:ring-0 focus:outline-none placeholder-gray-400 bg-transparent cursor-text"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="ml-4 bg-black text-[#fff3f3] p-3 rounded-full hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
-                  >
-                    <ArrowRight className="h-5 w-5" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsSearchOpen(false)}
-                    className="ml-4 text-gray-400 hover:text-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                </form>
-              </div>
-
-              {/* Live results */}
-              <div className="border-t border-gray-100">
-                <div className="container mx-auto px-4 py-4">
-                  {isSearching && (
-                    <div className="text-sm text-gray-500">Searching…</div>
-                  )}
-
-                  {!isSearching && searchError && (
-                    <div className="text-sm text-red-500">{searchError}</div>
-                  )}
-
-                  {!isSearching && !searchError && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
-                    <div className="text-sm text-gray-500">No products found.</div>
-                  )}
-
-                  {!isSearching && !searchError && searchResults.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                      {searchResults.map((p) => (
-                        <Link key={p._id} href={`/collection/product/${p.slug?.current ?? ""}`}
-                          className="group rounded-md border border-gray-200 bg-white p-2 hover:shadow-sm transition-shadow cursor-pointer focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
-                          <div className="aspect-square w-full overflow-hidden rounded-sm bg-gray-100">
-                            {p.image ? (
-                              <Image src={p.image} alt={p.name} width={100} height={100} className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105" />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center text-gray-400">No image</div>
-                            )}
-                          </div>
-                          <div className="mt-2">
-                            <div className="text-xs font-medium text-gray-900 line-clamp-1">{p.name}</div>
-                            {typeof p.price === 'number' && (
-                              <div className="text-xs text-gray-700">₹{p.price}</div>
-                            )}
-                            {p.category?.name && (
-                              <div className="text-[10px] text-gray-500 mt-0.5">{p.category.name}</div>
-                            )}
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Popular Searches */}
-              <div className="border-t border-gray-100 bg-gray-50">
-                <div className="container mx-auto px-4 py-4">
-                  <h3 className="text-sm font-medium text-gray-500 mb-2">Popular Searches</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {['Diamond Rings', 'Gold Necklaces', 'Pearl Earrings', 'Wedding Bands', 'Luxury Watches'].map((item) => (
-                      <button
-                        key={item}
-                        onClick={() => {
-                          setSearchQuery(item)
-                          searchInputRef.current?.focus()
-                        }}
-                        className="px-3 py-1 bg-[#fff3f3] border border-gray-200 rounded-full text-sm hover:bg-gray-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 cursor-pointer"
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+            transition={{ duration: 0.2 }}
+            className="md:hidden fixed inset-0 bg-black/30 z-[55]"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
         )}
       </AnimatePresence>
+
+      {/* Search Overlay */}
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   )
 }

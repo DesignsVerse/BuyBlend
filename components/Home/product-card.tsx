@@ -138,13 +138,13 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
       }}
       style={{ boxShadow: springShadow }}
     >
-      <Link
-        href={`/collection/product/${productSlug}`}
+      <div
         className="relative bg-white dark:bg-black shadow-md overflow-hidden border flex flex-col h-full"
       >
-        {/* Image Slider - Only Photos */}
-        <div className="relative aspect-square overflow-hidden">
-          <div className="relative w-full h-full">
+        {/* Image Slider - Only Photos (clickable area) */}
+        <div className="relative">
+          <Link href={`/collection/product/${productSlug}`} className="relative block aspect-square overflow-hidden">
+            <div className="relative w-full h-full">
             <AnimatePresence initial={false} custom={direction}>
               <motion.div
                 key={currentMediaIndex}
@@ -181,15 +181,13 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
                 )}
               </motion.div>
             </AnimatePresence>
-          </div>
+            </div>
+            {!isMediaLoaded && (
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 animate-pulse" />
+            )}
+          </Link>
 
-          {!isMediaLoaded && (
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 animate-pulse" />
-          )}
-
-        
-
-          {/* ❤️ Wishlist (inside card, but no link trigger) */}
+          {/* ❤️ Wishlist (separate from link) */}
           <button
             onClick={(e) => {
               e.preventDefault()
@@ -226,16 +224,18 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
           </div>
         </div>
 
-        {/* Content */}
+        {/* Content (clickable title/description only) */}
         <div className="p-4 flex flex-col gap-1 flex-grow">
-          <h3 className="text-sm font-semibold line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
-            {product.name}
-          </h3>
-          {product.description && (
-            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
-              {product.description}
-            </p>
-          )}
+          <Link href={`/collection/product/${productSlug}`} className="block">
+            <h3 className="text-sm font-semibold line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+              {product.name}
+            </h3>
+            {product.description && (
+              <p className="mt-1 text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
+                {product.description}
+              </p>
+            )}
+          </Link>
 
           {/* Price */}
           <div className="flex items-center gap-1.5 mt-2">
@@ -255,7 +255,7 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
           </div>
         </div>
 
-        {/* Add to Cart / Combo */}
+        {/* Add to Cart / Combo (non-link area) */}
         <div className="p-4 pt-0">
           {onSelectForCombo ? (
             <button
@@ -276,14 +276,10 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
             <AddToCartButton
               product={product}
               className="w-full py-2 bg-black text-white hover:bg-gray-800 rounded-md text-sm font-medium transition-all duration-300 transform hover:scale-[1.02]"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-              }}
             />
           )}
         </div>
-      </Link>
+      </div>
     </motion.div>
   )
 }

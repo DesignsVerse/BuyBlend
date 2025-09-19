@@ -2,6 +2,11 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+/* Remove default outline globally */
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
 
 :root {
   /* Updated color tokens to match modern admin dashboard design */

@@ -1,8 +1,6 @@
 "use client";
 
-
 import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback } from "react";
-
 
 export interface CartItem {
   id: string;
@@ -13,7 +11,6 @@ export interface CartItem {
   slug: string;
 }
 
-
 export interface CartState {
   items: CartItem[];
   total: number;
@@ -23,7 +20,6 @@ export interface CartState {
   lastActivity: Date;
   isAbandoned: boolean;
 }
-
 
 type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
@@ -37,7 +33,6 @@ type CartAction =
   | { type: "MARK_ABANDONED" }
   | { type: "RESTORE_CART"; payload: CartState };
 
-
 const CartContext = createContext<{
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
@@ -50,11 +45,9 @@ const CartContext = createContext<{
   clearIdentityAndCart: () => void;
 } | null>(null);
 
-
 function generateSessionId(): string {
   return "cart_" + Math.random().toString(36).substr(2, 9) + "_" + Date.now();
 }
-
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
@@ -109,7 +102,6 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   }
 }
 
-
 const initialState: CartState = {
   items: [],
   total: 0,
@@ -119,14 +111,11 @@ const initialState: CartState = {
   isAbandoned: false,
 };
 
-
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { ...initialState });
 
-
   // keep a local ref of current server cartId (filled after first server call)
   const cartIdRef = useRef<string | null>(null);
-
 
   // Load from localStorage
   useEffect(() => {
@@ -145,20 +134,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-
   // Save to localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(state));
   }, [state]);
-
 
   // Helpers
   const getIdentity = () => {
     return state.userId ? { userId: state.userId } : state.sessionId ? { sessionId: state.sessionId } : {};
   };
 
-
-  const reconcileFromServer = useCallback(async () => {
+  const reconcileFromServer = useCallback(async (localItemsOverride?: CartItem[]) => {
     try {
       const params = new URLSearchParams();
       if (state.userId) params.set("userId", state.userId);
@@ -169,8 +155,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const serverCart = await res.json();
       cartIdRef.current = serverCart?.id ?? cartIdRef.current;
       // Merge: prefer server values, but fall back to local for name/image/slug if missing
-      const localItemById = new Map(state.items.map((li) => [li.id, li]));
-      const items: CartItem[] = (serverCart.items || []).map((it: any) => {
+      const localSourceItems = Array.isArray(localItemsOverride) && localItemsOverride.length > 0
+        ? localItemsOverride
+        : state.items;
+      const localItemById = new Map(localSourceItems.map((li) => [li.id, li]));
+      const serverItemsRaw: any[] = Array.isArray(serverCart.items) ? serverCart.items : [];
+      const itemsFromServer: CartItem[] = serverItemsRaw.map((it: any) => {
         const local = localItemById.get(it.variantId);
         return {
           id: it.variantId,
@@ -181,12 +171,39 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           slug: (it.slug ?? local?.slug ?? ""),
         };
       });
+      // Include any local items not present in server response (union by id)
+      const serverIds = new Set(itemsFromServer.map((i) => i.id));
+      const unmatchedLocal: CartItem[] = localSourceItems
+        .filter((li) => !serverIds.has(li.id))
+        .map((li) => ({ ...li }));
+      let items: CartItem[] = itemsFromServer.length > 0 ? [...itemsFromServer, ...unmatchedLocal] : [...localSourceItems];
+
+      // If any items still missing name/image/slug, fetch metadata from Sanity
+      const missingMetaIds = items.filter((i) => !i.name || !i.image || !i.slug).map((i) => i.id);
+      if (missingMetaIds.length > 0) {
+        try {
+          const metaRes = await fetch('/api/products/get', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: missingMetaIds }) });
+          if (metaRes.ok) {
+            const { products } = await metaRes.json();
+            const metaById: Map<string, any> = new Map((products || []).map((p: any) => [p._id as string, p]));
+            items = items.map((it) => {
+              const meta: any = metaById.get(it.id);
+              if (!meta) return it;
+              return {
+                ...it,
+                name: it.name || meta.name || '',
+                slug: it.slug || meta.slug || '',
+                image: it.image || meta.image || '',
+              };
+            });
+          }
+        } catch {}
+      }
       const total = items.reduce((s, it) => s + it.originalPrice * it.quantity, 0);
       const itemCount = items.reduce((s, it) => s + it.quantity, 0);
       dispatch({ type: "RESTORE_CART", payload: { ...state, items, total, itemCount, lastActivity: new Date() } });
     } catch { }
   }, [state.userId, state.sessionId]);
-
 
   // API calls
   const addCall = async (
@@ -213,7 +230,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-
   const updateCall = async (id: string, quantity: number) => {
     const item = state.items.find((it) => it.id === id);
     const body =
@@ -223,7 +239,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     await fetch("/api/cart/update", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   };
 
-
   const removeCall = async (id: string) => {
     const body =
       cartIdRef.current
@@ -232,6 +247,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     await fetch("/api/cart/remove", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   };
 
+  // New: Clear cart API call (add this endpoint on server if not present)
+  const clearCall = async (identity: { userId?: string; sessionId?: string }) => {
+    await fetch("/api/cart/clear", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(identity) });
+  };
 
   // Public API (optimistic first)
   const addItem = (item: Omit<CartItem, "quantity">) => {
@@ -246,12 +265,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     addCall(item, identityForThisAdd); // fire-and-forget
   };
 
-
   const removeItem = (id: string) => {
     dispatch({ type: "REMOVE_ITEM", payload: id });
     removeCall(id);
   };
-
 
   const updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) return removeItem(id);
@@ -259,35 +276,43 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     updateCall(id, quantity);
   };
 
-
   const clearCart = () => {
     dispatch({ type: "CLEAR_CART" });
-    // optional: server clear endpoint call
+    // Call server clear if needed
+    clearCall(getIdentity());
   };
-
 
   const trackActivity = () => dispatch({ type: "UPDATE_ACTIVITY" });
 
   const setUserId = (userId: string) => {
-    // Capture existing guest session id (if any) then immediately clear it locally
-    const previousSessionId = state.sessionId;
+    // Take a snapshot of local items before any local clear so we can enrich server data
+    const localItemsSnapshot = state.items;
+    const previousSessionId = state.sessionId; // guest session
+  
     dispatch({ type: "SET_USER_ID", payload: userId });
     if (previousSessionId) {
-      dispatch({ type: "SET_SESSION_ID", payload: "" });
+      dispatch({ type: "SET_SESSION_ID", payload: "" }); // guest session clear
     }
-
-    // Merge any guest cart into the user's cart on the server, then reconcile
+  
     const doMerge = async () => {
       try {
         if (previousSessionId) {
+          // Merge first
           await fetch("/api/cart/merge", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId, sessionId: previousSessionId }),
           });
+          
+          // After merge, clear the old session cart (set items to 0)
+          await clearCall({ sessionId: previousSessionId });
+          
+          // Local clear for safety (items will be restored by reconcile)
+          dispatch({ type: "CLEAR_CART" });
         }
       } catch {}
-      reconcileFromServer();
+      // Reconcile using snapshot so name/image/slug are preserved if server doesn't send them
+      reconcileFromServer(localItemsSnapshot); // ✅ UI update from server with merged cart
     };
     doMerge();
   };
@@ -301,12 +326,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } catch { }
   };
 
-
   // Initial reconcile (optional)
   useEffect(() => {
     reconcileFromServer();
   }, [reconcileFromServer]);
-
 
   return (
     <CartContext.Provider value={{ state, dispatch, addItem, removeItem, updateQuantity, clearCart, trackActivity, setUserId, clearIdentityAndCart }}>
@@ -314,7 +337,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     </CartContext.Provider>
   );
 }
-
 
 export function useCart() {
   const context = useContext(CartContext);

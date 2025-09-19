@@ -38,18 +38,37 @@ const testimonials: Testimonial[] = [
     image: '/images/1.jpg', // Replace with real image URL
     rating: 4
   },
+  {
+    id: 4,
+    name: 'Vikram Singh',
+    role: 'Collector',
+    text: 'As someone who appreciates fine jewelry, I can confidently say this is among the best I\'ve encountered. The pieces have a distinctive character.',
+    image: '/images/1.jpg', // Replace with real image URL
+    rating: 5
+  },
+  {
+    id: 5,
+    name: 'Meera Desai',
+    role: 'Fashion Blogger',
+    text: 'These pieces are not just accessories but works of art. They elevate any outfit and always receive compliments whenever I wear them.',
+    image: '/images/1.jpg', // Replace with real image URL
+    rating: 4
+  }
 ];
 
 const TestimonialReviews: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   // Auto-scroll every 5 seconds
   useEffect(() => {
+    if (isPaused) return;
+    
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isPaused]);
 
   // Star rating component
   const StarRating = ({ rating }: { rating: number }) => {
@@ -58,7 +77,7 @@ const TestimonialReviews: React.FC = () => {
         {[...Array(5)].map((_, i) => (
           <svg
             key={i}
-            className={`w-5 h-5 ${i < rating ? 'text-amber-400' : 'text-gray-300'}`}
+            className={`w-5 h-5 ${i < rating ? 'text-black' : 'text-gray-300'}`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -69,43 +88,76 @@ const TestimonialReviews: React.FC = () => {
     );
   };
 
+  const nextTestimonial = () => {
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-50 to-white text-black">
+    <section className="py-16 bg-[#fff3f3] text-black">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 text-gray-900">What Our Customers Say</h2>
-          <div className="w-20 h-1 bg-amber-500 mx-auto"></div>
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-4xl font-serif font-bold mb-4 text-black"
+          >
+            What Our Customers Say
+          </motion.h2>
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: 80 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="h-1 bg-black mx-auto mb-4"
+          ></motion.div>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg"
+          >
             Discover why our customers love our premium jewelry collections and exceptional service
-          </p>
+          </motion.p>
         </div>
         
-        <div className="relative h-96">
+        <div 
+          className="relative h-96 max-w-4xl mx-auto"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.5 }}
-              className="absolute inset-0 flex flex-col items-center text-center bg-white p-8 rounded-lg shadow-xl border border-gray-100"
+              className="absolute inset-0 flex flex-col items-center text-center bg-white p-8 rounded-2xl shadow-lg border border-gray-100"
             >
               <div className="relative mb-6">
-                <img
-                  src={testimonials[currentIndex].image}
-                  alt={testimonials[currentIndex].name}
-                  className="w-20 h-20 rounded-full object-cover border-4 border-amber-100 shadow-md"
-                />
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-amber-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                  ★ {testimonials[currentIndex].rating}.0
+                <div className="relative inline-block">
+                  <img
+                    src={testimonials[currentIndex].image}
+                    alt={testimonials[currentIndex].name}
+                    className="w-20 h-20 rounded-full object-cover border-4 border-gray-100 shadow-md"
+                  />
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-black text-white px-2 py-1 rounded-full text-xs font-medium shadow-md">
+                    ★ {testimonials[currentIndex].rating}.0
+                  </div>
                 </div>
               </div>
               
               <StarRating rating={testimonials[currentIndex].rating} />
               
-              <svg className="w-8 h-8 text-amber-400 mb-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-              </svg>
+              <div className="text-gray-400 mb-4">
+                <svg className="w-8 h-8 inline-block" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                </svg>
+              </div>
               
               <p className="text-lg text-gray-700 mb-6 italic leading-relaxed max-w-2xl">
                 "{testimonials[currentIndex].text}"
@@ -113,10 +165,31 @@ const TestimonialReviews: React.FC = () => {
               
               <div>
                 <h3 className="font-semibold text-gray-900 text-xl">{testimonials[currentIndex].name}</h3>
-                <p className="text-sm text-amber-600">{testimonials[currentIndex].role}</p>
+                <p className="text-sm text-gray-600">{testimonials[currentIndex].role}</p>
               </div>
             </motion.div>
           </AnimatePresence>
+          
+          {/* Navigation arrows */}
+          <button 
+            onClick={prevTestimonial}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-black"
+            aria-label="Previous testimonial"
+          >
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <button 
+            onClick={nextTestimonial}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-50 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-black"
+            aria-label="Next testimonial"
+          >
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
         
         <div className="flex justify-center mt-8 space-x-3">
@@ -125,14 +198,23 @@ const TestimonialReviews: React.FC = () => {
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentIndex ? 'bg-amber-500 scale-125' : 'bg-gray-300 hover:bg-amber-300'
+                index === currentIndex ? 'bg-black scale-125' : 'bg-gray-300 hover:bg-gray-500'
               }`}
               aria-label={`Go to testimonial ${index + 1}`}
             />
           ))}
         </div>
         
-       
+        {/* Additional decorative elements */}
+        <div className="mt-12 text-center">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-black hover:bg-gray-800 text-white font-medium py-3 px-8 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg"
+          >
+            Read More Testimonials
+          </motion.button>
+        </div>
       </div>
     </section>
   );

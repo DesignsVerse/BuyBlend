@@ -11,6 +11,7 @@ import Head from "next/head"
 import { SiteFooter } from "@/components/Home/footer"
 import { SiteHeader } from "@/components/Home/header"
 import { WishlistProvider } from "@/lib/wishlist/wishlist-context"
+import GlobalLoadingOverlay from "@/components/ui/global-loading"
 
 export const metadata: Metadata = {
   title: "BuyBlend.in",
@@ -37,6 +38,7 @@ html {
       <body className="antialiased" cz-shortcut-listen="true">
         <CartProvider >
           <WishlistProvider>
+            <GlobalLoadingOverlay />
             <SiteHeader/>
             {children}
             <Toaster />

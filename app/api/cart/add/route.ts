@@ -15,17 +15,34 @@ export async function POST(req: Request) {
     // Find or create cart
     let cart = null;
     if (userId) {
-      cart = await prisma.cart.upsert({
-        where: { userId },
-        update: {},
-        create: { userId },
-      });
+      try {
+        cart = await prisma.cart.upsert({
+          where: { userId },
+          update: {},
+          create: { userId },
+        });
+      } catch (e: any) {
+        if (e?.code === 'P2002') {
+          cart = await prisma.cart.findUnique({ where: { userId } });
+        } else {
+          throw e;
+        }
+      }
     } else if (sessionId) {
-      cart = await prisma.cart.upsert({
-        where: { sessionId },
-        update: {},
-        create: { sessionId },
-      });
+      try {
+        cart = await prisma.cart.upsert({
+          where: { sessionId },
+          update: {},
+          create: { sessionId },
+        });
+      } catch (e: any) {
+        // Handle potential race condition where two concurrent requests try to create the same session cart
+        if (e?.code === 'P2002') {
+          cart = await prisma.cart.findUnique({ where: { sessionId } });
+        } else {
+          throw e;
+        }
+      }
     }
 
     if (!cart) return NextResponse.json({ error: "Cart not found or created" }, { status: 404 });

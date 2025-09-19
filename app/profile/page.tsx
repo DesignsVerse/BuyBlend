@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useCart } from '@/lib/cart/cart-context';
 import { useRouter } from 'next/navigation';
 
 type User = {
@@ -17,6 +18,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({ name: '', email: '' });
+  const { clearIdentityAndCart } = useCart();
 
   useEffect(() => {
     async function fetchProfile() {
@@ -36,6 +38,8 @@ export default function ProfilePage() {
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
+    // Clear cart locally on logout only
+    try { clearIdentityAndCart(); } catch {}
     router.push('/login');
   }
 

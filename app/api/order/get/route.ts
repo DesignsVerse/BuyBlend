@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     const orderId = searchParams.get("orderId");
 
     if (!orderId) {
-      return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+      return NextResponse.json({ error: "orderId is required" }, { status: 400 });
     }
 
     const order = await prisma.order.findUnique({
@@ -19,7 +19,8 @@ export async function GET(req: Request) {
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
     return NextResponse.json(order);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -4,39 +4,49 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 export async function POST(req: Request) {
   try {
-    const { userId, cartId } = await req.json();
+    const body = await req.json();
+    const { userId, sessionId, currency = "USD", shipping = 0, tax = 0 } = body;
 
-    if (!cartId || !userId) {
-      return NextResponse.json({ error: "Missing userId or cartId" }, { status: 400 });
+    if (!userId && !sessionId) {
+      return NextResponse.json({ error: "userId or sessionId is required" }, { status: 400 });
     }
+    
 
-    // Fetch cart with items
-    const cart = await prisma.cart.findUnique({
-      where: { id: cartId },
+    // --- 1. Fetch active cart ---
+    const cart = await prisma.cart.findFirst({
+      where: userId ? { userId } : { sessionId },
       include: { items: true },
     });
 
     if (!cart || cart.items.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
+    // Security layer
+    if (userId && cart.userId !== userId) {
+      return NextResponse.json({ error: "Cart does not belong to this user" }, { status: 403 });
+    }
+    if (sessionId && cart.sessionId !== sessionId) {
+      return NextResponse.json({ error: "Cart does not belong to this session" }, { status: 403 });
+    }
 
-    // Calculate totals
-    const subtotal = cart.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-    const tax = subtotal * 0.1; // 10% tax (example)
-    const shipping = 50; // flat shipping (example)
-    const total = subtotal + tax + shipping;
+    // --- 2. Calculate totals ---
+    const subtotal = cart.items.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0
+    );
+    const total = subtotal + shipping + tax;
 
-    // Create order
+    // --- 3. Create Order ---
     const order = await prisma.order.create({
       data: {
-        userId,
-        cartId,
+        userId: userId || null,
+        cartId: cart.id,
         status: "PENDING",
         subtotal,
         tax,
         shipping,
         total,
-        currency: "USD",
+        currency,
         items: {
           create: cart.items.map((item) => ({
             productId: item.productId,
@@ -47,7 +57,9 @@ export async function POST(req: Request) {
             snapshot: {
               productId: item.productId,
               variantId: item.variantId,
-              unitPrice: item.unitPrice,
+              productName: item.productName, // ✅ include name
+              price: item.unitPrice,
+              quantity: item.quantity,
             },
           })),
         },
@@ -55,9 +67,10 @@ export async function POST(req: Request) {
       include: { items: true },
     });
 
-    return NextResponse.json(order);
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(order, { status: 201 });
+
+  } catch (error) {
+    console.error("Error creating order:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

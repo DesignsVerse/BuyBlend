@@ -5,7 +5,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // change to mysql/sqlite if needed
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -14,14 +14,32 @@ datasource db {
 // ----------------
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String     @id @default(uuid())
+  email     String     @unique
   name      String?
   password  String
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
 
-  carts   Cart[]
-  orders  Order[]
+  carts     Cart[]
+  orders    Order[]
+  customer  Customer?  // one-to-one link to checkout info
+}
+
+model Customer {
+  id        String     @id @default(uuid())
+  userId    String?    @unique
+  name      String
+  email     String
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  country   String?
+  postal    String?
+  createdAt DateTime   @default(now())
+
+  user      User?      @relation(fields: [userId], references: [id])
+  orders    Order[]
 }
 
 model Cart {
@@ -43,6 +61,7 @@ model Cart {
 model CartItem {
   id        String   @id @default(uuid())
   cartId    String
+  productName String
   productId String
   variantId String
   quantity  Int
@@ -68,21 +87,23 @@ model CartItemLog {
 }
 
 model Order {
-  id        String     @id @default(uuid())
-  userId    String?
-  cartId    String?
-  status    OrderStatus
-  subtotal  Float
-  tax       Float
-  shipping  Float
-  total     Float
-  currency  String
-  placedAt  DateTime   @default(now())
+  id         String     @id @default(uuid())
+  userId     String?
+  customerId String?
+  cartId     String?
+  status     OrderStatus
+  subtotal   Float
+  tax        Float
+  shipping   Float
+  total      Float
+  currency   String
+  placedAt   DateTime   @default(now())
 
-  user    User?     @relation(fields: [userId], references: [id])
-  cart    Cart?     @relation(fields: [cartId], references: [id])
-  items   OrderItem[]
-  payment Payment?
+  user       User?       @relation(fields: [userId], references: [id])
+  customer   Customer?   @relation(fields: [customerId], references: [id])
+  cart       Cart?       @relation(fields: [cartId], references: [id])
+  items      OrderItem[]
+  payment    Payment?
 }
 
 model OrderItem {

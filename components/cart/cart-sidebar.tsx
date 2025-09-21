@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2, ShoppingBag, Lock, Truck, ChevronRight, X } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Lock, Truck, ChevronRight,CreditCard , X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart/cart-context";
 import { motion, AnimatePresence } from "framer-motion";

@@ -37,6 +37,8 @@ export async function POST(req: Request) {
     const total = subtotal + shipping + tax;
 
     // --- 3. Create Order ---
+    console.log("Cart items:", cart.items);
+    
     const order = await prisma.order.create({
       data: {
         userId: userId || null,
@@ -51,13 +53,14 @@ export async function POST(req: Request) {
           create: cart.items.map((item) => ({
             productId: item.productId,
             variantId: item.variantId,
+            productName: item.productName || `Product ${item.productId}`, // Required field in OrderItem
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             currency: item.currency,
             snapshot: {
               productId: item.productId,
               variantId: item.variantId,
-              productName: item.productName, // ✅ include name
+              productName: item.productName || `Product ${item.productId}`,
               price: item.unitPrice,
               quantity: item.quantity,
             },

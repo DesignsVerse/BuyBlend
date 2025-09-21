@@ -61,7 +61,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         : [...state.items, { ...action.payload, quantity: 1 }];
       const total = updatedItems.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0);
       const itemCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
-      return { ...state, items: updatedItems, total, itemCount, lastActivity: new Date(), isAbandoned: false, isCartOpen: true }; // Set isCartOpen to true
+      return { ...state, items: updatedItems, total, itemCount, lastActivity: new Date(), isAbandoned: false };
     }
     case "REMOVE_ITEM": {
       const updatedItems = state.items.filter((item) => item.id !== action.payload);
@@ -201,9 +201,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 name: it.name || meta.name || '',
                 slug: it.slug || meta.slug || '',
                 image: it.image || meta.image || '',
-              };
-            });
-          }
+            };
+            }
+  )}
         } catch {}
       }
       const total = items.reduce((s, it) => s + it.originalPrice * it.quantity, 0);
@@ -220,6 +220,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const body = {
       ...(identityOverride ?? getIdentity()),
       productId: item.id,
+      productName: item.name,
       variantId: item.id,
       quantity: 1,
       unitPrice: item.originalPrice,
@@ -266,7 +267,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       identityForThisAdd = { sessionId: newSessionId };
     }
     dispatch({ type: "ADD_ITEM", payload: { ...item, quantity: 1 } });
-    dispatch({ type: "SET_CART_OPEN", payload: true }); // Already present
     addCall(item, identityForThisAdd);
   };
 
@@ -328,7 +328,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     reconcileFromServer();
-  }, [reconcileFromServer]);
+  }, []); // Changed to empty array to run only on mount, preventing loops
 
   return (
     <CartContext.Provider

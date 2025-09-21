@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle, Lock } from "lucide-react"
+import { ArrowLeft, Truck, CheckCircle, Lock } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -23,10 +23,6 @@ interface CheckoutForm {
   city: string
   state: string
   zipCode: string
-  cardNumber: string
-  cardExpiry: string
-  cardCvv: string
-  cardName: string
   notes: string
   saveInfo: boolean
 }
@@ -40,10 +36,6 @@ const initialForm: CheckoutForm = {
   city: "",
   state: "",
   zipCode: "",
-  cardNumber: "",
-  cardExpiry: "",
-  cardCvv: "",
-  cardName: "",
   notes: "",
   saveInfo: false,
 }
@@ -64,39 +56,74 @@ export default function CheckoutPage() {
     return cartState.total >= 299 ? 0 : 69
   }
 
+  const totalAmount = cartState.total + calculateShipping()
 
-
-  const totalAmount = cartState.total + calculateShipping() 
-
-  const handleProceedToShipping = () => {
-    if (cartState.items.length === 0) return
-    setCurrentStep(2)
-  }
-
-  const handleProceedToPayment = () => {
+  const handlePlaceOrder = async () => {
     if (!form.firstName || !form.lastName || !form.email || !form.address || !form.city || !form.state || !form.zipCode) {
       alert("Please fill in all required shipping fields")
       return
     }
-    setCurrentStep(3)
-  }
-
-  const handlePlaceOrder = async () => {
-    if (!form.cardNumber || !form.cardExpiry || !form.cardCvv || !form.cardName) {
-      alert("Please fill in all payment details")
-      return
-    }
 
     setIsProcessing(true)
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    const newOrderNumber = `ORD-${Date.now().toString().slice(-8)}`
-    setOrderNumber(newOrderNumber)
-    
-    setIsProcessing(false)
-    setCurrentStep(4)
-    setOrderComplete(true)
-    clearCart()
+
+    try {
+      // Prepare order data
+      const orderData = {
+        userId: cartState.userId || null,
+        sessionId: cartState.sessionId,
+        currency: "INR",
+        shipping: calculateShipping(),
+        tax: 0,
+        customerInfo: {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          phone: form.phone,
+          address: form.address,
+          city: form.city,
+          state: form.state,
+          zipCode: form.zipCode,
+          notes: form.notes
+        },
+        items: cartState.items.map(item => ({
+          productId: item.id,
+          variantId: item.id, // Use product ID as variant ID for now
+          productName: item.name,
+          quantity: item.quantity,
+          unitPrice: item.originalPrice,
+          currency: "INR",
+          image: item.image,
+          slug: item.slug
+        }))
+      }
+
+      // Call order creation API
+      const response = await fetch('/api/order/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create order')
+      }
+
+      const order = await response.json()
+      setOrderNumber(order.id || `ORD-${Date.now().toString().slice(-8)}`)
+
+      setIsProcessing(false)
+      setCurrentStep(2)
+      setOrderComplete(true)
+      clearCart()
+
+    } catch (error) {
+      console.error('Order creation failed:', error)
+      alert(`Order creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      setIsProcessing(false)
+    }
   }
 
   if (cartState.items.length === 0 && !orderComplete) {
@@ -105,7 +132,7 @@ export default function CheckoutPage() {
         <Card className="w-full max-w-md">
           <CardContent className="p-8 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CreditCard className="h-8 w-8 text-gray-400" />
+              <Truck className="h-8 w-8 text-gray-400" />
             </div>
             <h2 className="text-xl font-semibold mb-2">Your Cart is Empty</h2>
             <p className="text-gray-600 mb-6">Add some products to your cart before checkout</p>
@@ -137,62 +164,6 @@ export default function CheckoutPage() {
             {currentStep === 1 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {cartState.items.map((item) => (
-                    <div key={item.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                      <div className="relative h-16 w-16 overflow-hidden rounded-md">
-                        <Image
-                          src={item.image || "/placeholder.svg?height=80&width=80"}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium">{item.name}</h4>
-                        <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">Rs. {(item.originalPrice * item.quantity).toFixed(2)}</p>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  <Separator />
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span>Subtotal</span>
-                      <span>Rs. {cartState.total.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Shipping</span>
-                      <span>{calculateShipping() === 0 ? "FREE" : `Rs. ${calculateShipping().toFixed(2)}`}</span>
-                    </div>
-                   
-                    <Separator />
-                    <div className="flex justify-between font-semibold text-lg">
-                      <span>Total</span>
-                      <span>Rs. {totalAmount.toFixed(2)}</span>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    onClick={handleProceedToShipping}
-                    className="w-full mt-6"
-                    disabled={cartState.items.length === 0}
-                  >
-                    Proceed to Shipping
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {currentStep === 2 && (
-              <Card>
-                <CardHeader>
                   <CardTitle className="flex items-center">
                     <Truck className="mr-2 h-5 w-5" />
                     Shipping Information
@@ -219,7 +190,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="email">Email Address *</Label>
@@ -241,7 +212,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="address">Shipping Address *</Label>
                     <Textarea
@@ -252,7 +223,7 @@ export default function CheckoutPage() {
                       rows={3}
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="city">City *</Label>
@@ -282,7 +253,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="notes">Order Notes (Optional)</Label>
                     <Textarea
@@ -293,7 +264,7 @@ export default function CheckoutPage() {
                       rows={2}
                     />
                   </div>
-                  
+
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="saveInfo"
@@ -302,107 +273,19 @@ export default function CheckoutPage() {
                     />
                     <Label htmlFor="saveInfo">Save this information for future orders</Label>
                   </div>
-                  
-                  <div className="flex space-x-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setCurrentStep(1)}
-                      className="flex-1"
-                    >
-                      Back
-                    </Button>
-                    <Button 
-                      onClick={handleProceedToPayment}
-                      className="flex-1"
-                    >
-                      Continue to Payment
-                    </Button>
-                  </div>
+
+                  <Button
+                    onClick={handlePlaceOrder}
+                    disabled={isProcessing}
+                    className="w-full"
+                  >
+                    {isProcessing ? "Processing..." : `Place Order - Rs. ${totalAmount.toFixed(2)}`}
+                  </Button>
                 </CardContent>
               </Card>
             )}
 
-            {currentStep === 3 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Payment Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                    <div className="flex items-center space-x-2 text-blue-800">
-                      <Shield className="h-4 w-4" />
-                      <span className="text-sm font-medium">Secure Payment</span>
-                    </div>
-                    <p className="text-sm text-blue-700 mt-1">
-                      Your payment information is encrypted and secure.
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="cardName">Name on Card *</Label>
-                    <Input
-                      id="cardName"
-                      value={form.cardName}
-                      onChange={(e) => handleInputChange('cardName', e.target.value)}
-                      placeholder="Enter name as it appears on card"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="cardNumber">Card Number *</Label>
-                    <Input
-                      id="cardNumber"
-                      value={form.cardNumber}
-                      onChange={(e) => handleInputChange('cardNumber', e.target.value)}
-                      placeholder="1234 5678 9012 3456"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="cardExpiry">Expiry Date *</Label>
-                      <Input
-                        id="cardExpiry"
-                        value={form.cardExpiry}
-                        onChange={(e) => handleInputChange('cardExpiry', e.target.value)}
-                        placeholder="MM/YY"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cardCvv">CVV *</Label>
-                      <Input
-                        id="cardCvv"
-                        value={form.cardCvv}
-                        onChange={(e) => handleInputChange('cardCvv', e.target.value)}
-                        placeholder="123"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setCurrentStep(2)}
-                      className="flex-1"
-                    >
-                      Back
-                    </Button>
-                    <Button 
-                      onClick={handlePlaceOrder}
-                      disabled={isProcessing}
-                      className="flex-1"
-                    >
-                      {isProcessing ? "Processing..." : `Place Order - Rs. ${totalAmount.toFixed(2)}`}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {currentStep === 4 && (
+            {currentStep === 2 && (
               <Card>
                 <CardContent className="p-8 text-center">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -413,7 +296,7 @@ export default function CheckoutPage() {
                   <Badge variant="secondary" className="mb-6">
                     Order #{orderNumber}
                   </Badge>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg mb-6">
                     <h3 className="font-medium mb-2">Order Summary</h3>
                     <div className="space-y-1 text-sm">
@@ -427,7 +310,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3">
                     <p className="text-sm text-gray-600">
                       We'll send you an email confirmation with tracking details.
@@ -437,7 +320,7 @@ export default function CheckoutPage() {
                       <span>Secure payment processed</span>
                     </div>
                   </div>
-                  
+
                   <div className="mt-8 space-y-3">
                     <Link href="/products">
                       <Button className="w-full">Continue Shopping</Button>
@@ -455,7 +338,7 @@ export default function CheckoutPage() {
             <div className="sticky top-8">
               <Card>
                 <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
+                  <CardTitle>Order Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {cartState.items.map((item) => (
@@ -475,9 +358,9 @@ export default function CheckoutPage() {
                       <p className="text-sm font-medium">Rs. {(item.originalPrice * item.quantity).toFixed(2)}</p>
                     </div>
                   ))}
-                  
+
                   <Separator />
-                  
+
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Subtotal</span>
@@ -487,14 +370,14 @@ export default function CheckoutPage() {
                       <span>Shipping</span>
                       <span>{calculateShipping() === 0 ? "FREE" : `Rs. ${calculateShipping().toFixed(2)}`}</span>
                     </div>
-                   
+
                     <Separator />
                     <div className="flex justify-between font-semibold">
                       <span>Total</span>
                       <span>Rs. {totalAmount.toFixed(2)}</span>
                     </div>
                   </div>
-                  
+
                   {calculateShipping() > 0 && (
                     <div className="bg-amber-50 p-3 rounded-md border border-amber-100">
                       <p className="text-xs text-amber-800 text-center">

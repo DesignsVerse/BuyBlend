@@ -1,5 +1,3 @@
-// schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,25 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ----------------
-// MODELS
-// ----------------
-
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
+  id        String    @id @default(uuid())
+  email     String    @unique
   name      String?
   password  String
-  createdAt DateTime   @default(now())
-
-  carts     Cart[]
+  createdAt DateTime  @default(now())
+  carts     Cart?
+  customer  Customer?
   orders    Order[]
-  customer  Customer?  // one-to-one link to checkout info
 }
 
 model Customer {
-  id        String     @id @default(uuid())
-  userId    String?    @unique
+  id        String   @id @default(uuid())
+  userId    String?  @unique
   name      String
   email     String
   phone     String?
@@ -36,58 +29,53 @@ model Customer {
   state     String?
   country   String?
   postal    String?
-  createdAt DateTime   @default(now())
-
-  user      User?      @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
   orders    Order[]
 }
 
 model Cart {
-  id        String     @id @default(uuid())
-  sessionId String?    @unique
-  userId    String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  user   User?   @relation(fields: [userId], references: [id])
-  items  CartItem[]
-  logs   CartItemLog[]
-  orders Order[]
+  id        String        @id @default(uuid())
+  sessionId String?       @unique
+  userId    String?       @unique
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  user      User?         @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  logs      CartItemLog[]
+  orders    Order[]
 
   @@index([sessionId])
-  @@unique([userId]) // one active cart per user
 }
 
 model CartItem {
-  id        String   @id @default(uuid())
-  cartId    String
+  id          String   @id @default(uuid())
+  cartId      String
   productName String
-  productId String
-  variantId String
-  quantity  Int
-  unitPrice Float
-  currency  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  productId   String
+  variantId   String
+  quantity    Int
+  unitPrice   Float
+  currency    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cart        Cart     @relation(fields: [cartId], references: [id])
 
-  cart Cart @relation(fields: [cartId], references: [id])
-
-  @@unique([cartId, variantId]) // enforce one variant per cart
+  @@unique([cartId, variantId])
 }
 
 model CartItemLog {
-  id        String          @id @default(uuid())
+  id        String         @id @default(uuid())
   cartId    String
   productId String
   variantId String
   action    CartActionType
-  createdAt DateTime        @default(now())
-
-  cart Cart @relation(fields: [cartId], references: [id])
+  createdAt DateTime       @default(now())
+  cart      Cart           @relation(fields: [cartId], references: [id])
 }
 
 model Order {
-  id         String     @id @default(uuid())
+  id         String      @id @default(uuid())
   userId     String?
   customerId String?
   cartId     String?
@@ -97,44 +85,38 @@ model Order {
   shipping   Float
   total      Float
   currency   String
-  placedAt   DateTime   @default(now())
-
-  user       User?       @relation(fields: [userId], references: [id])
-  customer   Customer?   @relation(fields: [customerId], references: [id])
+  placedAt   DateTime    @default(now())
   cart       Cart?       @relation(fields: [cartId], references: [id])
+  customer   Customer?   @relation(fields: [customerId], references: [id])
+  user       User?       @relation(fields: [userId], references: [id])
   items      OrderItem[]
   payment    Payment?
 }
 
 model OrderItem {
-  id        String   @id @default(uuid())
+  id        String @id @default(uuid())
   orderId   String
   productId String
   variantId String
+  productName String
   quantity  Int
   unitPrice Float
   currency  String
   snapshot  Json
-
-  order Order @relation(fields: [orderId], references: [id])
+  order     Order  @relation(fields: [orderId], references: [id])
 }
 
 model Payment {
-  id               String   @id @default(uuid())
-  orderId          String   @unique
+  id               String        @id @default(uuid())
+  orderId          String        @unique
   provider         String
   providerIntentId String
   amount           Float
   currency         String
   status           PaymentStatus
-  createdAt        DateTime @default(now())
-
-  order Order @relation(fields: [orderId], references: [id])
+  createdAt        DateTime      @default(now())
+  order            Order         @relation(fields: [orderId], references: [id])
 }
-
-// ----------------
-// ENUMS
-// ----------------
 
 enum CartActionType {
   ADDED

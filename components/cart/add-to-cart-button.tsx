@@ -17,7 +17,7 @@ interface AddToCartButtonProps {
 
 export function AddToCartButton({ product, disabled, className, onClick }: AddToCartButtonProps) {
   const [status, setStatus] = useState<"idle" | "adding" | "added">("idle");
-  const { addItem, trackActivity, setIsCartOpen } = useCart(); // Added setIsCartOpen for explicit control if needed
+  const { addItem, trackActivity } = useCart(); // Removed setIsCartOpen since we don't auto-open
   const { toast } = useToast();
 
   const getImageUrl = useCallback(() => {

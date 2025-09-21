@@ -1,60 +1,73 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { Minus, Plus, Trash2, ShoppingBag, Lock, Sparkles, X, Truck, Gift, ShieldCheck, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useCart } from "@/lib/cart/cart-context"
-import { motion, AnimatePresence } from "framer-motion"
-import { useEffect, useState } from "react"
+import Image from "next/image";
+import Link from "next/link";
+import { Minus, Plus, Trash2, ShoppingBag, Lock, Truck, ChevronRight, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/lib/cart/cart-context";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export function CartSidebar() {
-  const { state, removeItem, updateQuantity, clearCart, trackActivity } = useCart()
-  const [isVisible, setIsVisible] = useState(false)
-  const [promoCode, setPromoCode] = useState("")
-  const [appliedPromo, setAppliedPromo] = useState(false)
-  const [isRemoving, setIsRemoving] = useState(false)
+  const { state, removeItem, updateQuantity, clearCart, trackActivity, setIsCartOpen } = useCart(); // Added setIsCartOpen
+  const [isVisible, setIsVisible] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100)
-    return () => clearTimeout(timer)
-  }, [])
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleInteraction = () => {
-    trackActivity()
-  }
+    trackActivity();
+  };
 
   const applyPromoCode = () => {
     if (promoCode.trim() !== "") {
-      setAppliedPromo(true)
+      setAppliedPromo(true);
       // Here you would typically validate and apply the promo code
     }
-  }
+  };
 
   const calculateDiscount = () => {
-    return appliedPromo ? state.total * 0.1 : 0 // 10% discount for demo
-  }
+    return appliedPromo ? state.total * 0.1 : 0; // 10% discount for demo
+  };
 
   const calculateFinalTotal = () => {
-    return state.total - calculateDiscount()
-  }
+    return state.total - calculateDiscount();
+  };
 
   const handleRemoveItem = (id: string) => {
-    setIsRemoving(true)
-    removeItem(id)
-    handleInteraction()
-    setTimeout(() => setIsRemoving(false), 300)
-  }
+    setIsRemoving(true);
+    removeItem(id);
+    handleInteraction();
+    setTimeout(() => setIsRemoving(false), 300);
+  };
+
+  // Add close button to header (for consistency and manual close)
+  const handleClose = () => {
+    setIsCartOpen(false);
+  };
 
   if (state.items.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col items-center justify-center h-full text-center p-8 bg-gradient-to-b from-white to-gray-50"
+        className="flex flex-col items-center justify-center h-full text-center p-8 bg-gradient-to-b from-white to-gray-50 relative"
       >
-        <motion.div 
+        <button
+          onClick={handleClose}
+          aria-label="Close cart"
+          className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+        >
+          <X className="h-6 w-6" />
+        </button>
+        <motion.div
           animate={{ y: [0, -5, 0], rotate: [0, -5, 0] }}
           transition={{ repeat: Infinity, duration: 3 }}
           className="relative mb-6"
@@ -71,26 +84,32 @@ export function CartSidebar() {
           </Button>
         </Link>
       </motion.div>
-    )
+    );
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
       className="flex flex-col h-full bg-white overflow-hidden"
     >
-      {/* Header */}
+      {/* Header - Added close button */}
       <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex items-center">
           <div className="bg-gradient-to-r from-gray-900 to-black p-2 rounded-lg mr-3 shadow-sm">
             <ShoppingBag className="h-5 w-5 text-white" />
           </div>
           <h2 className="text-xl font-bold text-gray-900">Your Cart</h2>
-          <span className="ml-2 text-xs text-gray-500">({state.itemCount} {state.itemCount === 1 ? 'item' : 'items'})</span>
+          <span className="ml-2 text-xs text-gray-500">({state.itemCount} {state.itemCount === 1 ? "item" : "items"})</span>
         </div>
-      
+        <button
+          onClick={handleClose}
+          aria-label="Close cart"
+          className="text-gray-600 hover:text-gray-800"
+        >
+          <X className="h-6 w-6" />
+        </button>
       </div>
 
       {/* Free Shipping Progress Bar */}
@@ -105,20 +124,20 @@ export function CartSidebar() {
             </span>
           </div>
           {state.total < 299 && (
-            <span className="text-xs font-semibold  bg-white px-2 py-1 rounded-full">
+            <span className="text-xs font-semibold bg-white px-2 py-1 rounded-full">
               ₹{(299 - state.total).toLocaleString("en-IN")} more
             </span>
           )}
         </div>
         <div className="w-full bg-blue-200 rounded-full h-2 overflow-hidden">
-          <motion.div 
+          <motion.div
             className="bg-black h-2 rounded-full relative"
             initial={{ width: "0%" }}
             animate={{ width: `${Math.min((state.total / 299) * 100, 100)}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
           >
             {state.total < 299 && (
-              <motion.div 
+              <motion.div
                 className="absolute right-0 top-0 w-3 h-3 bg-white rounded-full -mt-0.5 -mr-1.5 shadow-sm"
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 2 }}
@@ -127,8 +146,6 @@ export function CartSidebar() {
           </motion.div>
         </div>
       </div>
-
-      
 
       {/* Cart Items - Vertical Scroll */}
       <div className="flex-1 overflow-y-auto py-4 px-5">
@@ -152,7 +169,7 @@ export function CartSidebar() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
-                      e.currentTarget.src = "/placeholder.svg?height=80&width=80"
+                      e.currentTarget.src = "/placeholder.svg?height=80&width=80";
                     }}
                   />
                   <div className="absolute top-1 right-1 bg-black text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center shadow-sm">
@@ -173,9 +190,9 @@ export function CartSidebar() {
                         size="icon"
                         className="h-7 w-7 rounded-full bg-white border border-gray-300 hover:bg-gray-200 hover:border-gray-400 transition-colors shadow-sm"
                         onClick={() => {
-                          const newQty = Math.max(item.quantity - 1, 1)
-                          updateQuantity(item.id, newQty)
-                          handleInteraction()
+                          const newQty = Math.max(item.quantity - 1, 1);
+                          updateQuantity(item.id, newQty);
+                          handleInteraction();
                         }}
                       >
                         <Minus className="h-3 w-3 text-gray-700" />
@@ -186,8 +203,8 @@ export function CartSidebar() {
                         size="icon"
                         className="h-7 w-7 rounded-full bg-white border border-gray-300 hover:bg-gray-200 hover:border-gray-400 transition-colors shadow-sm"
                         onClick={() => {
-                          updateQuantity(item.id, item.quantity + 1)
-                          handleInteraction()
+                          updateQuantity(item.id, item.quantity + 1);
+                          handleInteraction();
                         }}
                       >
                         <Plus className="h-3 w-3 text-gray-700" />
@@ -203,7 +220,7 @@ export function CartSidebar() {
                     </Button>
                   </div>
                 </div>
-                
+
                 {/* Subtle background pattern */}
                 <div className="absolute -right-4 -bottom-4 h-16 w-16 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full opacity-50"></div>
               </motion.div>
@@ -213,51 +230,27 @@ export function CartSidebar() {
       </div>
 
       {/* Cart Summary - Sticky */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
         className="sticky bottom-0 border-t border-gray-100 bg-white p-5 space-y-5 shadow-lg"
       >
-       
-
         {/* Order Summary */}
         <div className="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
-          {/* <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-            Order Summary
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </h3>
-          
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Subtotal</span>
-            <span>₹{state.total.toLocaleString("en-IN")}</span>
-          </div>
-          
-          {appliedPromo && (
-            <div className="flex justify-between text-sm text-green-600">
-              <span>Discount (10%)</span>
-              <span>-₹{calculateDiscount().toLocaleString("en-IN")}</span>
-            </div>
-          )} */}
-          
-          {/* <div className="flex justify-between text-sm text-gray-600">
-            <span>Shipping</span>
-            <span className={state.total >= 299 ? "text-green-600 font-medium" : ""}>
-              {state.total >= 299 ? "FREE" : "₹50"}
-            </span>
-          </div> */}
-          
-          {/* <div className="h-px bg-gray-200 my-2"></div> */}
-          
           <div className="flex justify-between text-lg font-bold text-gray-900">
             <span>Total</span>
-          <span>₹{state.total.toLocaleString("en-IN")}</span>
+            <span>₹{state.total.toLocaleString("en-IN")}</span>
           </div>
         </div>
 
         {/* Buttons */}
         <div className="space-y-3">
-          <Link href="/checkout" className="block">
+          <Link
+            href="/checkout"
+            onClick={handleClose} // Close sidebar before navigation
+            className="block"
+          >
             <Button className="w-full bg-gradient-to-r from-gray-900 to-black hover:from-black hover:to-gray-900 text-white rounded-lg h-12 font-medium shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center">
               Proceed to Checkout
               <ChevronRight className="ml-2 h-4 w-4" />
@@ -267,8 +260,8 @@ export function CartSidebar() {
             variant="outline"
             className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg h-10 font-medium shadow-sm"
             onClick={() => {
-              clearCart()
-              handleInteraction()
+              clearCart();
+              handleInteraction();
             }}
           >
             Clear Cart
@@ -284,5 +277,5 @@ export function CartSidebar() {
         </div>
       </motion.div>
     </motion.div>
-  )
+  );
 }

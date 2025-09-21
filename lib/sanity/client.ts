@@ -146,3 +146,7 @@ export const queries = {
     }`
     
   }  
+  export async function getFeaturedProducts() {
+    return client.fetch(queries.featuredProducts)
+  }
+  

@@ -91,7 +91,6 @@ export default function WishlistPage() {
           Clear All
         </Button>
       </div>
-
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {state.items.map((item) => (
           <Card key={item.id} className="overflow-hidden border border-gray-200 bg-white">

@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { ShoppingCart } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useCart } from "@/lib/cart/cart-context"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { CartSidebar } from "./cart-sidebar"
+import { ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/lib/cart/cart-context";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { CartSidebar } from "./cart-sidebar";
 
 export function CartButton() {
-  const { state } = useCart()
+  const { state, setIsCartOpen } = useCart();
 
   return (
-    <Sheet>
+    <Sheet open={state.isCartOpen} onOpenChange={setIsCartOpen}>
       <SheetTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="icon" 
+        <Button
+          variant="outline"
+          size="icon"
           className="relative bg-transparent border-none hover:bg-gray-100 transition-all duration-300"
+          onClick={() => setIsCartOpen(true)} // Ensure clicking the button opens the sheet
         >
           <ShoppingCart className="h-5 w-5" />
-          
           {state.itemCount > 0 && (
             <Badge
               variant="destructive"
@@ -30,22 +30,12 @@ export function CartButton() {
           )}
         </Button>
       </SheetTrigger>
-      
-      <SheetContent 
-        side="right" 
+      <SheetContent
+        side="right"
         className="w-full sm:max-w-md bg-white p-0 overflow-hidden"
       >
-        {/* <SheetHeader className="px-6 py-4 border-b border-gray-100">
-          <SheetTitle className="text-xl font-serif">Your Shopping Cart</SheetTitle>
-          <SheetDescription className="text-sm">
-            {state.itemCount === 0
-              ? "Your cart is empty"
-              : `${state.itemCount} premium item${state.itemCount > 1 ? "s" : ""} awaiting checkout`}
-          </SheetDescription>
-        </SheetHeader> */}
-        
         <CartSidebar />
       </SheetContent>
     </Sheet>
-  )
+  );
 }

@@ -64,11 +64,9 @@ export default function CheckoutPage() {
     return cartState.total >= 299 ? 0 : 69
   }
 
-  const calculateTax = () => {
-    return cartState.total * 0.18
-  }
 
-  const totalAmount = cartState.total + calculateShipping() + calculateTax()
+
+  const totalAmount = cartState.total + calculateShipping() 
 
   const handleProceedToShipping = () => {
     if (cartState.items.length === 0) return
@@ -173,10 +171,7 @@ export default function CheckoutPage() {
                       <span>Shipping</span>
                       <span>{calculateShipping() === 0 ? "FREE" : `Rs. ${calculateShipping().toFixed(2)}`}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Tax (GST)</span>
-                      <span>Rs. {calculateTax().toFixed(2)}</span>
-                    </div>
+                   
                     <Separator />
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total</span>
@@ -492,10 +487,7 @@ export default function CheckoutPage() {
                       <span>Shipping</span>
                       <span>{calculateShipping() === 0 ? "FREE" : `Rs. ${calculateShipping().toFixed(2)}`}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Tax (GST)</span>
-                      <span>Rs. {calculateTax().toFixed(2)}</span>
-                    </div>
+                   
                     <Separator />
                     <div className="flex justify-between font-semibold">
                       <span>Total</span>

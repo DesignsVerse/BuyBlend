@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft, Truck, CheckCircle, Lock } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import GiftOption from "@/components/gift/gift"
 
 interface CheckoutForm {
   firstName: string
@@ -333,8 +334,11 @@ export default function CheckoutPage() {
               </Card>
             )}
           </div>
-
           <div className="lg:col-span-1">
+            <div className="sticky top-8 mb-2">
+              <GiftOption/>
+            </div>
+
             <div className="sticky top-8">
               <Card>
                 <CardHeader>

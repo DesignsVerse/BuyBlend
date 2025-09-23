@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { FeaturedProducts } from "@/components/wishlist/featured-products"
 
 export default function WishlistPage() {
   const { state, removeItem, clear } = useWishlist()
@@ -65,18 +66,10 @@ export default function WishlistPage() {
             </div>
           </div>
 
-          {/* Optional: suggested products block (neutral skeletons) */}
+          {/* Featured products section */}
           <div className="mt-12">
             <h2 className="text-lg font-medium text-gray-900 mb-4">Popular picks</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="rounded-xl border border-gray-200 bg-white p-4">
-                  <div className="aspect-square rounded-lg bg-gray-100 animate-pulse" />
-                  <div className="mt-3 h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
-                  <div className="mt-2 h-4 w-1/3 bg-gray-100 rounded animate-pulse" />
-                </div>
-              ))}
-            </div>
+            <FeaturedProducts />
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { client, queries, urlFor } from "@/lib/sanity/client"
 import type { Product } from "@/lib/sanity/types"
 import { AddToCartButton } from "@/components/cart/add-to-cart-button"
-import { Star, Truck, Shield, RotateCw, Check, Heart, Share2 } from "lucide-react"
+import { Star, Truck, Shield, RotateCw, Check, Heart, Share2, MessageCircle } from "lucide-react"
 import { ProductMediaSlider } from "@/components/products/product-media-slider"
 import { TestimonialSection } from "@/components/products/TestimonialSection"
 import { FeaturedProductsSection } from "@/components/Home/bestseller"
@@ -11,6 +11,7 @@ import CustomerLove from "@/components/products/customer-images"
 import { mockProducts } from "@/lib/sanity/mock-data"
 import Breadcrumbs from "@/components/products/Breadcrumbs"
 import { RecommendedProductsSection } from "@/components/products/recommended-products"
+import { WhatsAppButton } from "@/components/ui/whatsapp-button"
 
 interface ProductPageProps {
   params: {
@@ -92,7 +93,7 @@ const discountPercent = hasDiscount
   const isLowStock = product.inStock && product.inventory > 0 && product.inventory <= 10
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white relative">
       <div className="px-4 py-8">
         {/* Breadcrumbs Import kiya */}
         <Breadcrumbs  product={product} />
@@ -200,6 +201,13 @@ const discountPercent = hasDiscount
                   </div>
                 )}
               </div>
+{/* WhatsApp Button for Combo Products */}
+{product.category?.slug?.current === "combos" && (
+  <div className="pt-4 border-t border-gray-200">
+    <WhatsAppButton productName={product.name} />
+  </div>
+)}
+
 {/* Add to Cart & Wishlist Section */}
 <div className="pt-4 border-t border-gray-200">
   <div className="flex items-center gap-3">

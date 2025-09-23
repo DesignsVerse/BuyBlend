@@ -17,25 +17,25 @@ const categories: Category[] = [
   { 
     slug: "earrings", 
     title: "Earrings", 
-    image: "/new/2.jpg", 
+    image: "/category/earring.jpg", 
     description: "Sparkling ear adornments"
   },
   { 
     slug: "pendants", 
     title: "Pendants", 
-    image: "/new/8.jpg", 
+    image: "/category/pendant.jpg", 
     description: "Elegant neckpieces for every occasion"
   },
   { 
     slug: "ring", 
-    title: "Rings", 
-    image: "/new/6.jpg", 
+    title: "Rings",   
+    image: "/category/ring.jpg", 
     description: "Symbols of love"
   },
   { 
     slug: "combos", 
     title: "Combos", 
-    image: "/new/3.jpg", 
+    image: "/category/combo.jpg", 
     description: "Perfect matching sets"
   },
 ];
@@ -45,14 +45,14 @@ const featuredCategories: Category[] = [
   { 
     slug: "earrings/korean", 
     title: "Korean Earrings", 
-    image: "/new/4.jpg", 
+    image: "/category/korean.jpg", 
     description: "Trendy Korean style earrings",
     featured: true
   },
   { 
     slug: "earrings/western", 
     title: "Western Earrings", 
-    image: "/new/5.jpg", 
+    image: "/category/western.jpg", 
     description: "Classic western designs",
     featured: true
   },

@@ -208,7 +208,7 @@ export function SiteHeader() {
                <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
                  <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
                    <Image 
-                     src="/new/1.jpg" 
+                     src="/category/pendant.jpg" 
                      alt="Pendants" 
                      width={60}  
                      height={60} 
@@ -223,7 +223,7 @@ export function SiteHeader() {
               <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
                 <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
                   <Image 
-                    src="/new/2.jpg" 
+                    src="/category/earring.jpg" 
                     alt="Earrings" 
                     width={60} 
                     height={60} 
@@ -238,7 +238,7 @@ export function SiteHeader() {
               <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
                 <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
                   <Image 
-                    src="/new/3.jpg" 
+                    src="/category/ring.jpg" 
                     alt="Rings" 
                     width={60} 
                     height={60} 
@@ -253,7 +253,7 @@ export function SiteHeader() {
               <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
                 <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
                   <Image 
-                    src="/new/4.jpg" 
+                    src="/category/combo.jpg" 
                     alt="Combos" 
                     width={60} 
                     height={60} 
@@ -305,7 +305,7 @@ export function SiteHeader() {
                <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
                  <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
                    <Image 
-                     src="/new/5.jpg" 
+                     src="/category/stud.jpg" 
                      alt="Stud Earrings" 
                      width={60} 
                      height={60} 
@@ -320,7 +320,7 @@ export function SiteHeader() {
                <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
                  <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
                    <Image 
-                     src="/new/6.jpg" 
+                     src="/category/western.jpg" 
                      alt="Western Earrings" 
                      width={60} 
                      height={60} 
@@ -335,7 +335,7 @@ export function SiteHeader() {
                <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
                  <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
                    <Image 
-                     src="/new/7.jpg" 
+                     src="/category/korean.jpg" 
                      alt="Korean Earrings" 
                      width={60} 
                      height={60} 
@@ -350,7 +350,7 @@ export function SiteHeader() {
                <div className="bg-gray-50 rounded-lg p-1.5 hover:bg-gray-100 transition-colors duration-200">
                  <div className="aspect-square w-full overflow-hidden rounded-md bg-white mb-1">
                    <Image 
-                     src="/new/8.jpg" 
+                     src="/category/jhumka.jpg" 
                      alt="Jhumkas" 
                      width={60} 
                      height={60} 

@@ -31,8 +31,7 @@ export function SiteFooter() {
               <span className="text-2xl font-serif font-bold tracking-wider">BuyBlend.in</span>
             </Link>
             <p className="text-gray-400 mb-6 max-w-xs">
-              Discover exquisite jewelry crafted to perfection. Each piece tells a story of elegance and timeless beauty.
-            </p>
+            Blend brings you jewelry crafted with love, respect, and perfection — a graceful touch of timeless elegance for every occasion.            </p>
             <div className="flex space-x-3">
               <a href="#" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">
                 <Facebook className="h-5 w-5 text-white group-hover:text-black" />

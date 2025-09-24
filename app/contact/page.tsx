@@ -1,12 +1,28 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Mail, Phone, MapPin, Clock,
   Linkedin, Twitter, Instagram,
   Loader2, CheckCircle2, AlertTriangle, Send,
   ShoppingBag, Headphones, Truck, Shield, ArrowRight
 } from "lucide-react";
+
+// Animation variants
+const fadeIn = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const staggerChildren = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
 
 type FormState = {
   name: string;
@@ -132,117 +148,98 @@ export default function ContactPage() {
   const isDisabled = status === "loading";
 
   return (
-    <main className="relative min-h-screen bg-white overflow-hidden">
+    <main className="relative min-h-screen bg-gray-50 overflow-hidden">
       {/* Decorative elements */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 left-0 w-72 h-72 bg-gray-100 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-50" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gray-100 rounded-full translate-x-1/3 translate-y-1/3 opacity-30" />
+        <div className="absolute top-0 left-0 w-48 sm:w-64 md:w-80 h-48 sm:h-64 md:h-80 bg-amber-100/20 rounded-full -translate-x-1/3 -translate-y-1/3 opacity-50" />
+        <div className="absolute bottom-0 right-0 w-64 sm:w-80 md:w-96 h-64 sm:h-80 md:h-96 bg-amber-200/20 rounded-full translate-x-1/3 translate-y-1/3 opacity-30" />
       </div>
 
-
-
-      <section className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Contact Us
+      <section className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-24">
+        <motion.div
+          className="text-center mb-12 md:mb-16"
+          variants={fadeIn}
+          initial="initial"
+          animate="animate"
+        >
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light text-gray-900 mb-4 font-serif">
+            <span className="text-amber-600">Connect</span> With Us
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Have questions about your order, products, or anything else? Our team is here to help.
+          <p className="text-base sm:text-lg text-gray-600 max-w-md sm:max-w-lg md:max-w-2xl mx-auto">
+            We're here to assist with any questions about our collections, orders, or bespoke services.
           </p>
-        </div>
+        </motion.div>
 
         {/* Support features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-black text-white rounded-full mb-4">
-              <Headphones className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">24/7 Support</h3>
-            <p className="text-gray-600 text-sm">Round-the-clock assistance for all your queries</p>
-          </div>
-          
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-black text-white rounded-full mb-4">
-              <Truck className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Fast Shipping</h3>
-            <p className="text-gray-600 text-sm">Free shipping on orders over $50</p>
-          </div>
-          
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-black text-white rounded-full mb-4">
-              <Shield className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Secure Payments</h3>
-            <p className="text-gray-600 text-sm">Your payment information is safe with us</p>
-          </div>
-          
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-black text-white rounded-full mb-4">
-              <ShoppingBag className="h-6 w-6" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Easy Returns</h3>
-            <p className="text-gray-600 text-sm">30-day return policy on all items</p>
-          </div>
-        </div>
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 md:mb-16"
+          variants={staggerChildren}
+          initial="initial"
+          animate="animate"
+        >
+          {[
+            { icon: Headphones, title: "24/7 Support", desc: "Round-the-clock assistance for all your queries" },
+            { icon: Truck, title: "Fast Shipping", desc: "Free shipping on orders over $50" },
+            { icon: Shield, title: "Secure Payments", desc: "Your payment information is safe with us" },
+            { icon: ShoppingBag, title: "Easy Returns", desc: "30-day return policy on all items" }
+          ].map((feature, index) => (
+            <motion.div
+              key={index}
+              variants={fadeIn}
+              className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-black text-white rounded-full mb-4">
+                <feature.icon className="h-6 w-6" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2 text-lg">{feature.title}</h3>
+              <p className="text-gray-600 text-sm">{feature.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Info card */}
-          <aside className="relative rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-            <div className="p-8 sm:p-10">
+          <motion.aside
+            className="relative rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden"
+            variants={fadeIn}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+          >
+            <div className="p-6 sm:p-8 md:p-10">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-3">Contact Information</h2>
-                <p className="text-gray-600">
-                  Get in touch with our customer support team through any of these channels.
+                <h2 className="text-2xl sm:text-3xl font-light text-gray-900 mb-3 font-serif">Contact Information</h2>
+                <p className="text-gray-600 text-base sm:text-lg">
+                  Reach out through your preferred channel for personalized assistance.
                 </p>
               </div>
 
               <ul className="space-y-5 mb-10">
-                <li className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-black text-white shrink-0">
-                    <Mail className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-800">Email</h3>
-                    <span className="text-gray-600">support@example.com</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-black text-white shrink-0">
-                    <Phone className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-800">Phone</h3>
-                    <span className="text-gray-600">+1 (800) 123-4567</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-black text-white shrink-0">
-                    <MapPin className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-800">Address</h3>
-                    <span className="text-gray-600">123 Commerce St, Business District, 10001</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                  <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-gray-800 text-white shrink-0">
-                    <Clock className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-800">Business Hours</h3>
-                    <span className="text-gray-600">Mon-Fri: 9AM-6PM EST</span>
-                  </div>
-                </li>
+                {[
+                  { icon: Mail, title: "Email", value: "support@example.com" },
+                  { icon: Phone, title: "Phone", value: "+1 (800) 123-4567" },
+                  { icon: MapPin, title: "Address", value: "123 Commerce St, Business District, 10001" },
+                  { icon: Clock, title: "Business Hours", value: "Mon-Fri: 9AM-6PM EST" }
+                ].map((item, index) => (
+                  <li key={index} className="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
+                    <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-black text-white shrink-0">
+                      <item.icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800 text-sm sm:text-base">{item.title}</h3>
+                      <span className="text-gray-600 text-sm">{item.value}</span>
+                    </div>
+                  </li>
+                ))}
               </ul>
 
               {/* FAQ CTA */}
               <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 mb-6">
-                <h3 className="font-semibold text-gray-900 mb-2">Before you contact us</h3>
+                <h3 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">Before You Contact Us</h3>
                 <p className="text-gray-600 text-sm mb-3">Many questions are answered in our FAQ section.</p>
                 <Link 
                   href="/faq" 
-                  className="inline-flex items-center text-sm font-medium text-black hover:underline"
+                  className="inline-flex items-center text-sm font-medium text-amber-600 hover:text-amber-700"
                 >
                   Visit FAQ <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
@@ -250,46 +247,41 @@ export default function ContactPage() {
 
               {/* Socials */}
               <div>
-                <h3 className="font-medium text-gray-900 mb-3">Follow us</h3>
+                <h3 className="font-medium text-gray-900 mb-3 text-base sm:text-lg">Follow Us</h3>
                 <div className="flex items-center gap-3">
-                  <Link
-                    aria-label="LinkedIn"
-                    href="#"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-white transition-all hover:bg-black"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                  </Link>
-                  <Link
-                    aria-label="Twitter"
-                    href="#"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-white transition-all hover:bg-black"
-                  >
-                    <Twitter className="h-5 w-5" />
-                  </Link>
-                  <Link
-                    aria-label="Instagram"
-                    href="#"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-white transition-all hover:bg-black"
-                  >
-                    <Instagram className="h-5 w-5" />
-                  </Link>
+                  {[Linkedin, Twitter, Instagram].map((Icon, index) => (
+                    <Link
+                      key={index}
+                      aria-label={Icon.name}
+                      href="#"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-white transition-all hover:bg-black"
+                    >
+                      <Icon className="h-5 w-5" />
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>
-          </aside>
+          </motion.aside>
 
           {/* Form card */}
-          <section className="relative rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden">
-            <form onSubmit={submit} className="p-8 sm:p-10" noValidate>
+          <motion.section
+            className="relative rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden"
+            variants={fadeIn}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+          >
+            <form onSubmit={submit} className="p-6 sm:p-8 md:p-10" noValidate>
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Send us a message</h2>
-                <p className="text-gray-600">Fill out the form below and we'll get back to you as soon as possible.</p>
+                <h2 className="text-2xl sm:text-3xl font-light text-gray-900 mb-2 font-serif">Send a Message</h2>
+                <p className="text-gray-600 text-base sm:text-lg">Our team will respond within 24 hours.</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
                 {/* Name */}
                 <div className="sm:col-span-1">
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full name *</label>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                   <input
                     id="name"
                     name="name"
@@ -297,11 +289,11 @@ export default function ContactPage() {
                     autoComplete="name"
                     value={data.name}
                     onChange={onChange}
-                    className={`mt-1 block w-full rounded-lg border ${
+                    className={`block w-full rounded-lg border ${
                       errors.name
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:border-black focus:ring-black"
-                    } bg-white px-4 py-3 text-gray-900 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all duration-200`}
+                        : "border-gray-300 focus:border-amber-600 focus:ring-amber-600"
+                    } bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base`}
                     placeholder="Your full name"
                     aria-invalid={!!errors.name}
                     aria-describedby={errors.name ? "name-error" : undefined}
@@ -311,7 +303,7 @@ export default function ContactPage() {
 
                 {/* Email */}
                 <div className="sm:col-span-1">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email address *</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
                   <input
                     id="email"
                     name="email"
@@ -319,11 +311,11 @@ export default function ContactPage() {
                     autoComplete="email"
                     value={data.email}
                     onChange={onChange}
-                    className={`mt-1 block w-full rounded-lg border ${
+                    className={`block w-full rounded-lg border ${
                       errors.email
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:border-black focus:ring-black"
-                    } bg-white px-4 py-3 text-gray-900 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all duration-200`}
+                        : "border-gray-300 focus:border-amber-600 focus:ring-amber-600"
+                    } bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base`}
                     placeholder="your.email@example.com"
                     aria-invalid={!!errors.email}
                     aria-describedby={errors.email ? "email-error" : undefined}
@@ -333,7 +325,7 @@ export default function ContactPage() {
 
                 {/* Phone */}
                 <div className="sm:col-span-1">
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone (optional)</label>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone (Optional)</label>
                   <input
                     id="phone"
                     name="phone"
@@ -341,11 +333,11 @@ export default function ContactPage() {
                     autoComplete="tel"
                     value={data.phone}
                     onChange={onChange}
-                    className={`mt-1 block w-full rounded-lg border ${
+                    className={`block w-full rounded-lg border ${
                       errors.phone
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:border-black focus:ring-black"
-                    } bg-white px-4 py-3 text-gray-900 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all duration-200`}
+                        : "border-gray-300 focus:border-amber-600 focus:ring-amber-600"
+                    } bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base`}
                     placeholder="(123) 456-7890"
                     aria-invalid={!!errors.phone}
                     aria-describedby={errors.phone ? "phone-error" : undefined}
@@ -362,11 +354,11 @@ export default function ContactPage() {
                       name="topic"
                       value={data.topic}
                       onChange={onChange}
-                      className={`mt-1 block w-full appearance-none rounded-lg border ${
+                      className={`block w-full appearance-none rounded-lg border ${
                         errors.topic
                           ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:border-black focus:ring-black"
-                      } bg-white px-4 py-3 text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all duration-200`}
+                          : "border-gray-300 focus:border-amber-600 focus:ring-amber-600"
+                      } bg-white px-4 py-3 text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base`}
                       aria-invalid={!!errors.topic}
                       aria-describedby={errors.topic ? "topic-error" : undefined}
                     >
@@ -393,11 +385,11 @@ export default function ContactPage() {
                       type="text"
                       value={data.orderNumber}
                       onChange={onChange}
-                      className={`mt-1 block w-full rounded-lg border ${
+                      className={`block w-full rounded-lg border ${
                         errors.orderNumber
                           ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:border-black focus:ring-black"
-                      } bg-white px-4 py-3 text-gray-900 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all duration-200`}
+                          : "border-gray-300 focus:border-amber-600 focus:ring-amber-600"
+                      } bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base`}
                       placeholder="e.g., ORD-123456"
                       aria-invalid={!!errors.orderNumber}
                       aria-describedby={errors.orderNumber ? "orderNumber-error" : undefined}
@@ -415,30 +407,30 @@ export default function ContactPage() {
                     rows={5}
                     value={data.message}
                     onChange={onChange}
-                    className={`mt-1 block w-full rounded-lg border ${
+                    className={`block w-full rounded-lg border ${
                       errors.message
                         ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:border-black focus:ring-black"
-                    } bg-white px-4 py-3 text-gray-900 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-20 transition-all duration-200`}
+                        : "border-gray-300 focus:border-amber-600 focus:ring-amber-600"
+                    } bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-all duration-200 text-sm sm:text-base`}
                     placeholder="Please describe your issue or question in detail..."
                     aria-invalid={!!errors.message}
                     aria-describedby={errors.message ? "message-error" : "message-hint"}
                   />
                   {!errors.message && (
-                    <p id="message-hint" className="mt-1 text-sm text-gray-500">Please include relevant details like order ID, product details, or timelines.</p>
+                    <p id="message-hint" className="mt-1 text-xs sm:text-sm text-gray-500">Please include relevant details like order ID, product details, or timelines.</p>
                   )}
                   {errors.message && <p id="message-error" className="mt-1 text-sm text-red-600">{errors.message}</p>}
                 </div>
 
                 {/* File Upload */}
                 <div className="sm:col-span-2">
-                  <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-1">Attach file (optional)</label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                  <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-1">Attach File (Optional)</label>
+                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-amber-600 transition-all duration-200">
                     <div className="space-y-1 text-center">
                       <div className="flex text-sm text-gray-600">
                         <label
                           htmlFor="file"
-                          className="relative cursor-pointer bg-white rounded-md font-medium text-black hover:text-gray-800 focus-within:outline-none"
+                          className="relative cursor-pointer bg-white rounded-md font-medium text-amber-600 hover:text-amber-700 focus-within:outline-none"
                         >
                           <span>Upload a file</span>
                           <input 
@@ -471,17 +463,17 @@ export default function ContactPage() {
                         type="checkbox"
                         checked={data.consent}
                         onChange={onChange}
-                        className={`h-4 w-4 rounded border-gray-300 text-black focus:ring-black ${errors.consent ? "border-red-500" : ""}`}
+                        className={`h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-600 ${errors.consent ? "border-red-500" : ""}`}
                         aria-invalid={!!errors.consent}
                         aria-describedby={errors.consent ? "consent-error" : "consent-hint"}
                       />
                     </div>
                     <span className="text-sm text-gray-700">
                       I agree to the{" "}
-                      <Link href="/privacy" className="underline underline-offset-2 text-black hover:text-gray-800">Privacy Policy</Link>.
+                      <Link href="/privacy" className="underline underline-offset-2 text-amber-600 hover:text-amber-700">Privacy Policy</Link>.
                     </span>
                   </label>
-                  {!errors.consent && <p id="consent-hint" className="mt-1 text-xs text-gray-500 ml-7">This allows contact regarding the inquiry.</p>}
+                  {!errors.consent && <p id="consent-hint" className="mt-1 text-xs sm:text-sm text-gray-500 ml-7">This allows contact regarding the inquiry.</p>}
                   {errors.consent && <p id="consent-error" className="mt-1 text-sm text-red-600 ml-7">{errors.consent}</p>}
                 </div>
 
@@ -505,7 +497,7 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={isDisabled}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-black px-6 py-3.5 text-white shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="inline-flex items-center justify-center gap-2 rounded-lgc px-6 py-3.5 text-white shadow-lg hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {status === "loading" ? (
                     <>
@@ -515,7 +507,7 @@ export default function ContactPage() {
                   ) : (
                     <>
                       <Send className="h-5 w-5" />
-                      Send message
+                      Send Message
                     </>
                   )}
                 </button>
@@ -534,7 +526,7 @@ export default function ContactPage() {
                 )}
               </div>
             </form>
-          </section>
+          </motion.section>
         </div>
       </section>
     </main>

@@ -54,7 +54,7 @@ export default function ComboProductsPage() {
     <EarringsLayout
       collectionType="combos"
       title="Combo Collection"
-      description="Create the perfect jewelry combination with our curated combo collections. Mix and match different pieces to create unique looks that express your personal style. Save more when you buy together!"
+      description="Blend brings you exclusive jewelry combos—crafted to mix, match, and elevate your style while you save more."
       icon={<Package className="h-12 w-12 text-white" />}
       products={products}
       isLoading={isLoading}

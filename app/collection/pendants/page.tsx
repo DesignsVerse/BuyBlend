@@ -54,7 +54,7 @@ export default function PendantProductsPage() {
     <EarringsLayout
       collectionType="pendant"
       title="Pendant Collection"
-      description="Discover our stunning collection of pendants, each piece carefully crafted to add elegance and charm to your jewelry collection. From delicate designs to statement pieces, find the perfect pendant for every occasion."
+      description="Discover Blend’s exquisite pendant collection. Each piece is a symbol of elegance, designed to complement your unique style, day or night."
       icon={<Heart className="h-12 w-12 text-white" />}
       products={products}
       isLoading={isLoading}

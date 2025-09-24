@@ -83,22 +83,23 @@ export function AddToCartButton({ product, disabled, className, onClick }: AddTo
 
   return (
     <Button
-      onClick={handleAddToCart}
-      disabled={disabled || status !== "idle"}
-      className={cn(
-        "w-full py-3 rounded-sm font-medium transition-all duration-200",
-        "bg-black text-white hover:bg-gray-800",
-        "disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
-        status === "added" && "bg-gray-700 hover:bg-gray-600",
-        "shadow-sm hover:shadow-md active:shadow-sm",
-        className
-      )}
-      size="lg"
-      aria-label={buttonContent[status].text}
-      aria-live="polite" // Improved accessibility for status changes
-    >
-      {buttonContent[status].icon}
-      {buttonContent[status].text}
-    </Button>
+    onClick={handleAddToCart}
+    disabled={disabled || status !== "idle"}
+    className={cn(
+      "w-full py-3 rounded-sm font-medium transition-all duration-200 flex items-center justify-center cursor-pointer",
+      "bg-black text-white hover:bg-gray-800",
+      "disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed",
+      status === "added" && "bg-gray-700 hover:bg-gray-600",
+      "shadow-sm hover:shadow-md active:shadow-sm",
+      className
+    )}
+    size="lg"
+    aria-label={buttonContent[status].text}
+    aria-live="polite" // Accessibility for status changes
+  >
+    {buttonContent[status].icon}
+    {buttonContent[status].text}
+  </Button>
+  
   );
 }

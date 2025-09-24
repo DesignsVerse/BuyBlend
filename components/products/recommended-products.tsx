@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react"
 import { ProductCard } from "@/components/Home/product-card"
 import type { Product } from "@/lib/sanity/types"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, ChevronLeft, ChevronRight } from "lucide-react"
+import { Sparkles, ArrowRight } from "lucide-react"
 
 interface RecommendedProductsSectionProps {
   recommendedProducts: Product[]
@@ -12,28 +12,18 @@ interface RecommendedProductsSectionProps {
 export function RecommendedProductsSection({ recommendedProducts }: RecommendedProductsSectionProps) {
   const [isHovered, setIsHovered] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const autoScrollRef = useRef<NodeJS.Timeout | null>(null)
+  const autoScrollRef = useRef<NodeJS.Timeout| null>(null);
   const [showScrollButtons, setShowScrollButtons] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    const checkIsMobile = () => setIsMobile(window.innerWidth < 768)
-    const checkOverflow = () => { 
+    const checkOverflow = () => {
       if (scrollRef.current) {
         setShowScrollButtons(scrollRef.current.scrollWidth > scrollRef.current.clientWidth)
       }
     }
-    
-    checkIsMobile()
     checkOverflow()
-    
-    const handleResize = () => {
-      checkIsMobile()
-      checkOverflow()
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    window.addEventListener("resize", checkOverflow)
+    return () => window.removeEventListener("resize", checkOverflow)
   }, [recommendedProducts])
 
   useEffect(() => {
@@ -49,31 +39,29 @@ export function RecommendedProductsSection({ recommendedProducts }: RecommendedP
 
   const scrollLeft = () => {
     if (scrollRef.current) {
-      const cardWidth = scrollRef.current.querySelector('.product-card')?.clientWidth || 280
-      const scrollAmount = isMobile ? cardWidth * 2 + 16 : cardWidth + 16
-      scrollRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" })
+      const cardWidth = scrollRef.current.querySelector(".product-card")?.clientWidth || 320
+      scrollRef.current.scrollBy({ left: -cardWidth - 24, behavior: "smooth" })
     }
   }
 
   const scrollRight = () => {
     if (scrollRef.current) {
-      const cardWidth = scrollRef.current.querySelector('.product-card')?.clientWidth || 280
-      const scrollAmount = isMobile ? cardWidth * 2 + 16 : cardWidth + 16
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" })
+      const cardWidth = scrollRef.current.querySelector(".product-card")?.clientWidth || 320
+      scrollRef.current.scrollBy({ left: cardWidth + 24, behavior: "smooth" })
     }
   }
 
   return (
-    <section className="py-12 md:py-16 bg-white relative overflow-hidden scrollbar-hide">
-      <div className="container mx-auto px-4 relative z-10">
+    <section className="py-12 bg-white relative overflow-hidden scrollbar-hide">
+      <div className="w-full md:px-4 relative z-10">
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-6"
+          className="text-center mb-6 px-4"
         >
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
@@ -81,38 +69,33 @@ export function RecommendedProductsSection({ recommendedProducts }: RecommendedP
           >
             <Sparkles className="h-3 w-3 text-white mr-2" />
             <span className="text-xs font-medium text-white uppercase tracking-wider">
-              Recommended for You
+              Recommended Collection
             </span>
           </motion.div>
-          
-          <h2 className="text-3xl md:text-4xl font-serif font-normal text-gray-900 mb-2">
-            Our Top Picks
+
+          <h2 className="text-3xl md:text-4xl font-serif font-normal text-gray-900 mb-4">
+            Recommended For You
           </h2>
-          
+
           <p className="text-gray-600 max-w-3xl mx-auto text-sm md:text-base">
-            Explore products tailored just for you, handpicked based on your preferences
+            Explore our curated selection of products tailored to your preferences
           </p>
         </motion.div>
 
         {/* Scrollable Products Container */}
-        <div 
-          className="relative"
+        <div
+          className="relative w-full"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <motion.div 
+          <motion.div
             ref={scrollRef}
-            className="flex overflow-x-auto gap-3 pb-4 md:pb-6 px-2 snap-x snap-mandatory scrollbar-hide scroll-smooth"
-            style={{ scrollPadding: "0 16px" }}
+            className="flex overflow-x-auto gap-2 pb-10 snap-x snap-mandatory scrollbar-hide w-full"
           >
             {recommendedProducts.map((product) => (
               <motion.div
                 key={product._id}
-                className={`flex-shrink-0 snap-center product-card ${
-                  isMobile 
-                    ? 'w-[calc(50%-12px)]' // 2 cards per view on mobile
-                    : 'w-[260px] sm:w-[280px] md:w-[300px]' // desktop/tablet sizes
-                }`}
+                className="flex-shrink-0 snap-center w-1/2 sm:w-1/3 md:w-[320px] lg:w-[300px] product-card"
               >
                 <ProductCard product={product} />
               </motion.div>
@@ -120,12 +103,12 @@ export function RecommendedProductsSection({ recommendedProducts }: RecommendedP
           </motion.div>
 
           {/* Scroll Buttons */}
-          <AnimatePresence>
-            {showScrollButtons && recommendedProducts.length > (isMobile ? 2 : 1) && (
+          {/* <AnimatePresence>
+            {showScrollButtons && (
               <>
-                <motion.button 
+                <motion.button
                   onClick={scrollLeft}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-2 md:p-3 rounded-r-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 flex items-center justify-center"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-r-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
@@ -135,9 +118,9 @@ export function RecommendedProductsSection({ recommendedProducts }: RecommendedP
                 >
                   <ChevronLeft className="h-5 w-5 text-gray-700" />
                 </motion.button>
-                <motion.button 
+                <motion.button
                   onClick={scrollRight}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-2 md:p-3 rounded-l-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 flex items-center justify-center"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-l-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 10 }}
@@ -149,8 +132,25 @@ export function RecommendedProductsSection({ recommendedProducts }: RecommendedP
                 </motion.button>
               </>
             )}
-          </AnimatePresence>
+          </AnimatePresence> */}
         </div>
+
+        {/* View All Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          className="text-center"
+        >
+          <motion.button
+            className="inline-flex items-center justify-center bg-black text-white px-8 py-3 rounded-sm hover:bg-gray-800 transition-all duration-300 group text-sm font-medium border border-black mt-4"
+            whileHover={{ y: -2 }}
+            whileTap={{ y: 0 }}
+          >
+            View All Recommended
+            <ArrowRight className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
+          </motion.button>
+        </motion.div>
       </div>
     </section>
   )

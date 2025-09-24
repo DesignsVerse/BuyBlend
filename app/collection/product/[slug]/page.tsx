@@ -94,14 +94,14 @@ const discountPercent = hasDiscount
 
   return (
     <div className="min-h-screen bg-white relative">
-      <div className="px-4 py-8">
+      <div className=" py-8">
         {/* Breadcrumbs Import kiya */}
         <Breadcrumbs  product={product} />
         {/* Product Content Grid - Only this section has max-w-7xl */}
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="px-4 grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Media Section */}
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               <ProductMediaSlider mediaItems={mediaItems} product={product} />
             </div>
 

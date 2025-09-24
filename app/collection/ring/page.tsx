@@ -54,7 +54,7 @@ export default function RingProductsPage() {
     <EarringsLayout
       collectionType="rings"
       title="Ring Collection"
-      description="Explore our exquisite collection of rings, from elegant bands to statement pieces. Each ring is crafted with precision and attention to detail, designed to complement your style and celebrate life's special moments."
+      description="From classic bands to statement designs—Blend rings are crafted to define your style and cherish life’s special moments."
       icon={<Circle className="h-12 w-12 text-white" />}
       products={products}
       isLoading={isLoading}

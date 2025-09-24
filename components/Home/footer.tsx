@@ -37,7 +37,7 @@ export function SiteFooter() {
               <a href="#" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">
                 <Facebook className="h-5 w-5 text-white group-hover:text-black" />
               </a>
-              <a href="#" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">
+              <a href="https://www.instagram.com/buyblend.in/" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">
                 <Instagram className="h-5 w-5 text-white group-hover:text-black" />
               </a>
               <a href="#" className="bg-white/5 hover:bg-white p-2 rounded-full transition-colors group">

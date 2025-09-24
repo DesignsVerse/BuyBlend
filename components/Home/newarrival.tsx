@@ -147,7 +147,7 @@ export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSecti
       </motion.div>
   
       {/* Category Filters */}
-      <div className="grid grid-cols-3 gap-2 mb-8 md:flex md:justify-center md:gap-4 md:flex-wrap px-4">
+      <div className="grid grid-cols-3 gap-2 mb-8 md:flex md:justify-center md:gap-4 md:flex-wrap ">
         {categories.map((cat) => (
           <button
             key={cat.value}
@@ -163,68 +163,42 @@ export function NewArrivalsSection({ initialNewArrivals = [] }: NewArrivalsSecti
         ))}
       </div>
   
-      {/* ✅ Full width scrollable container */}
-      <div 
-        className="relative w-full"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <motion.div 
-          ref={scrollRef}
-          className="flex overflow-x-auto gap-3 pt-4 pb-10 snap-x snap-mandatory scrollbar-hide w-full"
+    {/* ✅ Full width scrollable container with correct snap padding */}
+<div
+  className="relative w-full"
+  onMouseEnter={() => setIsHovered(true)}
+  onMouseLeave={() => setIsHovered(false)}
+>
+  <motion.div
+    ref={scrollRef}
+    className="
+      flex overflow-x-auto gap-2 pt-4 pb-10 no-scrollbar w-full
+      snap-x snap-mandatory
+      -mx- px-4
+      scroll-px-4
+    "
+  >
+    {filteredProducts.length > 0 ? (
+      filteredProducts.map((product) => (
+        <motion.div
+          key={product._id}
+          className="
+            product-card flex-shrink-0
+            snap-center
+            w-1/2 sm:w-1/3 md:w-[320px] lg:w-[300px]
+          "
         >
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <motion.div
-                key={product._id}
-                className="
-                flex-shrink-0 snap-center
-                w-1/2 sm:w-1/3 md:w-[320px] lg:w-[300px] product-card
-              "
-              
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))
-          ) : (
-            <div className="flex items-center justify-center w-full text-gray-600 py-8">
-              No new arrivals in this category yet.
-            </div>
-          )}
+          <ProductCard product={product} />
         </motion.div>
-  
-        {/* Scroll Buttons */}
-        {/* <AnimatePresence>
-          {showScrollButtons && (
-            <>
-              <motion.button 
-                onClick={scrollLeft}
-                className="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-r-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="Scroll left"
-              >
-                <ChevronLeft className="h-5 w-5 text-gray-700" />
-              </motion.button>
-              <motion.button 
-                onClick={scrollRight}
-                className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-l-lg shadow-md hover:bg-gray-50 transition-all border border-gray-200 hidden md:flex items-center justify-center"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                aria-label="Scroll right"
-              >
-                <ChevronRight className="h-5 w-5 text-gray-700" />
-              </motion.button>
-            </>
-          )}
-        </AnimatePresence> */}
+      ))
+    ) : (
+      <div className="flex items-center justify-center w-full text-gray-600 py-8">
+        No new arrivals in this category yet.
       </div>
+    )}
+  </motion.div>
+</div>
+
     </div>
   </section>
   

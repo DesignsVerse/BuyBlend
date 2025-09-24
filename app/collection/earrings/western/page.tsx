@@ -54,7 +54,7 @@ export default function WesternProductsPage() {
     <EarringsLayout
       collectionType="western"
       title="Western Earrings Collection"
-      description="Discover our exquisite collection of western-style earrings, crafted to perfection for every occasion. From classic elegance to modern sophistication, find your perfect statement piece."
+      description="Blend western-style earrings—crafted to perfection, from timeless classics to bold modern statements."
       icon={<Crown className="h-12 w-12 text-white" />}
       products={products}
       isLoading={isLoading}

@@ -54,7 +54,7 @@ export default function KoreanProductsPage() {
     <EarringsLayout
       collectionType="korean"
       title="Korean Earrings Collection"
-      description="Discover our exquisite collection of Korean-inspired earrings, featuring delicate designs and modern elegance that capture the essence of Korean beauty and sophistication."
+      description="Redefine your style with Blend’s Korean-inspired earrings, crafted for timeless sophistication."
       icon={<Sparkles className="h-12 w-12 text-white" />}
       products={products}
       isLoading={isLoading}

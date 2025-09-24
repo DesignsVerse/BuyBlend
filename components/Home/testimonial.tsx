@@ -64,17 +64,43 @@ export default function TestimonialReviews() {
 
       <div className="w-full relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-6 md:mb-8 max-w-7xl mx-auto px-4">
-          <motion.h2
-            className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            viewport={{ once: true }}
-          >
-            What Our Customers Say
-          </motion.h2>
-        </div>
+        <div className="font-serif text-center mb-6 md:mb-8 max-w-7xl mx-auto px-4">
+  {/* Top label */}
+  <motion.div
+    className="inline-flex items-center justify-center mb-2"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6 }}
+    viewport={{ once: true }}
+  >
+    <span className="text-sm md:text-base font-medium text-amber-600 uppercase tracking-wider">
+      Customer Reviews
+    </span>
+  </motion.div>
+
+  {/* Main heading */}
+  <motion.h2
+    className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3"
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.1 }}
+    viewport={{ once: true }}
+  >
+    What Our Customers Say
+  </motion.h2>
+
+  {/* Short description */}
+  <motion.p
+    className="text-gray-600 text-sm md:text-base max-w-2xl mx-auto"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.2 }}
+    viewport={{ once: true }}
+  >
+    Hear from our happy customers who love our exquisite jewelry collections. Real reviews, real satisfaction!
+  </motion.p>
+</div>
+
 
         {/* Top Marquee: Scrolls Left */}
         <div className="relative flex overflow-hidden">
@@ -102,7 +128,7 @@ export default function TestimonialReviews() {
                 </p>
                 <div className="flex items-center space-x-3 md:space-x-4 relative z-10 mt-auto">
                   <Avatar className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0 shadow-sm ring-2 ring-white">
-                    <AvatarFallback className="bg-gradient-to-br from-rose-500 to-pink-600 text-white font-semibold">
+                    <AvatarFallback className="bg-black text-white font-semibold">
                       {testimonial.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
@@ -148,7 +174,7 @@ export default function TestimonialReviews() {
                 </p>
                 <div className="flex items-center space-x-3 md:space-x-4 relative z-10 mt-auto">
                   <Avatar className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0 shadow-sm ring-2 ring-white">
-                    <AvatarFallback className="bg-gradient-to-br from-amber-500 to-orange-600 text-white font-semibold">
+                    <AvatarFallback className="bg-black text-white font-semibold">
                       {testimonial.name.split(' ').map(n => n[0]).join('')}
                     </AvatarFallback>
                   </Avatar>

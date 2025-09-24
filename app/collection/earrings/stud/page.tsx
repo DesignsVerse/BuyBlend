@@ -54,7 +54,7 @@ export default function StudProductsPage() {
     <EarringsLayout
       collectionType="stud"
       title="Premium Stud Collection"
-      description="Discover our exclusive range of premium stud earrings, crafted for durability and style. Each piece is meticulously designed to elevate your look with timeless elegance."
+      description="Discover Blend’s exclusive stud earrings, where timeless design meets unmatched durability for a look that lasts."
       icon={<Gem className="h-12 w-12 text-white" />}
       products={products}
       isLoading={isLoading}

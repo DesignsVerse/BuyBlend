@@ -90,7 +90,7 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
         >
           <motion.div
             ref={scrollRef}
-            className="flex overflow-x-auto gap-4 pb-10 snap-x snap-mandatory scrollbar-hide w-full"
+            className="flex overflow-x-auto gap-2 pb-10 snap-x snap-mandatory scrollbar-hide w-full"
           >
             {featuredProducts.map((product) => (
               <motion.div

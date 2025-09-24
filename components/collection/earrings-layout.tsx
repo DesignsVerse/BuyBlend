@@ -204,56 +204,64 @@ export default function EarringsLayout({
     return (
         <div className="min-h-screen bg-white">
             {/* Premium Hero Section */}
-            <div className="relative bg-black text-white py-12 md:py-16 px-4 overflow-hidden">
-                {/* Background Elements - More Subtle */}
-                <div className="absolute inset-0">
-                    <div className="absolute top-5 left-5 w-20 h-20 bg-white/5 rounded-full animate-pulse"></div>
-                    <div className="absolute bottom-5 right-5 w-16 h-16 bg-gray-800/30 rounded-full animate-pulse delay-1000"></div>
-                    <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-gray-700/20 rounded-full animate-pulse delay-500"></div>
-                </div>
+            <div className="relative bg-gradient-to-b from-black via-[#0a0a0a] to-black text-white py-10 md:py-18 px-6 overflow-hidden">
+  {/* Background Elements - Premium Glow */}
+  <div className="absolute inset-0">
+    <div className="absolute -top-20 -left-20 w-72 h-72 bg-gradient-to-tr from-white/10 to-gray-700/20 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+    <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-gradient-to-bl from-gray-600/20 to-black/40 rounded-full blur-3xl opacity-40 animate-pulse delay-700"></div>
+    <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-gray-700/20 rounded-full blur-xl animate-pulse delay-500"></div>
+  </div>
 
-                <div className="container mx-auto relative z-10">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <div className="flex justify-center mb-4">
-                            <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl">
-                                {icon}
-                            </div>
-                        </div>
-                        <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                            {title}
-                        </h1>
-                        <p className="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                            {description}
-                        </p>
+  <div className="container mx-auto relative z-10">
+    <div className="max-w-2xl mx-auto text-center">
+      {/* Icon */}
+      <div className="flex justify-center mb-6">
+        <div className="p-2 bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 shadow-xl">
+          {icon}
+        </div>
+      </div>
 
-                        {/* Search Bar in Hero - More Compact */}
-                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-2 flex items-center max-w-2xl mx-auto">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder={`Search ${collectionType} products...`}
-                                    className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 text-base"
-                                />
-                            </div>
-                            <button
-                                onClick={() => setShowFilters(!showFilters)}
-                                className="ml-2 flex items-center gap-2 px-4 py-3 bg-white text-black rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm"
-                            >
-                                <Filter size={16} />
-                                Filters
-                                {activeFilterCount > 0 && (
-                                    <span className="bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
-                                        {activeFilterCount}
-                                    </span>
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      {/* Title */}
+      <h1 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent tracking-tight">
+        {title}
+      </h1>
+
+      {/* Description */}
+      <p className="text-lg md:text-xl text-gray-300/90 max-w-3xl mx-auto leading-relaxed font-light tracking-wide">
+        {description}
+      </p>
+
+      {/* Optional Search Bar (Uncomment if needed) */}
+      {/*
+      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2 flex items-center max-w-2xl mx-auto mt-8">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={`Search ${collectionType} products...`}
+            className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/30 text-base"
+          />
+        </div>
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="ml-2 flex items-center gap-2 px-4 py-3 bg-white text-black rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 hover:scale-105 text-sm"
+        >
+          <Filter size={16} />
+          Filters
+          {activeFilterCount > 0 && (
+            <span className="bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+      </div>
+      */}
+    </div>
+  </div>
+</div>
+
 
             {/* Advanced Filter Panel */}
             {showFilters && (
@@ -411,12 +419,12 @@ export default function EarringsLayout({
                             >
                                 <Grid size={20} />
                             </button>
-                            <button
+                            {/* <button
                                 onClick={() => setViewMode("list")}
                                 className={`p-3 rounded-xl transition-all ${viewMode === "list" ? "bg-gray-100 text-black shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
                             >
                                 <List size={20} />
-                            </button>
+                            </button> */}
                         </div>
 
                         {/* Sort Dropdown */}

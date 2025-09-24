@@ -16,7 +16,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
 
   const scrollerRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ Mobile detection
+  // Mobile detection
   useEffect(() => {
     const checkIsMobile = () => setIsMobile(window.innerWidth < 1024);
     checkIsMobile();
@@ -24,7 +24,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
     return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
-  // ✅ Scroll to a specific card index
+  // Scroll to a specific card index
   const scrollToIndex = useCallback((index: number) => {
     const el = scrollerRef.current;
     if (!el) return;
@@ -37,7 +37,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
     });
   }, []);
 
-  // ✅ Prev/next buttons
+  // Prev/next buttons
   const goPrev = () => {
     if (!products || products.length === 0) return;
     const next = Math.max(0, activeIndex - 1);
@@ -50,7 +50,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
     scrollToIndex(next);
   };
 
-  // ✅ Track which card is most visible
+  // Track which card is most visible
   useEffect(() => {
     if (!products || products.length === 0) return;
 
@@ -79,7 +79,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
     return () => observer.disconnect();
   }, [products]);
 
-  // ✅ Auto-scroll
+  // Auto-scroll
   useEffect(() => {
     if (!products || products.length === 0) return;
     if (!isHovered) {
@@ -96,17 +96,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
   return (
     <section className="py-10 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section Heading */}
-        <div className="text-center mb-10">
-          <h3 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-3">
-            Featured Collection
-          </h3>
-          <p className="text-gray-600 max-w-3xl mx-auto">
-            Handpicked selections of our finest gemstones, meticulously crafted to bring out their natural beauty
-          </p>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 items-center">
           {/* Video Section */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -177,8 +167,16 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="w-full lg:w-3/5 flex flex-col justify-center order-2"
+            className="w-full lg:w-[65%] flex flex-col justify-center order-2"
           >
+            <div className="text-center mb-10">
+              <h3 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-3">
+                Featured Collection
+              </h3>
+              <p className="text-gray-600 max-w-3xl mx-auto">
+                Handpicked selections of our finest gemstones, meticulously crafted to bring out their natural beauty
+              </p>
+            </div>
             <div
               className="relative"
               onMouseEnter={() => setIsHovered(true)}
@@ -219,7 +217,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
               {/* Scroller */}
               <div
                 ref={scrollerRef}
-                className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 hide-scrollbar pb-4 px-1"
+                className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-2 hide-scrollbar pb-10 -mx-4 px-4 scroll-px-4"
               >
                 {products.map((product, index) => (
                   <motion.div
@@ -227,7 +225,7 @@ const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products }) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="snap-center snap-always shrink-0 w-full basis-[85%] sm:basis-[45%] lg:basis-[30%]"
+                    className="snap-center snap-always shrink-0 w-1/2 sm:w-1/3 md:w-[320px] lg:w-[240px]"
                   >
                     <ProductCard product={product} />
                   </motion.div>

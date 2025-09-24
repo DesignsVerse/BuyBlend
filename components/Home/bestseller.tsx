@@ -12,7 +12,7 @@ interface FeaturedProductsSectionProps {
 export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSectionProps) {
   const [isHovered, setIsHovered] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const autoScrollRef = useRef<NodeJS.Timeout>()
+  const autoScrollRef = useRef<NodeJS.Timeout  | null>(null);
   const [showScrollButtons, setShowScrollButtons] = useState(false)
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
   }
 
   return (
-    <section className="py-12 bg-white relative overflow-hidden scrollbar-hide">
+    <section className="py-6 bg-white relative overflow-hidden scrollbar-hide">
       <div className="w-full md:px-4 relative z-10">
         {/* Section Header */}
         <motion.div
@@ -136,7 +136,7 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
         </div>
 
         {/* View All Button */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}
@@ -150,7 +150,7 @@ export function FeaturedProductsSection({ featuredProducts }: FeaturedProductsSe
             View All Products
             <ArrowRight className="h-4 w-4 ml-2 transform group-hover:translate-x-1 transition-transform" />
           </motion.button>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   )

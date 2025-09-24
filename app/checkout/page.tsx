@@ -15,6 +15,50 @@ import Image from "next/image"
 import Link from "next/link"
 import GiftOption from "@/components/gift/gift"
 
+// Add custom CSS for premium animations and styling
+const customStyles = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  .premium-button {
+    background: black;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .premium-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  .sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  @media (max-width: 640px) {
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .input, .textarea {
+      font-size: 1rem;
+      padding: 0.75rem;
+    }
+    .button {
+      font-size: 1.1rem;
+      padding: 0.75rem;
+    }
+  }
+`
+
 interface CheckoutForm {
   firstName: string
   lastName: string
@@ -68,7 +112,6 @@ export default function CheckoutPage() {
     setIsProcessing(true)
 
     try {
-      // Prepare order data
       const orderData = {
         userId: cartState.userId || null,
         sessionId: cartState.sessionId,
@@ -88,7 +131,7 @@ export default function CheckoutPage() {
         },
         items: cartState.items.map(item => ({
           productId: item.id,
-          variantId: item.id, // Use product ID as variant ID for now
+          variantId: item.id,
           productName: item.name,
           quantity: item.quantity,
           unitPrice: item.originalPrice,
@@ -98,7 +141,6 @@ export default function CheckoutPage() {
         }))
       }
 
-      // Call order creation API
       const response = await fetch('/api/order/create', {
         method: 'POST',
         headers: {
@@ -129,16 +171,16 @@ export default function CheckoutPage() {
 
   if (cartState.items.length === 0 && !orderComplete) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8 text-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-">
+        <Card className="w-full max-w-md card animate-fade-in">
+          <CardContent className="p-6 sm:p-8 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Truck className="h-8 w-8 text-gray-400" />
             </div>
-            <h2 className="text-xl font-semibold mb-2">Your Cart is Empty</h2>
-            <p className="text-gray-600 mb-6">Add some products to your cart before checkout</p>
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">Your Cart is Empty</h2>
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">Add some products to your cart before checkout</p>
             <Link href="/products">
-              <Button className="w-full">Continue Shopping</Button>
+              <Button className="w-full premium-button">Continue Shopping</Button>
             </Link>
           </CardContent>
         </Card>
@@ -148,7 +190,8 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b">
+      <style>{customStyles}</style>
+      {/* <div className="sticky-header">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
@@ -156,22 +199,29 @@ export default function CheckoutPage() {
               <span className="text-lg font-serif font-bold">BuyBlend.in</span>
             </Link>
           </div>
+         
         </div>
+      </div> */}
+      <div>
+      <div className="flex justify-center space-x-2 mt-4">
+            <div className={`h-2 w-16 rounded-full ${currentStep >= 1 ? 'bg-black' : 'bg-gray-300'}`}></div>
+            <div className={`h-2 w-16 rounded-full ${currentStep >= 2 ? 'bg-black' : 'bg-gray-300'}`}></div>
+          </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           <div className="lg:col-span-2">
             {currentStep === 1 && (
-              <Card>
+              <Card className="card animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="flex items-center">
+                  <CardTitle className="flex items-center text-lg sm:text-xl">
                     <Truck className="mr-2 h-5 w-5" />
                     Shipping Information
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name *</Label>
                       <Input
@@ -179,6 +229,8 @@ export default function CheckoutPage() {
                         value={form.firstName}
                         onChange={(e) => handleInputChange('firstName', e.target.value)}
                         placeholder="Enter your first name"
+                        className="input"
+                        required
                       />
                     </div>
                     <div>
@@ -188,11 +240,13 @@ export default function CheckoutPage() {
                         value={form.lastName}
                         onChange={(e) => handleInputChange('lastName', e.target.value)}
                         placeholder="Enter your last name"
+                        className="input"
+                        required
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="email">Email Address *</Label>
                       <Input
@@ -201,6 +255,8 @@ export default function CheckoutPage() {
                         value={form.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         placeholder="Enter your email"
+                        className="input"
+                        required
                       />
                     </div>
                     <div>
@@ -210,6 +266,7 @@ export default function CheckoutPage() {
                         value={form.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
                         placeholder="Enter your phone number"
+                        className="input"
                       />
                     </div>
                   </div>
@@ -222,10 +279,12 @@ export default function CheckoutPage() {
                       onChange={(e) => handleInputChange('address', e.target.value)}
                       placeholder="Enter your complete shipping address"
                       rows={3}
+                      className="textarea"
+                      required
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="city">City *</Label>
                       <Input
@@ -233,6 +292,8 @@ export default function CheckoutPage() {
                         value={form.city}
                         onChange={(e) => handleInputChange('city', e.target.value)}
                         placeholder="Enter city"
+                        className="input"
+                        required
                       />
                     </div>
                     <div>
@@ -242,6 +303,8 @@ export default function CheckoutPage() {
                         value={form.state}
                         onChange={(e) => handleInputChange('state', e.target.value)}
                         placeholder="Enter state"
+                        className="input"
+                        required
                       />
                     </div>
                     <div>
@@ -251,6 +314,8 @@ export default function CheckoutPage() {
                         value={form.zipCode}
                         onChange={(e) => handleInputChange('zipCode', e.target.value)}
                         placeholder="Enter ZIP code"
+                        className="input"
+                        required
                       />
                     </div>
                   </div>
@@ -263,6 +328,7 @@ export default function CheckoutPage() {
                       onChange={(e) => handleInputChange('notes', e.target.value)}
                       placeholder="Any special instructions for delivery"
                       rows={2}
+                      className="textarea"
                     />
                   </div>
 
@@ -278,7 +344,7 @@ export default function CheckoutPage() {
                   <Button
                     onClick={handlePlaceOrder}
                     disabled={isProcessing}
-                    className="w-full"
+                    className="w-full premium-button"
                   >
                     {isProcessing ? "Processing..." : `Place Order - Rs. ${totalAmount.toFixed(2)}`}
                   </Button>
@@ -287,19 +353,19 @@ export default function CheckoutPage() {
             )}
 
             {currentStep === 2 && (
-              <Card>
-                <CardContent className="p-8 text-center">
+              <Card className="card animate-fade-in">
+                <CardContent className="p-6 sm:p-8 text-center">
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="h-8 w-8 text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-semibold mb-2">Order Confirmed!</h2>
-                  <p className="text-gray-600 mb-4">Thank you for your purchase</p>
-                  <Badge variant="secondary" className="mb-6">
+                  <h2 className="text-xl sm:text-2xl font-semibold mb-2">Order Confirmed!</h2>
+                  <p className="text-gray-600 mb-4 text-sm sm:text-base">Thank you for your purchase</p>
+                  <Badge variant="secondary" className="mb-6 text-sm">
                     Order #{orderNumber}
                   </Badge>
 
                   <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                    <h3 className="font-medium mb-2">Order Summary</h3>
+                    <h3 className="font-medium mb-2 text-sm sm:text-base">Order Summary</h3>
                     <div className="space-y-1 text-sm">
                       <div className="flex justify-between">
                         <span>Items:</span>
@@ -322,9 +388,9 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <div className="mt-8 space-y-3">
+                  <div className="mt-6 sm:mt-8 space-y-3">
                     <Link href="/products">
-                      <Button className="w-full">Continue Shopping</Button>
+                      <Button className="w-full premium-button">Continue Shopping</Button>
                     </Link>
                     <Link href="/">
                       <Button variant="outline" className="w-full">Back to Home</Button>
@@ -335,24 +401,25 @@ export default function CheckoutPage() {
             )}
           </div>
           <div className="lg:col-span-1">
-            <div className="sticky top-8 mb-2">
-              <GiftOption/>
+            <div className="sticky top-20 mb-4">
+              <GiftOption />
             </div>
 
-            <div className="sticky top-8">
-              <Card>
+            <div className="sticky top-20">
+              <Card className="card">
                 <CardHeader>
-                  <CardTitle>Order Details</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl">Order Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {cartState.items.map((item) => (
                     <div key={item.id} className="flex items-center space-x-3">
-                      <div className="relative h-12 w-12 overflow-hidden rounded-md">
+                      <div className="relative h-12 w-12 sm:h-16 sm:w-16 overflow-hidden rounded-md">
                         <Image
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}
                           fill
                           className="object-cover"
+                          loading="lazy"
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -383,8 +450,8 @@ export default function CheckoutPage() {
                   </div>
 
                   {calculateShipping() > 0 && (
-                    <div className="bg-amber-50 p-3 rounded-md border border-amber-100">
-                      <p className="text-xs text-amber-800 text-center">
+                    <div className="bg-amber-50 p-3 rounded-md border border-amber-100 text-center">
+                      <p className="text-xs text-amber-800">
                         Add Rs. {(299 - cartState.total).toFixed(2)} more for free shipping
                       </p>
                     </div>

@@ -160,42 +160,51 @@ export default function ProductsPageClient({
 
             {/* Right: Sort Dropdown */}
             <div className="relative flex-shrink-0 self-end lg:self-auto">
-              <button
-                onClick={() => setShowSortOptions(!showSortOptions)}
-                className="flex items-center px-5 py-3 bg-white border border-gray-200 rounded-xl text-gray-700 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                <SlidersHorizontal className="h-4 w-4 mr-2 text-gray-500" />
-                <span className="font-medium">Sort by</span>
-                <ChevronDown className={`h-4 w-4 ml-2 transition-transform ${showSortOptions ? 'rotate-180' : ''}`} />
-              </button>
+  <button
+    onClick={() => setShowSortOptions(!showSortOptions)}
+    className="flex items-center px-5 py-3 bg-white/70 backdrop-blur-md border border-gray-200 rounded-2xl text-gray-700 hover:border-amber-400 hover:text-amber-600 transition-all duration-300 shadow-md hover:shadow-lg relative z-30"
+  >
+    <span className="font-medium">Sort by</span>
+    <ChevronDown
+      className={`h-4 w-4 ml-2 transition-transform duration-300 ${
+        showSortOptions ? "rotate-180 text-amber-500" : ""
+      }`}
+    />
+  </button>
 
-              {showSortOptions && (
-                <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-xl border border-gray-100 z-20 overflow-hidden py-2">
-                  <ul className="text-sm text-gray-700">
-                    {[
-                      { id: "featured", label: "Featured", icon: "✨" },
-                      { id: "newest", label: "Newest First", icon: "🆕" },
-                      { id: "price-low-high", label: "Price: Low to High", icon: "↗️" },
-                      { id: "price-high-low", label: "Price: High to Low", icon: "↘️" },
-                      { id: "name-a-z", label: "Name: A to Z", icon: "🔤" },
-                      { id: "name-z-a", label: "Name: Z to A", icon: "🔠" },
-                    ].map((option) => (
-                      <li key={option.id}>
-                        <button
-                          onClick={() => { setSortBy(option.id); setShowSortOptions(false) }}
-                          className={`w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center transition-colors ${
-                            sortBy === option.id ? 'bg-amber-50 text-amber-700' : ''
-                          }`}
-                        >
-                          <span className="mr-3">{option.icon}</span>
-                          <span>{option.label}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+  {showSortOptions && (
+    <div className="absolute right-0 mt-3 w-56 bg-white/90 backdrop-blur-xl shadow-2xl rounded-2xl border border-gray-100 z-[9999] overflow-hidden animate-fadeIn">
+      <ul className="text-sm text-gray-700 divide-y divide-gray-100">
+        {[
+          { id: "featured", label: "Featured" },
+          { id: "newest", label: "Newest First" },
+          { id: "price-low-high", label: "Price: Low to High" },
+          { id: "price-high-low", label: "Price: High to Low" },
+          { id: "name-a-z", label: "Name: A to Z" },
+          { id: "name-z-a", label: "Name: Z to A" },
+        ].map((option) => (
+          <li key={option.id}>
+            <button
+              onClick={() => {
+                setSortBy(option.id);
+                setShowSortOptions(false);
+              }}
+              className={`w-full text-left px-5 py-3 transition-all duration-200 ${
+                sortBy === option.id
+                  ? "bg-amber-100/70 text-amber-700 font-medium"
+                  : "hover:bg-gray-50 hover:text-amber-600"
+              }`}
+            >
+              {option.label}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
+
           </div>
         </div>
 

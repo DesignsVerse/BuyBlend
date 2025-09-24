@@ -58,7 +58,7 @@ export default function TestimonialReviews() {
   const duplicatedTestimonials = [...testimonials, ...testimonials];
 
   return (
-    <section className="py-10 md:py-14 bg-white relative overflow-hidden">
+    <section className="py-6 md:py-12 bg-white relative overflow-hidden">
       {/* Background disabled to keep clean white BG */}
       <div className="hidden"></div>
 

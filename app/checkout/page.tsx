@@ -157,10 +157,22 @@ export default function CheckoutPage() {
       const order = await response.json()
       setOrderNumber(order.id || `ORD-${Date.now().toString().slice(-8)}`)
 
+      // Initiate Cashfree payment and redirect
+      const payRes = await fetch('/api/payment/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id })
+      })
+      if (!payRes.ok) {
+        const err = await payRes.json().catch(() => ({}))
+        throw new Error(err.error || 'Failed to initiate payment')
+      }
+      const { checkoutUrl } = await payRes.json()
+      if (!checkoutUrl) throw new Error('Checkout URL missing')
+
+      // Do not clear cart until webhook confirms; keep optimistic UI minimal
       setIsProcessing(false)
-      setCurrentStep(2)
-      setOrderComplete(true)
-      clearCart()
+      window.location.href = checkoutUrl
 
     } catch (error) {
       console.error('Order creation failed:', error)

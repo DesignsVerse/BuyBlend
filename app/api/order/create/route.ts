@@ -70,6 +70,24 @@ export async function POST(req: Request) {
       include: { items: true },
     });
 
+    // Create pending payment row
+    await prisma.payment.upsert({
+      where: { orderId: order.id },
+      create: {
+        orderId: order.id,
+        provider: "cashfree",
+        providerIntentId: "",
+        amount: order.total,
+        currency: order.currency,
+        status: "PENDING",
+      },
+      update: {
+        amount: order.total,
+        currency: order.currency,
+        status: "PENDING",
+      },
+    })
+
     return NextResponse.json(order, { status: 201 });
 
   } catch (error) {

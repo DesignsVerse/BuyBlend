@@ -69,33 +69,33 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative h-screen max-h-[500px] w-full overflow-hidden">
+    <section className="relative h-[640px] w-full bg-[#FFF5F5] max-w-none overflow-hidden">
       <div
-        className="flex transition-transform duration-700 ease-in-out"
+        className="flex pt-8 pb-8  transition-transform duration-700 ease-in-out h-full"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
         {banners.map((banner) => (
-          <div key={banner.id} className="relative w-full flex-shrink-0" aria-hidden={currentSlide !== banner.id - 1}>
+          <div key={banner.id} className="relative w-full flex-shrink-0 h-full" aria-hidden={currentSlide !== banner.id - 1}>
             {/* Background Images: mobile vs desktop */}
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 h-full">
               {/* Mobile image */}
-              <div className="block md:hidden">
+              <div className="block md:hidden h-full rounded-2xl">
                 <Image
                   src={banner.imageMobile}
                   alt={banner.title}
                   fill
-                  className="object-cover"
+                  className="object-contain h-full"
                   priority={banner.id === 1}
                   sizes="100vw"
                 />
               </div>
               {/* Desktop image */}
-              <div className="hidden md:block">
+              <div className="hidden md:block h-full">
                 <Image
                   src={banner.imageDesktop}
                   alt={banner.title}
                   fill
-                  className="object-cover"
+                  className="object-contain h-full"
                   priority={banner.id === 1}
                   sizes="100vw"
                 />
@@ -103,7 +103,7 @@ export function HeroSection() {
             </div>
             
             {/* Content */}
-            <div className="relative flex h-screen max-h-[500px] items-center justify-center">
+            <div className="relative flex h-full items-center justify-center">
               
             </div>
           </div>

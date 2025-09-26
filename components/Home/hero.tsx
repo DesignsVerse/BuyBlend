@@ -69,9 +69,9 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative h-[640px] w-full bg-[#FFF5F5] max-w-none overflow-hidden">
+    <section className="relative h-[500px] md:h-[640px] w-full md:bg-[#FFF5F5] max-w-none overflow-hidden">
       <div
-        className="flex pt-8 pb-8  transition-transform duration-700 ease-in-out h-full"
+        className="flex md:pt-8 md:pb-8 transition-transform duration-700 ease-in-out h-full"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
         {banners.map((banner) => (
@@ -79,7 +79,7 @@ export function HeroSection() {
             {/* Background Images: mobile vs desktop */}
             <div className="absolute inset-0 h-full">
               {/* Mobile image */}
-              <div className="block md:hidden h-full rounded-2xl">
+              <div className="block md:hidden h-full">
                 <Image
                   src={banner.imageMobile}
                   alt={banner.title}
@@ -90,7 +90,7 @@ export function HeroSection() {
                 />
               </div>
               {/* Desktop image */}
-              <div className="hidden md:block h-full">
+              <div className="hidden md:block h-full rounded-2xl">
                 <Image
                   src={banner.imageDesktop}
                   alt={banner.title}

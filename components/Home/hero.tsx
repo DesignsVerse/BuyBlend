@@ -13,7 +13,7 @@ export function HeroSection() {
       title: "Elegant Diamond Collection",
       description: "Discover our exquisite diamond jewelry crafted to perfection",
       imageMobile: "/images/mobile.webp",
-      imageDesktop: "/images/1.jpg",
+      imageDesktop: "/hero/1.png",
             ctaText: "Shop Now",
       ctaLink: "/collections/diamonds"
     },
@@ -22,34 +22,29 @@ export function HeroSection() {
       title: "New Gold Arrivals",
       description: "Explore our latest 24K gold jewelry collection",
       imageMobile: "/images/mobile.webp",
-      imageDesktop: "/images/2.webp",
+      imageDesktop: "/hero/2.png",
             ctaText: "View Collection",
       ctaLink: "/collections/gold"
     },
-    // {
-    //   id: 3,
-    //   title: "Pearl Elegance",
-    //   description: "Timeless pearl jewelry for the modern woman",
-    //   image: "/api/placeholder/1200/600",
-    //   ctaText: "Discover Pearls",
-    //   ctaLink: "/collections/pearls"
-    // },
-    // {
-    //   id: 4,
-    //   title: "Wedding Collection",
-    //   description: "Perfect jewelry for your special day",
-    //   image: "/api/placeholder/1200/600",
-    //   ctaText: "Explore Wedding",
-    //   ctaLink: "/collections/wedding"
-    // },
-    // {
-    //   id: 5,
-    //   title: "Limited Edition",
-    //   description: "Exclusive designs available for a limited time",
-    //   image: "/api/placeholder/1200/600",
-    //   ctaText: "Shop Exclusive",
-    //   ctaLink: "/collections/limited"
-    // }
+    {
+      id: 3,
+      title: "New Gold Arrivals",
+      description: "Explore our latest 24K gold jewelry collection",
+      imageMobile: "/images/mobile.webp",
+      imageDesktop: "/hero/3.png",
+            ctaText: "View Collection",
+      ctaLink: "/collections/gold"
+    },
+    {
+      id: 4,
+      title: "New Gold Arrivals",
+      description: "Explore our latest 24K gold jewelry collection",
+      imageMobile: "/images/mobile.webp",
+      imageDesktop: "/hero/4.png",
+            ctaText: "View Collection",
+      ctaLink: "/collections/gold"
+    }
+   
   ];
 
   // Auto-scroll functionality

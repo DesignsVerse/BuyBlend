@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { useCart } from "@/lib/cart/cart-context"
+import { apiCache } from "@/lib/api-cache"
 import { Search, User, Heart, Menu, X, LogOut, Settings, Bell } from "lucide-react"
 import { useWishlist } from "@/lib/wishlist/wishlist-context"
 import { CartButton } from "@/components/cart/cart-button"
@@ -42,23 +43,31 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  // Add a ref to track if we've already fetched user
+  const hasFetchedUser = useRef(false);
+
   // Fetch user authentication status
   useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await fetch('/api/auth/me')
-        if (res.ok) {
-          const data = await res.json()
-          setUser(data.user)
-          setUserId(data.user.id)
+    // Only fetch user once per session
+    if (!hasFetchedUser.current) {
+      hasFetchedUser.current = true;
+      
+      async function fetchUser() {
+        try {
+          const res = await apiCache.fetch('/api/auth/me')
+          if (res.ok) {
+            const data = await res.json()
+            setUser(data.user)
+            setUserId(data.user.id)
+          }
+        } catch (error) {
+          console.error('Error fetching user:', error)
+        } finally {
+          setAuthLoading(false)
         }
-      } catch (error) {
-        console.error('Error fetching user:', error)
-      } finally {
-        setAuthLoading(false)
       }
+      fetchUser()
     }
-    fetchUser()
   }, [])
 
   // Close desktop dropdown when clicking outside

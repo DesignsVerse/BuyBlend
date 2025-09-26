@@ -3,59 +3,23 @@
 import { motion } from 'framer-motion';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { User } from 'lucide-react';
-
-interface Testimonial {
-  id: number;
-  name: string;
-  text: string;
-}
-
-const testimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: 'Priya Sharma',
-    text: 'This jewelry collection is stunning! The designs are elegant and the quality is top-notch. Highly recommend for anyone looking for timeless pieces.'
-  },
-  {
-    id: 2,
-    name: 'Rahul Verma',
-    text: 'Amazing service and beautiful products. The necklace I bought was perfect for my wife birthday. Fast delivery and great value for money!'
-  },
-  {
-    id: 3,
-    name: 'Anjali Patel',
-    text: 'The craftsmanship is exceptional. I\'ve purchased multiple pieces and each one has exceeded my expectations. Their attention to detail is remarkable.'
-  },
-  {
-    id: 4,
-    name: 'Vikram Singh',
-    text: 'As someone who appreciates fine jewelry, I can confidently say this is among the best I\'ve encountered. The pieces have a distinctive character.'
-  },
-  {
-    id: 5,
-    name: 'Meera Desai',
-    text: 'These pieces are not just accessories but works of art. They elevate any outfit and always receive compliments whenever I wear them.'
-  },
-  {
-    id: 6,
-    name: 'Arjun Kumar',
-    text: 'Outstanding quality and beautiful designs. The customer service is exceptional and the delivery was super fast. Will definitely order again!'
-  },
-  {
-    id: 7,
-    name: 'Kavya Reddy',
-    text: 'Love the attention to detail in every piece. The jewelry feels premium and looks absolutely gorgeous. Worth every penny!'
-  },
-  {
-    id: 8,
-    name: 'Suresh Gupta',
-    text: 'Perfect gift for special occasions. The packaging was beautiful and the jewelry exceeded my expectations. Highly recommended!'
-  }
-];
+import { testimonials } from '@/data/testimonials';
 
 export default function TestimonialReviews() {
+  // Shuffle testimonials randomly
+  const shuffleArray = (array: typeof testimonials) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  const shuffledTestimonials = shuffleArray(testimonials);
+  
   // Create a duplicated array for seamless scrolling
-  const duplicatedTestimonials = [...testimonials, ...testimonials];
+  const duplicatedTestimonials = [...shuffledTestimonials, ...shuffledTestimonials];
 
   return (
     <section className="py-6 md:py-12 bg-white relative overflow-hidden">
@@ -91,7 +55,7 @@ export default function TestimonialReviews() {
 
   {/* Short description */}
   <motion.p
-    className="text-gray-600 text-sm md:text-base max-w-2xl mx-auto"
+    className="text-gray-600 text-sm md:text-base max-w-3xl mx-auto"
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.8, delay: 0.2 }}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback } from "react";
+import { apiCache } from "@/lib/api-cache";
 
 export interface CartItem {
   id: string;
@@ -160,7 +161,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (state.userId) params.set("userId", state.userId);
       else if (state.sessionId) params.set("sessionId", state.sessionId);
       else return;
-      const res = await fetch(`/api/cart/get?${params.toString()}`, { method: "GET" });
+      const res = await apiCache.fetch(`/api/cart/get?${params.toString()}`, { method: "GET" });
       if (!res.ok) return;
       const serverCart = await res.json();
       cartIdRef.current = serverCart?.id ?? cartIdRef.current;
@@ -326,9 +327,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "SET_CART_OPEN", payload: open });
   };
 
+  // Add a ref to track if we've already loaded from server
+  const hasLoadedFromServer = useRef(false);
+
   useEffect(() => {
-    reconcileFromServer();
-  }, []); // Changed to empty array to run only on mount, preventing loops
+    // Only load from server once per session
+    if (!hasLoadedFromServer.current) {
+      hasLoadedFromServer.current = true;
+      reconcileFromServer();
+    }
+  }, []); // Run only on mount
 
   return (
     <CartContext.Provider

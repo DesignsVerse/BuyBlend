@@ -108,7 +108,7 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
       onHoverEnd={() => { shadow.set("0 4px 8px rgba(0, 0, 0, 0.05)"); setIsHovered(false) }}
       style={{ boxShadow: springShadow as any }}
     >
-      <div className="relative bg-white dark:bg-black shadow-md overflow-hidden border flex flex-col h-full   ">
+      <div className="relative bg-white dark:bg-black shadow-md overflow-hidden border flex flex-col h-full" data-card>
         {/* Media */}
         <div className="relative">
           <Link href={`/collection/product/${productSlug}`} className="relative block aspect-square overflow-hidden">
@@ -186,7 +186,7 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
         {/* Content */}
         <div className="p-3 sm:p-4 flex flex-col gap-1 flex-grow">
           <Link href={`/collection/product/${productSlug}`} className="block">
-            <h3 className="text-[13px] sm:text-sm font-semibold line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+            <h3 className="text-[13px] sm:text-sm font-semibold line-clamp-2 group-hover:text-[#FF905A] transition-colors duration-300">
               {product.name}
             </h3>
             {product.description && (
@@ -207,7 +207,7 @@ export function ProductCard({ product, onSelectForCombo, isSelected }: ProductCa
               </span>
             )}
             {hasDiscount && (
-              <span className="text-[11px] sm:text-xs text-[#FF905A] font-medium bg-orange-50 px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded">
+              <span className="text-[8px] sm:text-[10px] text-[#FF905A] font-medium bg-orange-50 px-1 py-0.5 sm:px-1.5 sm:py-0.5 rounded">
                 {discountPercent}% OFF
               </span>
             )}
